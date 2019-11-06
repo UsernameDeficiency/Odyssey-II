@@ -1,13 +1,27 @@
-/* Miscellaneous utility functions for the main program:
-   getPosy, debugMessage, exit_on_error, generateTerrain */
+/* Miscellaneous utility functions for the main program */
 #pragma once
 #include "load_TGA_data.h" // TextureData*
-#include "util_shader.h" // TextureData*
+#include "util_shader.h"
 #include "loadobj.h" // Model*
 #include "glm/vec3.hpp"
 #include <iostream>
 #include <vector>
 #include <string>
+
+
+/* Print average FPS once every second */
+void printFPS()
+{
+	accTime += deltaTime;
+	accFrames++;
+
+	if (accTime > 1.0f)
+	{
+		std::cout << "FPS: " << accFrames / accTime << "\n";
+		accTime = 0.0f;
+		accFrames = 0;
+	}
+}
 
 
 /* Interpolate y values over the vertex at position (x, z). No bounds checking for x and z. */

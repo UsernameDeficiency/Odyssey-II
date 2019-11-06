@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{f9f4cc29-752f-4647-ab5a-f719a04bf2ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -44,5 +47,25 @@
     <ClInclude Include="util_shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\skybox.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shader\skybox.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shader\terrain.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shader\terrain.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shader\water.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shader\water.vert">
+      <Filter>shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

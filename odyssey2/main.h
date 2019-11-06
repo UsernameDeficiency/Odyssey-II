@@ -27,5 +27,7 @@ TextureData terrainTex; // Terrain height map
 unsigned int waterVAO, skyboxVAO;
 float deltaTime = 0.0f;	// frame time for last frame
 float lastTime = 0.0f;
+float accTime; // used for printFPS()
+int accFrames; // used for printFPS()
 float mouseLastX = window_w / 2.0f;
 float mouseLastY = window_h / 2.0f;

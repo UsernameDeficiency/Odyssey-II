@@ -174,10 +174,6 @@ static void render(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen and depth buffer
 
-	// --------- Set up camera ---------
-	glm::mat4 camMatrix = camera.GetViewMatrix();
-	glm::mat4 modeltoWorld = glm::translate(glm::mat4(1.0f), camera.Position);
-
 	// --------- Draw new skybox ---------
 	glDepthMask(GL_FALSE); // = glDisable(GL_DEPTH_TEST)?
 	skyboxShader->use();
@@ -185,8 +181,8 @@ static void render(void)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
 
-	glm::mat4 view = glm::mat4(glm::mat3(camMatrix)); // Remove translation from the view matrix
-	skyboxShader->setMatrix4f("worldToView", view);
+	glm::mat4 worldToView = glm::mat4(glm::mat3(camera.GetViewMatrix())); // Remove translation from the view matrix
+	skyboxShader->setMatrix4f("worldToView", worldToView);
 	skyboxShader->setMatrix4f("projection", camera.projection);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -201,8 +197,7 @@ static void render(void)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, bottomTex);
 
-	terrainShader->setMatrix4f("modelToWorld", glm::mat4(1.0f)); // Already in world coordinates
-	terrainShader->setMatrix4f("worldToView", camMatrix);
+	terrainShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	terrainShader->setMatrix4f("projection", camera.projection);
 	terrainShader->setFloat("seaLevel", sea_y_pos);
 
@@ -212,8 +207,7 @@ static void render(void)
 	waterShader->use();
 	glBindVertexArray(waterVAO); // Select VAO
 
-	waterShader->setMatrix4f("modelToWorld", glm::mat4(1.0f)); // Already in world coordinates
-	waterShader->setMatrix4f("worldToView", camMatrix);
+	waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	waterShader->setMatrix4f("projection", camera.projection);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6); // Draw object
@@ -242,6 +236,7 @@ int main(int argc, char **argv)
 		// Update physics and render screen
 		updatePhysics();
 		render();
+		printFPS();
 		glfwPollEvents();
 	}
 

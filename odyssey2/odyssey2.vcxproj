@@ -31,6 +31,14 @@
     <ClInclude Include="util_misc.h" />
     <ClInclude Include="util_shader.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\skybox.frag" />
+    <None Include="shader\skybox.vert" />
+    <None Include="shader\terrain.frag" />
+    <None Include="shader\terrain.vert" />
+    <None Include="shader\water.frag" />
+    <None Include="shader\water.vert" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5A92ADA1-88F7-437A-8320-F89515C33442}</ProjectGuid>

@@ -5,9 +5,7 @@ in vec2 passTexCoord;
 in vec3 passNormal;
 in vec3 phongNormal;
 in vec3 light;
-in vec3 halfway;
-in vec3 pixelPos;
-in vec3 pixelNorm;
+in vec3 pixelPos; // Fragment position in world coordinates
 
 out vec4 outColor;
 
@@ -19,7 +17,7 @@ uniform sampler2D bottomTex;
 void main(void)
 {
 	// Calculate ambient and diffuse light
-	float ambient = 0.2;
+	float ambient = 0.0;
 	float diffuse = max(dot(normalize(light), normalize(phongNormal)), 0.0);
 	float shade = ambient + 0.7*diffuse;
 
