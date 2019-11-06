@@ -1,9 +1,12 @@
 https://learnopengl.com/Getting-started/Coordinate-Systems
-Decide which texture maps to use: https://help.poliigon.com/en/articles/1712652-what-are-the-different-texture-maps-for
+Decide which texture maps to use:
+https://help.poliigon.com/en/articles/1712652-what-are-the-different-texture-maps-for
+https://learnopengl.com/Lighting/Lighting-maps
+
 https://www.khronos.org/opengl/wiki/Sampler_Object#Anisotropic_filtering
 
 Shaders:
-Reflect skybox in water
+Reflect skybox in water https://learnopengl.com/Advanced-OpenGL/Cubemaps
 Rewrite shader lighting
 Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting-exercise2
 Add wave effect to water surface
@@ -17,5 +20,7 @@ Decide what to do with diamond square parameters
 Implement spline interpolation
 
 Optimization: Don't draw vertices outside frustum. Decrease detail level of far away vertices. Decrease lighting quality for far away vertices? GLM SIMD? Common libs modified?
-generateTerrain: Test normal generation from loadobj? Optimize by reducing new and LoadDataToModel operations if possible
+generateTerrain: Test GenerateNormals from loadobj? Optimize by reducing new and LoadDataToModel operations if possible (loadStbTextureRef in initTerrain also slow, but not possible to optimize?)
+glfwPollEvents() very slow according to profiling, try profiling without vsync
 Test back face culling impact on performance
+Add image to the Github page, link to learnopengl

@@ -1,7 +1,7 @@
 #version 400 core
 #define numLightSources 1
 
-in vec3 inPosition;
+in vec3 inPos;
 in vec2 inTexCoord;
 in vec3 inNormal;
 
@@ -26,10 +26,10 @@ void main(void)
 	phongNormal = inverse(transpose(normalMatrix1)) * inNormal;
 
 	// Direction that the camera is looking
-	vec3 player = vec3(normalize(-vec3(worldToView * vec4(inPosition, 1.0))));
+	vec3 player = vec3(normalize(-vec3(worldToView * vec4(inPos, 1.0))));
 
 	passTexCoord = inTexCoord;
 	passNormal = inNormal;
-	pixelPos = inPosition;
-	gl_Position = projection * worldToView * vec4(inPosition, 1.0);
+	pixelPos = inPos;
+	gl_Position = projection * worldToView * vec4(inPos, 1.0);
 }

@@ -45,6 +45,7 @@ static void initGL()
 	glEnable(GL_MULTISAMPLE); // Enable MSAA
 	glEnable(GL_BLEND); // Enable transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 0.0f);
 	// OpenGL debugging
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -75,7 +76,7 @@ static void initTerrain()
 	mTerrain = generateTerrain(&terrainTex, procTerrain, world_xz_scale, world_y_scale, tex_scale);
 
 	world_size = (float)terrainTex.width; // Assuming square terrain map
-	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray, &terrainTex) + CAM_HEIGHT;
+	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray, &terrainTex) + camera.height;
 	camera.Position = glm::vec3(world_size / 2, yPos, world_size / 2);
 	// Load terrain textures and upload to texture units
 	terrainShader->loadStbTextureRef("tex/snow.png", &snowTex, false);
@@ -164,8 +165,8 @@ static void initWaterSurface()
 	glGenBuffers(1, &surfaceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, surfaceVBO);
 	glBufferData(GL_ARRAY_BUFFER, 2*9*sizeof(GLfloat), waterSurfaceVert, GL_STATIC_DRAW);
-	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "in_Position"), 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(glGetAttribLocation(waterShader->ID, "in_Position"));
+	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(glGetAttribLocation(waterShader->ID, "inPos"));
 }
 
 
@@ -201,7 +202,7 @@ static void render(void)
 	terrainShader->setMatrix4f("projection", camera.projection);
 	terrainShader->setFloat("seaLevel", sea_y_pos);
 
-	DrawModel(mTerrain, terrainShader->ID, "inPosition", "inNormal", "inTexCoord");
+	DrawModel(mTerrain, terrainShader->ID, "inPos", "inNormal", "inTexCoord");
 
 	// --------- Draw water surface ---------
 	waterShader->use();

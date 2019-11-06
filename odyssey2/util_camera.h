@@ -37,12 +37,13 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float fov;
+	float height;
 	bool flying;
 
     // Initialize with glm::vec3 position
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f))
 		: Front(glm::vec3(0.0f, 0.0f, -1.0f)), WorldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
-		Yaw(0.0f), Pitch(0.0f), MovementSpeed(CAM_SPEED), MouseSensitivity(CAM_SENSITIVITY), fov(CAM_FOV), flying(false)
+		Yaw(0.0f), Pitch(0.0f), MovementSpeed(CAM_SPEED), MouseSensitivity(CAM_SENSITIVITY), fov(CAM_FOV), height(CAM_HEIGHT), flying(false)
     {
         Position = position;
 		projection = glm::perspective(glm::radians(fov), (GLfloat)window_w / (GLfloat)window_h, VP_NEAR, VP_FAR);
