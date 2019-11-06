@@ -8,7 +8,6 @@ in vec3 inNormal;
 out vec2 passTexCoord;
 out vec3 passNormal;
 out vec3 phongNormal;
-out vec3 light;
 out vec3 pixelPos; // Fragment position in world coordinates
 
 //uniform mat4 modelToWorld; // Already in world coordinates
@@ -17,10 +16,7 @@ uniform mat4 projection;
 
 void main(void)
 {
-	vec3 lightVec = vec3(0, 1, 0);
-
 	mat3 normalMatrix1 = mat3(worldToView);
-	light = mat3(worldToView) * lightVec;
 
 	// Phong, normal transformation
 	phongNormal = inverse(transpose(normalMatrix1)) * inNormal;
