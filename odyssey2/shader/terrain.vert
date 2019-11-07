@@ -1,5 +1,4 @@
 #version 400 core
-#define numLightSources 1
 
 in vec3 inPos;
 in vec2 inTexCoord;

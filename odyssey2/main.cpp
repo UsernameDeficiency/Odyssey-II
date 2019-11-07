@@ -45,7 +45,6 @@ static void initGL()
 	glEnable(GL_MULTISAMPLE); // Enable MSAA
 	glEnable(GL_BLEND); // Enable transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 0.0f);
 	// OpenGL debugging
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -77,7 +76,7 @@ static void initTerrain()
 
 	world_size = (float)terrainTex.width; // Assuming square terrain map
 	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray, &terrainTex) + camera.height;
-	camera.Position = glm::vec3(world_size / 2, yPos, world_size / 2);
+	camera.Position = glm::vec3(world_size * world_xz_scale / 2, yPos, world_size * world_xz_scale / 2);
 	// Load terrain textures and upload to texture units
 	terrainShader->loadStbTextureRef("tex/snow.png", &snowTex, false);
 	terrainShader->loadStbTextureRef("tex/mud_rocks.png", &rockTex, false);

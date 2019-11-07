@@ -109,12 +109,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 	}
 
+	// Crouch
 	else if (key == GLFW_KEY_C)
 	{
 		if (action == GLFW_PRESS)
+		{
 			camera.height = CAM_HEIGHT / 2.0f;
+			camera.MovementSpeed = CAM_SPEED * 0.4;
+		}
 		else if (action == GLFW_RELEASE)
+		{
 			camera.height = CAM_HEIGHT;
+			camera.MovementSpeed = CAM_SPEED;
+		}
 	}
 
 	else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)

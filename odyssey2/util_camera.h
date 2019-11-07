@@ -9,14 +9,14 @@
 enum Camera_Movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
 
 // Default camera values
-static const float CAM_SPEED = 75.0f;
+static const float CAM_SPEED = 85.0f;
 static const float CAM_SENSITIVITY = 0.1f;
 static const float CAM_FOV = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
 static const float CAM_HEIGHT = 15.0f; // Camera height above ground
 static const float VP_NEAR = 0.5f; // Near distance for frustum
 static const float VP_FAR = 20000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
-int window_w = 1680;
-int window_h = 1024;
+int window_w = 1920;
+int window_h = 1080;
 
 /* Camera utility class based on https://learnopengl.com/Getting-started/Camera, modified for Odyssey
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
