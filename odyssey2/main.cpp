@@ -209,6 +209,7 @@ static void render(void)
 
 	waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	waterShader->setMatrix4f("projection", camera.projection);
+	waterShader->setVec3("cameraPos", camera.Position);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6); // Draw object
 

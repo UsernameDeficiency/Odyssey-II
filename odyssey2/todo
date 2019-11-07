@@ -1,16 +1,14 @@
-Decide which texture maps to use:
-https://help.poliigon.com/en/articles/1712652-what-are-the-different-texture-maps-for
-https://learnopengl.com/Lighting/Lighting-maps
+Decide which texture maps to use
 
 Shaders:
-Reflect skybox in water https://learnopengl.com/Advanced-OpenGL/Cubemaps
 Rewrite shader lighting
 Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting-exercise2
-Add wave effect to water surface
 Add shader for long-distance fog
-Visualize tesselation with wireframe mode?
 Make geometry shader visualizing normal vectors. How to create grass with geometry shader?
 https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
+
+Water:
+Add wave effect to water surface
 
 Diamond-square:
 Decide what to do with diamond square parameters

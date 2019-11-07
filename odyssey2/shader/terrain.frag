@@ -1,7 +1,6 @@
 #version 400 core
 #define multiTexYLim 0.8
 #define multiTexWaterside 0.5
-
 in vec2 passTexCoord;
 in vec3 passNormal;
 in vec3 phongNormal;

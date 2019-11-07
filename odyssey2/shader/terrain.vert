@@ -1,5 +1,4 @@
 #version 400 core
-
 in vec3 inPos;
 in vec2 inTexCoord;
 in vec3 inNormal;
