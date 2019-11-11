@@ -25,6 +25,7 @@ static void initGL()
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
+	glfwWindowHint(GLFW_DEPTH_BITS, 32); // Increase z buffer size for fog and z-fighting
 	window = glfwCreateWindow(window_w, window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
@@ -84,6 +85,7 @@ static void initTerrain()
 	terrainShader->setInt("grassTex", 0);
 	terrainShader->setInt("rockTex", 1);
 	terrainShader->setInt("bottomTex", 2);
+	terrainShader->setFloat("seaLevel", sea_y_pos);
 }
 
 
@@ -94,34 +96,35 @@ static void initSkybox(void)
 	skyboxShader->use();
 
 	// Skyboxes: ely_cloudtop, miramar, stormydays
+	std::string skyboxPath = "tex/skybox/miramar/";
 	std::vector<std::string> faces
 	{
-		"tex/skybox/stormydays/front.tga",
-		"tex/skybox/stormydays/back.tga",
-		"tex/skybox/stormydays/top.tga",
-		"tex/skybox/stormydays/bottom.tga",
-		"tex/skybox/stormydays/right.tga",
-		"tex/skybox/stormydays/left.tga"
+		skyboxPath + "front.tga",
+		skyboxPath + "back.tga",
+		skyboxPath + "top.tga",
+		skyboxPath + "bottom.tga",
+		skyboxPath + "right.tga",
+		skyboxPath + "left.tga"
 	};
 
 	float skyboxVertices[] = {
-		-1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
+		-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
+		 5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
 
-		-1.0f, -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f,
+		-5.0f, -5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
+		-5.0f,  5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
 
-		 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,  1.0f, 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f, 1.0f,  1.0f, -1.0f, 1.0f, -1.0f, -1.0f,
+		 5.0f, -5.0f, -5.0f, 5.0f, -5.0f,  5.0f, 5.0f,  5.0f,  5.0f,
+		 5.0f,  5.0f,  5.0f, 5.0f,  5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
 
-		-1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f, 1.0f,  1.0f,  1.0f, 
-		 1.0f,  1.0f,  1.0f, 1.0f, -1.0f,  1.0f, -1.0f, -1.0f,  1.0f,
+		-5.0f, -5.0f,  5.0f, -5.0f,  5.0f,  5.0f, 5.0f,  5.0f,  5.0f, 
+		 5.0f,  5.0f,  5.0f, 5.0f, -5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
 
-		-1.0f,  1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,  1.0f,  1.0f, 
-		 1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f,
+		-5.0f,  5.0f, -5.0f, 5.0f,  5.0f, -5.0f, 5.0f,  5.0f,  5.0f, 
+		 5.0f,  5.0f,  5.0f, -5.0f,  5.0f,  5.0f, -5.0f,  5.0f, -5.0f,
 
-		-1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, 1.0f, -1.0f,  1.0f
+		-5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f, -5.0f,
+		 5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f,  5.0f
 	};
 
 	// Allocate and activate VAO/VBO
@@ -145,8 +148,7 @@ static void initWaterSurface()
 	waterShader = new Shader("shader/water.vert", "shader/water.frag");
 	waterShader->use();
 
-	GLfloat waterSurfaceVert[] =
-	{
+	GLfloat waterSurfaceVert[] = {
 		// Triangle 1
 		0.0f, sea_y_pos, 0.0f,
 		0.0f, sea_y_pos, world_size * world_xz_scale,
@@ -164,8 +166,28 @@ static void initWaterSurface()
 	glGenBuffers(1, &surfaceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, surfaceVBO);
 	glBufferData(GL_ARRAY_BUFFER, 2*9*sizeof(GLfloat), waterSurfaceVert, GL_STATIC_DRAW);
-	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(glGetAttribLocation(waterShader->ID, "inPos"));
+	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
+
+static void initFog()
+{
+	fogShader = new Shader("shader/fog.vert", "shader/fog.frag");
+	fogShader->use();
+
+	unsigned int fogVBO;
+	glGenVertexArrays(1, &fogVAO);
+	glBindVertexArray(fogVAO);
+
+	const GLfloat vertices[] = { -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f };
+	
+	glGenBuffers(1, &fogVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, fogVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glEnableVertexAttribArray(glGetAttribLocation(fogShader->ID, "inPos"));
 }
 
 
@@ -174,7 +196,7 @@ static void render(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen and depth buffer
 
-	// --------- Draw new skybox ---------
+	// --------- Draw skybox ---------
 	glDepthMask(GL_FALSE); // = glDisable(GL_DEPTH_TEST)?
 	skyboxShader->use();
 	glBindVertexArray(skyboxVAO);
@@ -199,19 +221,28 @@ static void render(void)
 
 	terrainShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	terrainShader->setMatrix4f("projection", camera.projection);
-	terrainShader->setFloat("seaLevel", sea_y_pos);
 
 	DrawModel(mTerrain, terrainShader->ID, "inPos", "inNormal", "inTexCoord");
 
 	// --------- Draw water surface ---------
 	waterShader->use();
-	glBindVertexArray(waterVAO); // Select VAO
+	glBindVertexArray(waterVAO);
 
 	waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	waterShader->setMatrix4f("projection", camera.projection);
 	waterShader->setVec3("cameraPos", camera.Position);
 
-	glDrawArrays(GL_TRIANGLES, 0, 6); // Draw object
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	// --------- Draw fog ---------
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+	fogShader->use();
+	glBindVertexArray(fogVAO);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 
 	// --------- Swap buffers ---------
 	glfwSwapBuffers(window);
@@ -225,6 +256,7 @@ int main(int argc, char **argv)
 	initTerrain();
 	initSkybox();
 	initWaterSurface();
+	initFog();
 
 	// Main render loop
 	while (!glfwWindowShouldClose(window))
@@ -237,7 +269,7 @@ int main(int argc, char **argv)
 		// Update physics and render screen
 		updatePhysics();
 		render();
-		printFPS();
+		//printFPS();
 		glfwPollEvents();
 	}
 

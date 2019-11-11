@@ -67,5 +67,11 @@
     <None Include="shader\water.vert">
       <Filter>shader</Filter>
     </None>
+    <None Include="shader\fog.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shader\fog.vert">
+      <Filter>shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

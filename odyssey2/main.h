@@ -20,11 +20,11 @@ float world_size; // width = height of world map
 float sea_y_pos; // Set by generateTerrain using mean height of terrain
 GLFWwindow* window = NULL;
 Camera camera = Camera(); // position initialized in initTerrain
-Model* mTerrain;// , * mSkybox;
-Shader *terrainShader, *skyboxShader, *waterShader;
+Model* mTerrain;
+Shader *terrainShader, *skyboxShader, *waterShader, *fogShader;
 GLuint snowTex, rockTex, bottomTex, skyboxTex;
 TextureData terrainTex; // Terrain height map
-unsigned int waterVAO, skyboxVAO;
+unsigned int waterVAO, skyboxVAO, fogVAO;
 float deltaTime = 0.0f;	// frame time for last frame
 float lastTime = 0.0f;
 float accTime; // used for printFPS()

@@ -1,6 +1,6 @@
 #pragma once
 #include <glad/glad.h>
-//#include <glm/mat4x4.hpp>
+#include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <iostream>
@@ -9,12 +9,12 @@
 enum Camera_Movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
 
 // Default camera values
-static const float CAM_SPEED = 85.0f;
+static const float CAM_SPEED = 120.0f;
 static const float CAM_SENSITIVITY = 0.1f;
 static const float CAM_FOV = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
-static const float CAM_HEIGHT = 25.0f; // Camera height above ground
-static const float VP_NEAR = 0.5f; // Near distance for frustum
-static const float VP_FAR = 20000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
+static const float CAM_HEIGHT = 30.0f; // Camera height above ground
+static const float VP_NEAR = 3.0f; // Near distance for frustum
+static const float VP_FAR = 18000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
 int window_w = 1920;
 int window_h = 1080;
 

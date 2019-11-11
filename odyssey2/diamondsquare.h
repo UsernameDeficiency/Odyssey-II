@@ -4,7 +4,7 @@
  * the lower frequency content, therefore the scaling for the random displacement
  * is small for both low and high, but not middle, frequencies. */
 #pragma once
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <cmath>
 #include <iostream> // cerr
 

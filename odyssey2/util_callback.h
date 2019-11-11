@@ -42,7 +42,7 @@ void updatePhysics()
 			camera.Position.z = world_size * world_xz_scale - 2.0f;
 
 		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray, &terrainTex) + camera.height;
-		const float swim_height = sea_y_pos + camera.height / 10;
+		const float swim_height = sea_y_pos + camera.height / 3;
 
 		// Make sure player does not drown.
 		if (new_y_pos > swim_height)
@@ -99,7 +99,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		if (action == GLFW_PRESS)
 		{
-			camera.projection = glm::perspective(glm::radians(camera.fov / 4), (GLfloat)window_w / (GLfloat)window_h, VP_NEAR, 2*VP_FAR);
+			camera.projection = glm::perspective(glm::radians(camera.fov / 4), (GLfloat)window_w / (GLfloat)window_h, VP_NEAR, 1.5f * VP_FAR);
 			camera.MouseSensitivity = CAM_SENSITIVITY / 3.0f;
 		}
 		else if (action == GLFW_RELEASE)
@@ -149,9 +149,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 	}
 	else // Player walking
-	{
 		keyState[KEY_DOWN] = keyState[KEY_UP] = false;
-	}
 }
 
 
