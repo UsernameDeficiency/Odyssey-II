@@ -26,6 +26,7 @@ static void initGL()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
 	glfwWindowHint(GLFW_DEPTH_BITS, 32); // Increase z buffer size for fog and z-fighting
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Increase z buffer size for fog and z-fighting
 	window = glfwCreateWindow(window_w, window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
@@ -40,7 +41,7 @@ static void initGL()
 		exit_on_error("Failed to initialize GLAD");
 
 	// --------- Initialize OpenGL ---------
-	glClearColor(0.85f, 0.96f, 0.98f, 1.0f); // Background color matching border of skybox
+	glClearColor(0.7, 0.7, 0.7, 1.0f); // Fog color
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE); // Enable MSAA
@@ -70,10 +71,12 @@ static void initTerrain()
 	/* Load pregenerated terrain data from terrainMap, calculate procedural terrain
 	   and add procTerrain values to the pregenerated map. */
 	LoadTGATextureData(terrainMap, &terrainTex); // TODO: Replace with loadStbTextureStruct
+	std::cout << ".";
 	//terrainShader->loadStbTextureStruct(terrainMap, &terrainTex);
 	//terrainShader->loadStbTextureRef(terrainMap, &terrainTex.texID, true);
 	float* procTerrain = diamondsquare(terrainTex.width, (int)terrainTex.width / (int)FILTER_DIV);
 	mTerrain = generateTerrain(&terrainTex, procTerrain, world_xz_scale, world_y_scale, tex_scale);
+	std::cout << ".";
 
 	world_size = (float)terrainTex.width; // Assuming square terrain map
 	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray, &terrainTex) + camera.height;
@@ -85,6 +88,7 @@ static void initTerrain()
 	terrainShader->setInt("grassTex", 0);
 	terrainShader->setInt("rockTex", 1);
 	terrainShader->setInt("bottomTex", 2);
+	terrainShader->setInt("draw_fog", draw_fog);
 	terrainShader->setFloat("seaLevel", sea_y_pos);
 }
 
@@ -96,7 +100,7 @@ static void initSkybox(void)
 	skyboxShader->use();
 
 	// Skyboxes: ely_cloudtop, miramar, stormydays
-	std::string skyboxPath = "tex/skybox/miramar/";
+	std::string skyboxPath = "tex/skybox/stormydays/";
 	std::vector<std::string> faces
 	{
 		skyboxPath + "front.tga",
@@ -139,6 +143,7 @@ static void initSkybox(void)
 
 	skyboxTex = loadCubemap(faces);
 	skyboxShader->setInt("skybox", 0);
+	skyboxShader->setInt("draw_fog", draw_fog);
 }
 
 
@@ -168,26 +173,7 @@ static void initWaterSurface()
 	glBufferData(GL_ARRAY_BUFFER, 2*9*sizeof(GLfloat), waterSurfaceVert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(glGetAttribLocation(waterShader->ID, "inPos"));
 	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
-}
-
-
-static void initFog()
-{
-	fogShader = new Shader("shader/fog.vert", "shader/fog.frag");
-	fogShader->use();
-
-	unsigned int fogVBO;
-	glGenVertexArrays(1, &fogVAO);
-	glBindVertexArray(fogVAO);
-
-	const GLfloat vertices[] = { -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f };
-	
-	glGenBuffers(1, &fogVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, fogVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-	glEnableVertexAttribArray(glGetAttribLocation(fogShader->ID, "inPos"));
+	waterShader->setInt("draw_fog", draw_fog);
 }
 
 
@@ -234,12 +220,6 @@ static void render(void)
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	// --------- Draw fog ---------
-	glDepthMask(GL_FALSE);
-	glDisable(GL_DEPTH_TEST);
-	fogShader->use();
-	glBindVertexArray(fogVAO);
-
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
@@ -252,11 +232,14 @@ static void render(void)
 int main(int argc, char **argv)
 {
 	// Initiate OpenGL and graphics
+	greet();
 	initGL();
 	initTerrain();
+	std::cout << ".";
 	initSkybox();
 	initWaterSurface();
-	initFog();
+	std::cout << " finished!\n";
+	glfwShowWindow(window);
 
 	// Main render loop
 	while (!glfwWindowShouldClose(window))
@@ -269,7 +252,7 @@ int main(int argc, char **argv)
 		// Update physics and render screen
 		updatePhysics();
 		render();
-		//printFPS();
+		printFPS();
 		glfwPollEvents();
 	}
 

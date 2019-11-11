@@ -32,8 +32,6 @@
     <ClInclude Include="util_shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\fog.frag" />
-    <None Include="shader\fog.vert" />
     <None Include="shader\skybox.frag" />
     <None Include="shader\skybox.vert" />
     <None Include="shader\terrain.frag" />

@@ -9,6 +9,23 @@
 #include <string>
 
 
+/* Print welcome message */
+void greet()
+{
+	std::cout << "Welcome to Odyssey II!\n\n"
+		"------------------------------------\n"
+		"The following controls are available\n"
+		"Move: W/A/S/D/Q/E\n"
+		"Run: Shift\n"
+		"Zoom: Ctrl\n"
+		"Crouch: C\n"
+		"Toggle flying/walking: F\n"
+		"Toggle fog: F1\n"
+		"------------------------------------\n\n"
+		"Loading";
+}
+
+
 /* Print average FPS once every second */
 void printFPS()
 {

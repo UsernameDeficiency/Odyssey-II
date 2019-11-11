@@ -13,6 +13,7 @@ uniform sampler2D grassTex;
 uniform sampler2D rockTex;
 uniform sampler2D bottomTex;
 uniform mat4 worldToView; // Transform light source to view coords
+uniform int draw_fog;
 
 void main(void)
 {
@@ -35,5 +36,18 @@ void main(void)
 	// Rocky slope
 	else {
 		outColor = vec4(shade * vec3(texture(rockTex, passTexCoord)), 1.0);
+	}
+
+	// Calculate fog
+	if (draw_fog == 1)
+	{
+		float zNear = 3.0f;
+		float zFar = 18000.0f / 100.0f;
+		float z = gl_FragCoord.z * 2.0 - 1.0; // Normalized device coordinates
+		float depth = (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
+		depth = depth / zFar;
+		depth = sqrt(depth);
+		vec3 fog_color = 0.7 * vec3(1.0, 1.0, 1.0);
+		outColor = vec4(depth * fog_color, depth) + vec4((1 - depth) * vec3(outColor), 1.0);
 	}
 }

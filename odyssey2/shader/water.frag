@@ -5,23 +5,32 @@ out vec4 outColor;
 
 uniform samplerCube skybox;
 uniform vec3 cameraPos;
+uniform int draw_fog;
 
 void main()
 {
-	// Calculate fog
-//	float zNear = 3.0f;
-//	float zFar = 18000.0f/3.0f;
-//	float z = gl_FragCoord.z * 2.0 - 1.0; // back to NDC
-//	float depth = (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
-//	vec4 fog = vec4(0.5 + 0.5*vec3(1 - depth/zFar), 1.0);
+	// TODO: Animate normal vector to give appearance of waves
+	vec3 normal = vec3(0.0, 1.0, 0.0);
 
 	// Calculate reflection (in world coordinates)
-	vec3 normal = vec3(0.0, 1.0, 0.0);
-    vec3 I = normalize(Position - cameraPos);
-    vec3 R = reflect(I, normal);
+	vec3 I = normalize(Position - cameraPos);
+	vec3 R = reflect(I, normal);
 	/* Blend cubemap (skybox) reflection and transparent water depending on reflection angle
 		(The transparent part should be refracted but I'm not sure how to do that) */
 	float blend = sqrt(dot(normal, R));
-    outColor = (1 - blend) * vec4(vec3(texture(skybox, R)), 1.0) + blend * vec4(0.1, 0.2, 0.3, 0.65);
+	outColor = (1 - blend) * texture(skybox, R) + blend * vec4(0.21, 0.25, 0.3, 0.9);
+
+	// Calculate fog
+	if (draw_fog == 1)
+	{
+		float zNear = 3.0f;
+		float zFar = 18000.0f / 128.0f;
+		float z = gl_FragCoord.z * 2.0 - 1.0; // Normalized device coordinates
+		float depth = (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
+		depth = depth / zFar;
+		depth = sqrt(depth);
+		vec3 fog_color = 0.7 * vec3(1.0, 1.0, 1.0);
+		outColor = vec4(depth * fog_color, depth) + (1 - depth) * vec4(0.5, 0.52, 0.58, 0.9);
+	}
 }
 

@@ -127,6 +127,18 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 
+	// Toggle fog
+	else if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
+	{
+		draw_fog = !draw_fog;
+		terrainShader->use();
+		terrainShader->setInt("draw_fog", draw_fog);
+		skyboxShader->use();
+		skyboxShader->setInt("draw_fog", draw_fog);
+		waterShader->use();
+		waterShader->setInt("draw_fog", draw_fog);
+	}
+
 	// Toggle flight/walk mode
 	else if (key == GLFW_KEY_F && action == GLFW_PRESS)
 		camera.flying = !camera.flying;

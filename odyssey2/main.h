@@ -18,6 +18,7 @@ const float tex_scale = 256.0f;
 /* Global variables */
 float world_size; // width = height of world map
 float sea_y_pos; // Set by generateTerrain using mean height of terrain
+int draw_fog = 0; // 1 = shaders draw fog effects
 GLFWwindow* window = NULL;
 Camera camera = Camera(); // position initialized in initTerrain
 Model* mTerrain;

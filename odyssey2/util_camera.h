@@ -10,7 +10,7 @@ enum Camera_Movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, C
 
 // Default camera values
 static const float CAM_SPEED = 120.0f;
-static const float CAM_SENSITIVITY = 0.1f;
+static const float CAM_SENSITIVITY = 0.2f;
 static const float CAM_FOV = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
 static const float CAM_HEIGHT = 30.0f; // Camera height above ground
 static const float VP_NEAR = 3.0f; // Near distance for frustum
