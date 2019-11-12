@@ -21,12 +21,14 @@ static void initGL()
 
 	// Create GLFW window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Tesselation support
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	if (DEBUG_CONTEXT)
+	{
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	}
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
-	glfwWindowHint(GLFW_DEPTH_BITS, 32); // Increase z buffer size for fog and z-fighting
-	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Increase z buffer size for fog and z-fighting
+	glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
 	window = glfwCreateWindow(window_w, window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
@@ -40,7 +42,7 @@ static void initGL()
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		exit_on_error("Failed to initialize GLAD");
 
-	// --------- Initialize OpenGL ---------
+	// --------- Initialize OpenGL and callbacks ---------
 	glClearColor(0.7, 0.7, 0.7, 1.0f); // Fog color
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -48,13 +50,16 @@ static void initGL()
 	glEnable(GL_BLEND); // Enable transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// OpenGL debugging
-	glEnable(GL_DEBUG_OUTPUT);
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageCallback(debugMessage, nullptr);
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+	if (DEBUG_CONTEXT)
+	{
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(debugMessage, nullptr);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+		glfwSetErrorCallback(error_callback);
+	}
 
 	// Callback functions
-	glfwSetErrorCallback(error_callback);
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetFramebufferSizeCallback(window, fb_size_callback);
 	glfwSetCursorPosCallback(window, cursor_pos_callback);
@@ -183,7 +188,7 @@ static void render(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen and depth buffer
 
 	// --------- Draw skybox ---------
-	glDepthMask(GL_FALSE); // = glDisable(GL_DEPTH_TEST)?
+	glDepthMask(GL_FALSE); // Disable depth writes
 	skyboxShader->use();
 	glBindVertexArray(skyboxVAO);
 	glActiveTexture(GL_TEXTURE0);
@@ -217,13 +222,9 @@ static void render(void)
 	waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	waterShader->setMatrix4f("projection", camera.projection);
 	waterShader->setVec3("cameraPos", camera.Position);
-	waterShader->setFloat("time", lastTime);
+	//waterShader->setFloat("time", lastTime);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
 
 	// --------- Swap buffers ---------
 	glfwSwapBuffers(window);

@@ -12,7 +12,8 @@
 /* Print welcome message */
 void greet()
 {
-	std::cout << "Welcome to Odyssey II!\n\n"
+	std::cout << "------------------------------------\n"
+		"       Welcome to Odyssey II!\n"
 		"------------------------------------\n"
 		"The following controls are available\n"
 		"Move: W/A/S/D/Q/E\n"
@@ -21,7 +22,7 @@ void greet()
 		"Crouch: C\n"
 		"Toggle flying/walking: F\n"
 		"Toggle fog: F1\n"
-		"------------------------------------\n\n"
+		"------------------------------------\n"
 		"Loading";
 }
 
@@ -64,10 +65,10 @@ float getPosy(float x, float z, GLfloat* vertexArray, TextureData* tex)
 }
 
 
-/* OpenGL debug callback from https://learnopengl.com */
+/* OpenGL debug callback modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com */
 void APIENTRY debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
-	// Ignore non-significant error/warning codes
+	// Ignore non-significant error codes
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
 	std::cout << "---------------" << std::endl;
@@ -203,7 +204,7 @@ Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scal
 }
 
 
-/* Load a cubemap, used for skybox. Code from https://learnopengl.com/Advanced-OpenGL/Cubemaps */
+/* Load a cubemap texture. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -214,18 +215,15 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	for (unsigned int i = 0; i < faces.size(); i++)
 	{
 		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-		if (data)
+		if (!data)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-			stbi_image_free(data);
-		}
-		else
-		{
-			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			std::cerr << "loadCubemap failed: texture " << faces[i] << " failed to load\n";
 			stbi_image_free(data);
 			exit(EXIT_FAILURE);
 		}
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+			0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		stbi_image_free(data);
 	}
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

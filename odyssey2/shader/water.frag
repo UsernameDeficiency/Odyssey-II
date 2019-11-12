@@ -5,7 +5,7 @@ out vec4 outColor;
 
 uniform samplerCube skybox;
 uniform vec3 cameraPos;
-uniform float time;
+//uniform float time;
 uniform int draw_fog;
 
 void main()

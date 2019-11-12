@@ -11,7 +11,7 @@
 #include <iostream>
 
 
-/* Shader utility class from https://learnopengl.com/Getting-started/Shaders, modified for Odyssey */
+/* Shader utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders */
 class Shader
 {
 public:
@@ -23,7 +23,7 @@ public:
 		std::string fragmentCode;
 		std::ifstream vShaderFile;
 		std::ifstream fShaderFile;
-		// ensure ifstream objects can throw exceptions (failbit checks fails for some reason):
+		// ensure ifstream objects can throw exceptions (failbit checks fail for some reason):
 		vShaderFile.exceptions(std::ifstream::badbit);//| std::ifstream::failbit);
 		fShaderFile.exceptions(std::ifstream::badbit);//| std::ifstream::failbit);
 		try
@@ -44,7 +44,7 @@ public:
 		}
 		catch (std::ifstream::failure e)
 		{
-			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+			std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 		}
 		const char* vShaderCode = vertexCode.c_str();
 		const char* fShaderCode = fragmentCode.c_str();
