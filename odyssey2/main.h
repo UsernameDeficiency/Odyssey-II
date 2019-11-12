@@ -11,14 +11,14 @@
 const char terrainMap[] = "heightmap/2048_flat.tga";
 // Scaling values for terrain vertices/texture coordinates
 const float world_xz_scale = 8.0f;
-const float world_y_scale = 6.0f;
+const float world_y_scale = 5.0f;
 const float tex_scale = 256.0f;
 
 
 /* Global variables */
 float world_size; // width = height of world map
 float sea_y_pos; // Set by generateTerrain using mean height of terrain
-int draw_fog = 0; // 1 = shaders draw fog effects
+bool draw_fog = false; // 1 = shaders draw fog effects
 GLFWwindow* window = NULL;
 Camera camera = Camera(); // position initialized in initTerrain
 Model* mTerrain;

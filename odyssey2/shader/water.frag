@@ -5,6 +5,7 @@ out vec4 outColor;
 
 uniform samplerCube skybox;
 uniform vec3 cameraPos;
+uniform float time;
 uniform int draw_fog;
 
 void main()
@@ -15,10 +16,9 @@ void main()
 	// Calculate reflection (in world coordinates)
 	vec3 I = normalize(Position - cameraPos);
 	vec3 R = reflect(I, normal);
-	/* Blend cubemap (skybox) reflection and transparent water depending on reflection angle
-		(The transparent part should be refracted but I'm not sure how to do that) */
-	float blend = sqrt(dot(normal, R));
-	outColor = (1 - blend) * texture(skybox, R) + blend * vec4(0.21, 0.25, 0.3, 0.9);
+	/* Blend cubemap (skybox) reflection and transparent water depending on reflection angle */
+	float blend = dot(normal, R);
+	outColor = (1 - blend) * texture(skybox, R) + blend * vec4(0.21, 0.25, 0.3, 0.85);
 
 	// Calculate fog
 	if (draw_fog == 1)
@@ -30,7 +30,7 @@ void main()
 		depth = depth / zFar;
 		depth = sqrt(depth);
 		vec3 fog_color = 0.7 * vec3(1.0, 1.0, 1.0);
-		outColor = vec4(depth * fog_color, depth) + (1 - depth) * vec4(0.5, 0.52, 0.58, 0.9);
+		outColor = vec4(depth * fog_color, depth) + (1 - depth) * vec4(0.5, 0.52, 0.56, 0.85);
 	}
 }
 

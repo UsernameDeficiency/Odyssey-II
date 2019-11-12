@@ -217,6 +217,7 @@ static void render(void)
 	waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	waterShader->setMatrix4f("projection", camera.projection);
 	waterShader->setVec3("cameraPos", camera.Position);
+	waterShader->setFloat("time", lastTime);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -238,7 +239,7 @@ int main(int argc, char **argv)
 	std::cout << ".";
 	initSkybox();
 	initWaterSurface();
-	std::cout << " finished!\n";
+	std::cout << " finished!\n\n";
 	glfwShowWindow(window);
 
 	// Main render loop
@@ -252,7 +253,7 @@ int main(int argc, char **argv)
 		// Update physics and render screen
 		updatePhysics();
 		render();
-		printFPS();
+		//printFPS();
 		glfwPollEvents();
 	}
 
