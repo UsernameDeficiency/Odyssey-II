@@ -1,7 +1,6 @@
 Shaders:
 Rewrite shader lighting
 Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting-exercise2
-Add shader for long-distance fog
 Make geometry shader visualizing normal vectors. How to create grass with geometry shader?
 https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
 https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
@@ -13,8 +12,6 @@ Use diamond-square for cloud generation?
 
 Optimization: Don't draw vertices outside frustum. Decrease detail level of far away vertices. Decrease lighting quality for far away vertices? GLM SIMD? Common libs modified?
 generateTerrain: Test GenerateNormals from loadobj? Optimize by reducing new and LoadDataToModel operations if possible (loadStbTextureRef in initTerrain also slow, but not possible to optimize?)
-Test back face culling impact on performance
 Add wave effect to water surface
-Add image to the Github page, link to learnopengl
+Add image to the Github page, link to learnopengl? Windows only?
 Decide which texture maps to use
-Interpolation within triangles: https://en.wikipedia.org/wiki/Barycentric_coordinate_system
