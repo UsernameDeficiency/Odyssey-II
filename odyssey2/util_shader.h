@@ -131,7 +131,7 @@ public:
 	{
 		glGenTextures(1, textureRef);
 		glBindTexture(GL_TEXTURE_2D, *textureRef);
-		// TODO: "For best results, combine anisotropic filtering with a GL_LINEAR_MIPMAP_LINEAR minification filter."
+		// GL_LINEAR_MIPMAP_LINEAR usually seems to be recommended but is slightly more blurry?
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 8);

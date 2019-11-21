@@ -43,7 +43,7 @@ static void initGL()
 		exit_on_error("Failed to initialize GLAD");
 
 	// --------- Initialize OpenGL and callbacks ---------
-	glClearColor(0.7, 0.7, 0.7, 1.0f); // Fog color
+	glClearColor(fogColor.r, fogColor.g, fogColor.b, 1.0f); // Fog color
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE); // Enable MSAA
@@ -93,7 +93,8 @@ static void initTerrain()
 	terrainShader->setInt("grassTex", 0);
 	terrainShader->setInt("rockTex", 1);
 	terrainShader->setInt("bottomTex", 2);
-	terrainShader->setInt("draw_fog", draw_fog);
+	terrainShader->setInt("drawFog", drawFog);
+	terrainShader->setVec3("fogColor", fogColor);
 	terrainShader->setFloat("seaLevel", sea_y_pos);
 }
 
@@ -148,7 +149,7 @@ static void initSkybox(void)
 
 	skyboxTex = loadCubemap(faces);
 	skyboxShader->setInt("skybox", 0);
-	skyboxShader->setInt("draw_fog", draw_fog);
+	skyboxShader->setInt("draw_fog", drawFog);
 }
 
 
@@ -178,7 +179,8 @@ static void initWaterSurface()
 	glBufferData(GL_ARRAY_BUFFER, 2*9*sizeof(GLfloat), waterSurfaceVert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(glGetAttribLocation(waterShader->ID, "inPos"));
 	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
-	waterShader->setInt("draw_fog", draw_fog);
+	waterShader->setInt("draw_fog", drawFog);
+	waterShader->setVec3("fogColor", fogColor);
 }
 
 

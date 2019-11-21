@@ -130,13 +130,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	// Toggle fog
 	else if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
 	{
-		draw_fog = !draw_fog;
+		drawFog = !drawFog;
 		terrainShader->use();
-		terrainShader->setInt("draw_fog", draw_fog);
+		terrainShader->setInt("drawFog", drawFog);
 		skyboxShader->use();
-		skyboxShader->setInt("draw_fog", draw_fog);
+		skyboxShader->setInt("drawFog", drawFog);
 		waterShader->use();
-		waterShader->setInt("draw_fog", draw_fog);
+		waterShader->setInt("drawFog", drawFog);
 	}
 
 	// Toggle flight/walk mode
