@@ -15,3 +15,4 @@ generateTerrain: Test GenerateNormals from loadobj? Optimize by reducing new and
 Add wave effect to water surface
 Add image to the Github page, link to learnopengl? Windows only?
 Decide which texture maps to use
+Use viewing angle dot sun direction to blind player if looking into the sun?

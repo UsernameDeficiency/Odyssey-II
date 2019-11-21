@@ -13,7 +13,7 @@ uniform sampler2D grassTex;
 uniform sampler2D rockTex;
 uniform sampler2D bottomTex;
 uniform mat4 worldToView; // Transform light source to view coords
-uniform int drawFog;
+uniform bool drawFog;
 uniform vec3 fogColor;
 
 void main(void)
@@ -40,7 +40,7 @@ void main(void)
 	}
 
 	// Calculate fog
-	if (drawFog == 1)
+	if (drawFog)
 	{
 		float zNear = 3.0f;
 		float zFar = 18000.0f / 200.0f;

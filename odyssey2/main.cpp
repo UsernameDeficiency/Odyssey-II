@@ -93,7 +93,7 @@ static void initTerrain()
 	terrainShader->setInt("grassTex", 0);
 	terrainShader->setInt("rockTex", 1);
 	terrainShader->setInt("bottomTex", 2);
-	terrainShader->setInt("drawFog", drawFog);
+	terrainShader->setBool("drawFog", drawFog);
 	terrainShader->setVec3("fogColor", fogColor);
 	terrainShader->setFloat("seaLevel", sea_y_pos);
 }
@@ -149,7 +149,7 @@ static void initSkybox(void)
 
 	skyboxTex = loadCubemap(faces);
 	skyboxShader->setInt("skybox", 0);
-	skyboxShader->setInt("draw_fog", drawFog);
+	skyboxShader->setBool("draw_fog", drawFog);
 }
 
 
@@ -179,7 +179,7 @@ static void initWaterSurface()
 	glBufferData(GL_ARRAY_BUFFER, 2*9*sizeof(GLfloat), waterSurfaceVert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(glGetAttribLocation(waterShader->ID, "inPos"));
 	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
-	waterShader->setInt("draw_fog", drawFog);
+	waterShader->setBool("draw_fog", drawFog);
 	waterShader->setVec3("fogColor", fogColor);
 }
 
@@ -224,7 +224,7 @@ static void render(void)
 	waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
 	waterShader->setMatrix4f("projection", camera.projection);
 	waterShader->setVec3("cameraPos", camera.Position);
-	//waterShader->setFloat("time", lastTime);
+	waterShader->setFloat("time", lastTime);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 

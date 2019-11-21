@@ -5,24 +5,32 @@ out vec4 outColor;
 
 uniform samplerCube skybox;
 uniform vec3 cameraPos;
-//uniform float time;
-uniform int drawFog;
+uniform float time;
+uniform bool drawFog;
 uniform vec3 fogColor;
 
 void main()
 {
-	// TODO: Animate normal vector to give appearance of waves
-	vec3 normal = vec3(0.0, 1.0, 0.0);
+	// ------------------ Calculate wave effect for normal --------------------
+	float normZ = 2.0 * Position.z / (2048.0 * 8.0); // [0, maxAmp]
+	int numWaves = 32;
+	float worldZ = mod(normZ * numWaves, 2.0); // [0, maxAmp], repeating numWaves times
+	if (worldZ > 1.0)
+		worldZ = 2.0 - worldZ; // [0, 1], discontinuities removed
+	//worldZ -= 0.5; // [-0.5, 0.5] (although this means the "back side" of the waves are visible?)
+	float normalPos = worldZ * abs(0.25 * sin(time / 10)); // Position offset used to animate normal
+	vec3 normal = normalize(vec3(0.0, 1.0, normalPos));
 
-	// Calculate reflection (in world coordinates)
+	// ------------- Calculate reflection (in world coordinates) --------------
 	vec3 I = normalize(Position - cameraPos);
 	vec3 R = reflect(I, normal);
-	/* Blend cubemap (skybox) reflection and transparent water depending on reflection angle */
+	// Blend cubemap (skybox) reflection and transparent water depending on reflection angle
 	float blend = dot(normal, R);
 	outColor = (1 - blend) * texture(skybox, R) + blend * vec4(0.21, 0.25, 0.3, 0.85);
+	//outColor = vec4(worldZ * vec3(1.0, 1.0, 1.0), 1.0); // Visualize normal animation
 
-	// Calculate fog
-	if (drawFog == 1)
+	// ---------------------------- Calculate fog -----------------------------
+	if (drawFog)
 	{
 		float zNear = 3.0f;
 		float zFar = 18000.0f / 200.0f;
