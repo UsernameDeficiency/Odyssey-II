@@ -9,6 +9,8 @@ Diamond-square:
 Decide what to do with diamond square parameters
 Implement spline interpolation
 Use diamond-square for cloud generation?
+Change arrays to double indices?
+Sliding window average for terrain smoothing?
 
 Optimization: Don't draw vertices outside frustum. Decrease detail level of far away vertices. Decrease lighting quality for far away vertices? GLM SIMD? Common libs modified?
 generateTerrain: Test GenerateNormals from loadobj? Optimize by reducing new and LoadDataToModel operations if possible (loadStbTextureRef in initTerrain also slow, but not possible to optimize?)
