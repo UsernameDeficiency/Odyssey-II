@@ -4,18 +4,13 @@
  * the lower frequency content, therefore the scaling for the random displacement
  * is small for both low and high, but not middle, frequencies. */
 #pragma once
-//#include <stdlib.h>
 #include <cmath>
 #include <iostream> // cerr
 
 
 /* Settings for diamond square algorithm */
- // Base weight for randomized values in diamond-square algorithm.
-static const float BASE_WEIGHT = 128.0f;
-/* Decides cutoff frequency for the diamond-square filter, FILTER_DIV = 2^n
-   for some integer n > 0. FILTER_DIV = 1 gives full low frequencies,
-   higher values filter out more frequency in the terrain. */
-static const float FILTER_DIV = 8;
+// Base weight for randomized values in diamond-square algorithm.
+static const float BASE_WEIGHT = 5 * 128.0f;
 // No random numbers will be added for steps with steps length shorter than LAST_STEP
 static const int LAST_STEP = 8;
 // Seeding for rand() in diamondsquare() (default 1).
@@ -36,13 +31,13 @@ float randnum(float max, float min)
 	 for use with pre-generated heightmaps describing the low frequency content. */
 static float calcweight(int step, int cutoff, float weight)
 {
-	if (step <= cutoff) {
+	if (step <= cutoff / 8.0f) { // TODO: Why divide by 8 here?
 		/* High frequencies. Divide magnitude by sqrt(2) for each iteration */
 		return weight / (float)sqrt(2);
 	}
 	else {
 		/* Low frequencies, use constant filter amplitude up to cutoff frequency */
-		return weight;
+		return weight; // TODO: This is not used if no divide by 8 above
 	}
 }
 

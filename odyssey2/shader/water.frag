@@ -11,8 +11,7 @@ uniform vec3 fogColor;
 
 void main()
 {
-	if (!drawFog)
-	{
+	if (!drawFog) {
 		// ------------------ Calculate wave effect for normal --------------------
 		vec3 normal = vec3(0.0, 1.0, 0.0);
 
@@ -29,12 +28,11 @@ void main()
 		vec3 I = normalize(Position - cameraPos);
 		vec3 R = reflect(I, normal);
 		// Blend cubemap (skybox) reflection and transparent water depending on reflection angle
-		float blend = 0 * dot(normal, R);
-		outColor = (1 - blend) * texture(skybox, R) + blend * vec4(0.21, 0.25, 0.3, 0.85);
+		float blend = dot(normal, R);
+		outColor = (1 - blend) * texture(skybox, R) + blend * vec4(0.21, 0.25, 0.3, 0.75);
 	}
 
-	else
-	{
+	else {
 		// ---------------------------- Calculate fog -----------------------------
 		float zNear = 3.0f;
 		float zFar = 18000.0f / 200.0f;

@@ -40,8 +40,7 @@ void main(void)
 	}
 
 	// Calculate fog
-	if (drawFog)
-	{
+	if (drawFog) {
 		float zNear = 3.0f;
 		float zFar = 18000.0f / 200.0f;
 		float z = gl_FragCoord.z * 2.0 - 1.0; // Normalized device coordinates

@@ -11,7 +11,7 @@
 const char terrainMap[] = "heightmap/2048_flat.tga";
 // Scaling values for terrain vertices/texture coordinates
 const float world_xz_scale = 8.0f;
-const float world_y_scale = 5.0f;
+const float world_y_scale = 1.0f;
 const float tex_scale = 256.0f;
 
 

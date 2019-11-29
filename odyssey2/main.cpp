@@ -79,7 +79,7 @@ static void initTerrain()
 	std::cout << ".";
 	//terrainShader->loadStbTextureStruct(terrainMap, &terrainTex);
 	//terrainShader->loadStbTextureRef(terrainMap, &terrainTex.texID, true);
-	float* procTerrain = diamondsquare(terrainTex.width, (int)terrainTex.width / (int)FILTER_DIV);
+	float* procTerrain = diamondsquare(terrainTex.width, terrainTex.width);
 	mTerrain = generateTerrain(&terrainTex, procTerrain, world_xz_scale, world_y_scale, tex_scale);
 	std::cout << ".";
 
