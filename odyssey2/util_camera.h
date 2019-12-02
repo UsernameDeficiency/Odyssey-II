@@ -60,6 +60,8 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
         float velocity = MovementSpeed * deltaTime;
+		if (flying)
+			velocity *= 4;
 
 		// Update position while making sure that the camera moves in the correct plane
         if (direction == CAM_FORWARD)
