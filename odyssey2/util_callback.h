@@ -132,11 +132,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		drawFog = !drawFog;
 		terrainShader->use();
-		terrainShader->setInt("drawFog", drawFog);
+		terrainShader->setBool("drawFog", drawFog);
 		skyboxShader->use();
-		skyboxShader->setInt("drawFog", drawFog);
+		skyboxShader->setBool("drawFog", drawFog);
 		waterShader->use();
-		waterShader->setInt("drawFog", drawFog);
+		waterShader->setBool("drawFog", drawFog);
+	}
+
+	// Toggle wave amount
+	else if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
+	{
+		extraWaves = !extraWaves;
+		waterShader->use();
+		waterShader->setBool("extraWaves", extraWaves);
 	}
 
 	// Toggle flight/walk mode

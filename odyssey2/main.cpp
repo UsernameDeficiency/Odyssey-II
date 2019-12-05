@@ -106,7 +106,7 @@ static void initSkybox(void)
 	skyboxShader->use();
 
 	// Skyboxes: ely_cloudtop, miramar, stormydays
-	std::string skyboxPath = "tex/skybox/stormydays/";
+	std::string skyboxPath = "tex/skybox/miramar/";
 	std::vector<std::string> faces
 	{
 		skyboxPath + "front.tga",
@@ -180,6 +180,7 @@ static void initWaterSurface()
 	glEnableVertexAttribArray(glGetAttribLocation(waterShader->ID, "inPos"));
 	glVertexAttribPointer(glGetAttribLocation(waterShader->ID, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
 	waterShader->setBool("draw_fog", drawFog);
+	waterShader->setBool("extraWaves", extraWaves);
 	waterShader->setVec3("fogColor", fogColor);
 }
 
