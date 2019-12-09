@@ -10,9 +10,11 @@ uniform float time;
 
 void main()
 {
+	// Animate water vertices in y direction
 	vec3 inPosAnim = inPos;
-	inPosAnim.y += sin(time + inPos.x / 4096) / 2;
+	inPosAnim.y += sin(time + inPos.x) / 4;
+	inPosAnim.y += sin(time + inPos.y) / 4;
+
 	Position = inPosAnim;
 	gl_Position = projection * worldToView * vec4(inPosAnim, 1.0);
-	//gl_Position.y += sin(time) / 2;
 }

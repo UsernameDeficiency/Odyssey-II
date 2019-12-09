@@ -106,7 +106,7 @@ static void initSkybox(void)
 	skyboxShader->use();
 
 	// Skyboxes: ely_cloudtop, miramar, stormydays
-	std::string skyboxPath = "tex/skybox/miramar/";
+	std::string skyboxPath = "tex/skybox/ely_cloudtop/";
 	std::vector<std::string> faces
 	{
 		skyboxPath + "front.tga",

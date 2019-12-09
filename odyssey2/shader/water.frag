@@ -16,22 +16,23 @@ void main()
 	if (!drawFog) {
 		// ------------------ Calculate wave effect for normal --------------------
 		vec3 normal = vec3(0.0, 1.0, 0.0);
-		int numWaves = 80;
+		int numWaves = 128;
 		float world_size = 2048.0 * 8.0;
 
 		float normPos = sqrt(Position.x * Position.x + Position.z * Position.z) / (sqrt(2.0) * world_size); // [0, 1]
-		normal.x = abs(sin(2 * M_PI * (-time / 16 + normPos * numWaves)) / 50);
+		normal.x = (sin(2 * M_PI * (-time / 10 + normPos * numWaves)) / 128);
 
+		// Add several waves with different velocity and amplitude
 		if (extraWaves)
 		{
 			normPos = sqrt((world_size - Position.x) * (world_size - Position.x) + Position.z * Position.z) / (sqrt(2.0) * world_size);
-			normal.z = (cos(2 * M_PI * (-time / 8 + normPos * numWaves * 4)) / 80);
+			normal.z = cos(2 * M_PI * (-time / 8 + normPos * numWaves * 4)) / 80;
 
 			normPos = Position.x / world_size;
-			normal.x += (sin(2 * M_PI * (-time / 7 + normPos * numWaves * 2)) / 64);
+			normal.x += sin(2 * M_PI * (-time / 7 + normPos * numWaves * 2)) / 96;
 
 			normPos = Position.z / world_size;
-			normal.z += (cos(2 * M_PI * (-time / 8 + normPos * numWaves)) / 64);
+			normal.z += cos(2 * M_PI * (-time / 8 + normPos * numWaves)) / 64;
 
 			normPos = (Position.x + Position.z) / (2.0 * world_size);
 			normal.x += sin(2 * M_PI * (time / 9 + normPos * numWaves * 4)) / 128;

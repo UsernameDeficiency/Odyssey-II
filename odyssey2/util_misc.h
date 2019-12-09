@@ -22,6 +22,7 @@ void greet()
 		"Crouch: C\n"
 		"Toggle flying/walking: F\n"
 		"Toggle fog: F1\n"
+		"Toggle water effect: F2\n"
 		"------------------------------------\n"
 		"Loading";
 }
