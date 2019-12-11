@@ -6,7 +6,7 @@
 #include "loadobj.h"
 #include "Load_TGA_data.h" // loadTGATextureData
 #include "diamondsquare.h"
-#include "util_misc.h" // generateTerrain, debugMessage, exit_on_error
+#include "util_misc.h" // generateTerrain, debugMessage, exit_on_error, loadSkyboxTex
 #include "util_callback.h" // GLFW callbacks, updatePhysics
 #include "util_shader.h"
 #include <vector>
@@ -105,18 +105,6 @@ static void initSkybox(void)
 	skyboxShader = new Shader("shader/skybox.vert", "shader/skybox.frag");
 	skyboxShader->use();
 
-	// Skyboxes: ely_cloudtop, miramar, stormydays
-	std::string skyboxPath = "tex/skybox/ely_cloudtop/";
-	std::vector<std::string> faces
-	{
-		skyboxPath + "front.tga",
-		skyboxPath + "back.tga",
-		skyboxPath + "top.tga",
-		skyboxPath + "bottom.tga",
-		skyboxPath + "right.tga",
-		skyboxPath + "left.tga"
-	};
-
 	float skyboxVertices[] = {
 		-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
 		 5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
@@ -147,8 +135,7 @@ static void initSkybox(void)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	skyboxTex = loadCubemap(faces);
-	skyboxShader->setInt("skybox", 0);
+	loadSkyboxTex(skyboxPaths.at(skyboxIndex));
 	skyboxShader->setBool("draw_fog", drawFog);
 }
 

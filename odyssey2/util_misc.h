@@ -22,7 +22,8 @@ void greet()
 		"Crouch: C\n"
 		"Toggle flying/walking: F\n"
 		"Toggle fog: F1\n"
-		"Toggle water effect: F2\n"
+		"Toggle water wave effect: F2\n"
+		"Toggle skybox: F3\n"
 		"------------------------------------\n"
 		"Loading";
 }
@@ -233,4 +234,25 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+
+
+/* Load skybox texture in the given folder. 
+	Available skyboxes: ely_cloudtop, miramar, stormydays */
+void loadSkyboxTex(std::string skyboxPath)
+{
+	skyboxShader->use();
+	skyboxPath = "tex/skybox/" + skyboxPath;
+	std::vector<std::string> faces
+	{
+		skyboxPath + "/front.tga",
+		skyboxPath + "/back.tga",
+		skyboxPath + "/top.tga",
+		skyboxPath + "/bottom.tga",
+		skyboxPath + "/right.tga",
+		skyboxPath + "/left.tga"
+	};
+
+	skyboxTex = loadCubemap(faces);
+	skyboxShader->setInt("skyboxTex", 0);
 }

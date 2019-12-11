@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <string>
 #include "loadobj.h" // Model
 #include "Load_TGA_data.h" // TextureData
 #include "util_camera.h" // Camera and camera settings
@@ -28,9 +30,12 @@ Shader *terrainShader, *skyboxShader, *waterShader, *fogShader;
 GLuint snowTex, rockTex, bottomTex, skyboxTex;
 TextureData terrainTex; // Terrain height map
 unsigned int waterVAO, skyboxVAO, fogVAO;
+unsigned int skyboxIndex;
+std::vector<std::string> skyboxPaths = {
+	"ely_cloudtop", "stormydays", "hw_morning", "mp_heresy", "sb_frozen", "ame_starfield" };
 float deltaTime = 0.0f;	// frame time for last frame
 float lastTime = 0.0f;
-float accTime; // used for printFPS()
-int accFrames; // used for printFPS()
+float accTime; // for printFPS()
+int accFrames; // for printFPS()
 float mouseLastX = window_w / 2.0f;
 float mouseLastY = window_h / 2.0f;

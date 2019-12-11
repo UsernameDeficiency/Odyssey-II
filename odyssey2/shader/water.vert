@@ -13,11 +13,11 @@ void main()
 {
 	// Animate water vertices in y direction
 	vec3 inPosAnim = inPos;
-	inPosAnim.y += sin(2 * M_PI * (time / 3)) / 12;
-	inPosAnim.y += sin(2 * M_PI * (time / 3 + 1 / 6)) / 12;
-	inPosAnim.y += sin(2 * M_PI * (time / 6) + 2 / 6) / 8;
-	inPosAnim.y += sin(2 * M_PI * (time / 6 + 3 / 6)) / 8;
-	inPosAnim.y += sin(2 * M_PI * (time / 10 + 4 / 6)) / 6;
+	inPosAnim.y += sin(2 * M_PI * (time / 3)) / 10;
+	inPosAnim.y += sin(2 * M_PI * (time / 4 + 0.1)) / 10;
+	inPosAnim.y += sin(2 * M_PI * (time / 6 + 0.2)) / 8;
+	inPosAnim.y += sin(2 * M_PI * (time / 7 + 0.3)) / 6;
+	inPosAnim.y += sin(2 * M_PI * (time / 10 + 0.4)) / 4;
 
 	Position = inPosAnim;
 	gl_Position = projection * worldToView * vec4(inPosAnim, 1.0);
