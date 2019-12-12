@@ -27,7 +27,7 @@ GLFWwindow* window = NULL;
 Camera camera = Camera(); // position initialized in initTerrain
 Model* mTerrain;
 Shader *terrainShader, *skyboxShader, *waterShader, *fogShader;
-GLuint snowTex, rockTex, bottomTex, skyboxTex;
+GLuint snowTex, grassTex, rockTex, bottomTex, skyboxTex;
 TextureData terrainTex; // Terrain height map
 unsigned int waterVAO, skyboxVAO, fogVAO;
 unsigned int skyboxIndex;
@@ -37,5 +37,5 @@ float deltaTime = 0.0f;	// frame time for last frame
 float lastTime = 0.0f;
 float accTime; // for printFPS()
 int accFrames; // for printFPS()
-float mouseLastX = window_w / 2.0f;
+float mouseLastX = 0.0f;
 float mouseLastY = window_h / 2.0f;

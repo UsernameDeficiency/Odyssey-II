@@ -77,8 +77,6 @@ static void initTerrain()
 	   and add procTerrain values to the pregenerated map. */
 	LoadTGATextureData(terrainMap, &terrainTex); // TODO: Replace with loadStbTextureStruct
 	std::cout << ".";
-	//terrainShader->loadStbTextureStruct(terrainMap, &terrainTex);
-	//terrainShader->loadStbTextureRef(terrainMap, &terrainTex.texID, true);
 	float* procTerrain = diamondsquare(terrainTex.width, terrainTex.width);
 	mTerrain = generateTerrain(&terrainTex, procTerrain, world_xz_scale, world_y_scale, tex_scale);
 	std::cout << ".";
@@ -87,12 +85,14 @@ static void initTerrain()
 	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray, &terrainTex) + camera.height;
 	camera.Position = glm::vec3(world_size * world_xz_scale / 2, yPos, world_size * world_xz_scale / 2);
 	// Load terrain textures and upload to texture units
-	terrainShader->loadStbTextureRef("tex/snow.png", &snowTex, false);
-	terrainShader->loadStbTextureRef("tex/mud_rocks.png", &rockTex, false);
-	terrainShader->loadStbTextureRef("tex/mud.png", &bottomTex, false);
-	terrainShader->setInt("grassTex", 0);
-	terrainShader->setInt("rockTex", 1);
-	terrainShader->setInt("bottomTex", 2);
+	terrainShader->loadStbTextureRef("tex/snow_02.png", &snowTex, false);
+	terrainShader->loadStbTextureRef("tex/forest_ground_01.png", &grassTex, true);
+	terrainShader->loadStbTextureRef("tex/grass_path_2.png", &rockTex, true);
+	terrainShader->loadStbTextureRef("tex/brown_mud_dry.png", &bottomTex, false);
+	terrainShader->setInt("snowTex", 0);
+	terrainShader->setInt("grassTex", 1);
+	terrainShader->setInt("rockTex", 2);
+	terrainShader->setInt("bottomTex", 3);
 	terrainShader->setBool("drawFog", drawFog);
 	terrainShader->setVec3("fogColor", fogColor);
 	terrainShader->setFloat("seaLevel", sea_y_pos);
@@ -196,8 +196,10 @@ static void render(void)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, snowTex);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, rockTex);
+	glBindTexture(GL_TEXTURE_2D, grassTex);
 	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, rockTex);
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, bottomTex);
 
 	terrainShader->setMatrix4f("worldToView", camera.GetViewMatrix());

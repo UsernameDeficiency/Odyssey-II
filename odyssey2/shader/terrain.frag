@@ -1,6 +1,7 @@
 #version 400 core
 #define multiTexYLim 0.8
-#define multiTexWaterside 0.5
+#define snowHeight -900
+#define watersideOffset 0.5
 in vec2 passTexCoord;
 in vec3 passNormal;
 in vec3 phongNormal;
@@ -9,6 +10,7 @@ in vec3 pixelPos; // Fragment position in world coordinates
 out vec4 outColor;
 
 uniform float seaLevel;
+uniform sampler2D snowTex;
 uniform sampler2D grassTex;
 uniform sampler2D rockTex;
 uniform sampler2D bottomTex;
@@ -26,13 +28,18 @@ void main(void)
 	float diffuse = max(dot(normalize(lightDir), normalize(phongNormal)), 0.0);
 	float shade = ambient + 0.8*diffuse;
 
+	// TODO: Modulate multitexturing limits with gl_FragCoord to make limits less visible
 	// Lake bottom
-	if (pixelPos.y < seaLevel + multiTexWaterside) {
+	if (pixelPos.y < seaLevel + watersideOffset) {
 		outColor = vec4(shade * vec3(texture(bottomTex, passTexCoord)), 1.0);
 	}
-	// Grass
 	else if (normalize(passNormal).y > multiTexYLim) {
-		outColor = vec4(shade * vec3(texture(grassTex, passTexCoord)), 1.0);
+		// Grass
+		if (pixelPos.y < snowHeight)
+			outColor = vec4(shade * vec3(texture(grassTex, passTexCoord)), 1.0);
+		// Snow TODO: use mix() to blend between snow and underlying ground? Maybe use normal value to give gradual change
+		else
+			outColor = vec4(shade * vec3(texture(snowTex, passTexCoord)), 1.0);
 	}
 	// Rocky slope
 	else {
@@ -42,7 +49,7 @@ void main(void)
 	// Calculate fog
 	if (drawFog) {
 		float zNear = 3.0f;
-		float zFar = 18000.0f / 200.0f;
+		float zFar = 90.0f;
 		float z = gl_FragCoord.z * 2.0 - 1.0; // Normalized device coordinates
 		float depth = (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
 		depth = depth / zFar;
