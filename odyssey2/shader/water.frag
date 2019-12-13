@@ -20,22 +20,22 @@ void main()
 		float world_size = 2048.0 * 8.0;
 
 		float normPos = sqrt(Position.x * Position.x + Position.z * Position.z) / (sqrt(2.0) * world_size); // [0, 1]
-		normal.x = pow(abs(sin(2 * M_PI * (-time / 10 + normPos * numWaves))), 3) / 64;
+		normal.x = pow(abs(sin(2 * M_PI * (-time / 10 + normPos * numWaves))), 2) / 64;
 
 		// Add several waves with different velocity and amplitude
 		if (extraWaves)
 		{
 			normPos = sqrt((world_size - Position.x) * (world_size - Position.x) + Position.z * Position.z) / (sqrt(2.0) * world_size);
-			normal.z = pow(abs(cos(2 * M_PI * (-time / 8 + normPos * numWaves * 2))), 3) / 80;
+			normal.z = pow(abs(cos(2 * M_PI * (-time / 8 + normPos * numWaves * 2 + 0.2))), 2) / 80;
 
 			normPos = Position.x / world_size;
-			normal.x += pow(abs(sin(2 * M_PI * (-time / 7 + normPos * numWaves))), 3) / 96;
+			normal.x += pow(abs(sin(2 * M_PI * (-time / 7 + normPos * numWaves + 0.4))), 2) / 96;
 
 			normPos = Position.z / world_size;
-			normal.z += pow(abs(cos(2 * M_PI * (-time / 8 + normPos * numWaves * 2))), 3) / 64;
+			normal.z += pow(abs(cos(2 * M_PI * (-time / 8 + normPos * numWaves * 2 + 0.6))), 2) / 64;
 
 			normPos = (Position.x + Position.z) / (2.0 * world_size);
-			normal.x += pow(abs(sin(2 * M_PI * (time / 9 + normPos * numWaves * 2))), 3) / 128;
+			normal.x += pow(abs(sin(2 * M_PI * (time / 8 + normPos * numWaves * 2 + 0.8))), 2) / 128;
 		}
 
 		normal = normalize(normal); // Normal animation finished

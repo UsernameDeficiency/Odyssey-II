@@ -5,7 +5,7 @@
 #include "main.h"
 #include "loadobj.h"
 #include "Load_TGA_data.h" // loadTGATextureData
-#include "diamondsquare.h"
+#include "diamondsquare2i.h" // TODO
 #include "util_misc.h" // generateTerrain, debugMessage, exit_on_error, loadSkyboxTex
 #include "util_callback.h" // GLFW callbacks, updatePhysics
 #include "util_shader.h"
@@ -86,16 +86,17 @@ static void initTerrain()
 	camera.Position = glm::vec3(world_size * world_xz_scale / 2, yPos, world_size * world_xz_scale / 2);
 	// Load terrain textures and upload to texture units
 	terrainShader->loadStbTextureRef("tex/snow_02.png", &snowTex, false);
-	terrainShader->loadStbTextureRef("tex/forest_ground_01.png", &grassTex, true);
-	terrainShader->loadStbTextureRef("tex/grass_path_2.png", &rockTex, true);
-	terrainShader->loadStbTextureRef("tex/brown_mud_dry.png", &bottomTex, false);
+	terrainShader->loadStbTextureRef("tex/burned_ground_01.png", &grassTex, false);
+	terrainShader->loadStbTextureRef("tex/rock_06.png", &rockTex, false);
+	terrainShader->loadStbTextureRef("tex/sandstone_cracks.png", &bottomTex, false);
 	terrainShader->setInt("snowTex", 0);
 	terrainShader->setInt("grassTex", 1);
 	terrainShader->setInt("rockTex", 2);
 	terrainShader->setInt("bottomTex", 3);
 	terrainShader->setBool("drawFog", drawFog);
 	terrainShader->setVec3("fogColor", fogColor);
-	terrainShader->setFloat("seaLevel", sea_y_pos);
+	terrainShader->setFloat("seaHeight", sea_y_pos);
+	terrainShader->setFloat("snowHeight", snow_y_pos);
 }
 
 
@@ -136,6 +137,7 @@ static void initSkybox(void)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	loadSkyboxTex(skyboxPaths.at(skyboxIndex));
+
 	skyboxShader->setBool("draw_fog", drawFog);
 }
 

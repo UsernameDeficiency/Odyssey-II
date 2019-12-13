@@ -147,9 +147,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		waterShader->setBool("extraWaves", extraWaves);
 	}
 
-	// Toggle active skybox texture
+	// Change skybox texture
 	else if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
-		loadSkyboxTex(skyboxPaths.at(++skyboxIndex % skyboxPaths.size()));
+	{
+		skyboxIndex = ++skyboxIndex % skyboxPaths.size();
+		loadSkyboxTex(skyboxPaths.at(skyboxIndex));
+	}
 
 	// Toggle flight/walk mode
 	else if (key == GLFW_KEY_F && action == GLFW_PRESS)

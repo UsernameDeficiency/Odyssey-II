@@ -198,10 +198,15 @@ Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scal
 		vertexCount,
 		triangleCount * 3);
 
-	if (meanHeight > 0)
-		sea_y_pos = 0.80f * meanHeight / (tex->width * tex->width);
-	else
-		sea_y_pos = 1.25f * meanHeight / (tex->width * tex->width);
+	unsigned int normalization = tex->width * tex->width;
+	if (meanHeight > 0) {
+		sea_y_pos = 0.80f * meanHeight / normalization;
+		snow_y_pos = 1.25f * meanHeight / normalization;
+	}
+	else {
+		sea_y_pos = 1.25f * meanHeight / normalization;
+		snow_y_pos = 0.8f * meanHeight / normalization;
+	}
 	return model;
 }
 
@@ -209,8 +214,13 @@ Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scal
 /* Load a cubemap texture. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
+	// Make sure the wanted texture has not already been loaded. This method makes sure new memory is not allocated
+	// every time the skybox is changed but still loads the texture from disk every time.
 	unsigned int textureID;
-	glGenTextures(1, &textureID);
+	if (skyboxTextureID.at(skyboxIndex) != -1)
+		textureID = skyboxTextureID.at(skyboxIndex);
+	else
+		glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
 	int width, height, nrChannels;
@@ -254,5 +264,6 @@ void loadSkyboxTex(std::string skyboxPath)
 	};
 
 	skyboxTex = loadCubemap(faces);
+	skyboxTextureID.at(skyboxIndex) = skyboxTex;
 	skyboxShader->setInt("skyboxTex", 0);
 }

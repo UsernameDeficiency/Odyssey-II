@@ -6,6 +6,7 @@
 #pragma once
 #include <cmath>
 #include <iostream> // cerr
+#include "terrain_filter.h"
 
 
 /* Settings for diamond square algorithm */

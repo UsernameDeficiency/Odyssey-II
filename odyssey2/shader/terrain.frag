@@ -1,7 +1,5 @@
 #version 400 core
-#define multiTexYLim 0.8
-#define snowHeight -900
-#define watersideOffset 0.5
+#define multiTexYLim 0.75
 in vec2 passTexCoord;
 in vec3 passNormal;
 in vec3 phongNormal;
@@ -9,7 +7,8 @@ in vec3 pixelPos; // Fragment position in world coordinates
 
 out vec4 outColor;
 
-uniform float seaLevel;
+uniform float seaHeight;
+uniform float snowHeight;
 uniform sampler2D snowTex;
 uniform sampler2D grassTex;
 uniform sampler2D rockTex;
@@ -20,33 +19,40 @@ uniform vec3 fogColor;
 
 void main(void)
 {
+	// ------------------ Lighting --------------------
 	// World directional light
 	vec3 lightDir = mat3(worldToView) * vec3(1, 0.75, 1); // Direction to light source (sun)
 
 	// Calculate ambient and diffuse light
-	float ambient = 0.3;
+	float ambient = 0.25;
 	float diffuse = max(dot(normalize(lightDir), normalize(phongNormal)), 0.0);
-	float shade = ambient + 0.8*diffuse;
-
-	// TODO: Modulate multitexturing limits with gl_FragCoord to make limits less visible
-	// Lake bottom
-	if (pixelPos.y < seaLevel + watersideOffset) {
-		outColor = vec4(shade * vec3(texture(bottomTex, passTexCoord)), 1.0);
+	float shade = ambient + (1 - ambient) * diffuse;
+	
+	// --------------- Multitexturing -----------------
+	// Lake bottom/shoreline
+	if (pixelPos.y < seaHeight + 1.0) {
+		// Approximate light loss through deep water by gradually darkening fragments
+		float depthFac = max((1 + (pixelPos.y - seaHeight) / 256.0f), 0.05f);
+		outColor = vec4(shade * depthFac * vec3(texture(bottomTex, passTexCoord)), 1.0);
 	}
-	else if (normalize(passNormal).y > multiTexYLim) {
-		// Grass
-		if (pixelPos.y < snowHeight)
-			outColor = vec4(shade * vec3(texture(grassTex, passTexCoord)), 1.0);
-		// Snow TODO: use mix() to blend between snow and underlying ground? Maybe use normal value to give gradual change
-		else
-			outColor = vec4(shade * vec3(texture(snowTex, passTexCoord)), 1.0);
-	}
-	// Rocky slope
 	else {
+		// Rocky slope (underlying ground)
 		outColor = vec4(shade * vec3(texture(rockTex, passTexCoord)), 1.0);
-	}
 
-	// Calculate fog
+		// Blend ground with snow/grass
+		if (pixelPos.y < snowHeight && normalize(passNormal).y > multiTexYLim) {
+			// Gradually blend between rock/grass depending on angle of the surface and proximity to snow height
+			float grassBlend = max(min(8.0f * (normalize(passNormal).y - multiTexYLim) + 1.0f / (pixelPos.y - snowHeight), 1.0f), 0.0f);
+			outColor = mix(outColor, vec4(shade * vec3(texture(grassTex, passTexCoord)), 1.0), grassBlend);
+		}
+		else if (pixelPos.y > snowHeight) {
+			// Gradually blend between rock/snow depending on angle of the surface and altitude
+			float snowBlend = min((pixelPos.y - snowHeight) * normalize(passNormal).y / 256.0f, 1.0f);
+			outColor = mix(outColor, vec4(shade * vec3(texture(snowTex, passTexCoord)), 1.0), snowBlend);
+		}
+	}
+	
+	// -------------------- Fog -----------------------
 	if (drawFog) {
 		float zNear = 3.0f;
 		float zFar = 90.0f;

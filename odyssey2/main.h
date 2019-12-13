@@ -19,7 +19,7 @@ const float tex_scale = 256.0f;
 
 /* Global variables */
 float world_size; // width = height of world map
-float sea_y_pos; // Set by generateTerrain using mean height of terrain
+float sea_y_pos, snow_y_pos; // Set by generateTerrain using mean height of terrain
 bool drawFog, extraWaves; // Shader effects
 glm::vec3 fogColor = glm::vec3(0.7, 0.7, 0.7);
 const bool DEBUG_CONTEXT = false; // Enable/disable debugging context and prints
@@ -32,7 +32,8 @@ TextureData terrainTex; // Terrain height map
 unsigned int waterVAO, skyboxVAO, fogVAO;
 unsigned int skyboxIndex;
 std::vector<std::string> skyboxPaths = {
-	"ely_cloudtop", "stormydays", "hw_morning", "mp_heresy", "sb_frozen", "ame_starfield" };
+	"stormydays", "hw_morning", "sb_frozen", "ame_starfield" };
+std::vector<int> skyboxTextureID(skyboxPaths.size(), -1);
 float deltaTime = 0.0f;	// frame time for last frame
 float lastTime = 0.0f;
 float accTime; // for printFPS()

@@ -47,6 +47,9 @@
     <ClInclude Include="util_shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="diamondsquare2i.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\skybox.frag">

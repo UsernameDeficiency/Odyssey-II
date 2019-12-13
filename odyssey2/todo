@@ -7,13 +7,14 @@ https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
 
 Diamond-square:
 Decide what to do with diamond square parameters
-Implement spline interpolation
+Implement spline interpolation?
 Change arrays to double indices?
 Sliding window average for terrain smoothing?
 
-Optimization: Don't draw vertices outside frustum. Decrease detail level of far away vertices. GLM SIMD? Common libs modified?
+Optimization: 
+Don't draw vertices outside frustum. Decrease detail level of far away vertices. GLM SIMD? Common libs modified?
+Optimize terrain array size
 generateTerrain: Test GenerateNormals from loadobj? Optimize by reducing new and LoadDataToModel operations if possible (loadStbTextureRef in initTerrain also slow, but not possible to optimize?)
-Add wave effect to water surface
+
 Add image to the Github page, link to learnopengl? Windows only?
-Decide which texture maps to use
-Use viewing angle dot sun direction to blind player if looking into the sun?
+Decide which texture maps to use (types.txt)
