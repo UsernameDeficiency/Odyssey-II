@@ -1,9 +1,10 @@
-/* Filters for terrain smoothing */
+/* Filters for terrain smoothing, designed for the square terrain maps from diamondsquare.h */
 #pragma once
 #include <algorithm>
 
 
-static void smooth(float arr[], const int width)
+/* */
+static void mean(float arr[], const int width)
 {
 	for (size_t i = 1; i < (double)width * width - 1; i++)
 	{
@@ -12,6 +13,7 @@ static void smooth(float arr[], const int width)
 }
 
 
+/* */
 static void median(float arr[], const int width)
 {
 	float* arr_tmp = (float*)malloc(sizeof(float) * width * width);

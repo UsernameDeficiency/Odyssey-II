@@ -5,7 +5,7 @@
 #include "main.h"
 #include "loadobj.h"
 #include "Load_TGA_data.h" // loadTGATextureData
-#include "diamondsquare2i.h" // TODO
+#include "diamondsquare.h"
 #include "util_misc.h" // generateTerrain, debugMessage, exit_on_error, loadSkyboxTex
 #include "util_callback.h" // GLFW callbacks, updatePhysics
 #include "util_shader.h"

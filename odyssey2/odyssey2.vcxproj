@@ -25,8 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="diamondsquare.h" />
-    <ClInclude Include="diamondsquare2i.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="terrain_filter.h" />
     <ClInclude Include="util_callback.h" />
     <ClInclude Include="util_camera.h" />
     <ClInclude Include="util_misc.h" />

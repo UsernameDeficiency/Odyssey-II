@@ -18,3 +18,4 @@ generateTerrain: Test GenerateNormals from loadobj? Optimize by reducing new and
 
 Add image to the Github page, link to learnopengl? Windows only?
 Decide which texture maps to use (types.txt)
+Make .zip file for textures

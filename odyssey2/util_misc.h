@@ -130,7 +130,8 @@ Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scal
 	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount];
 	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount];
 	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3];
-	float meanHeight = 0; // Used to set sea_y_pos
+	// TODO: Implement minHeight/maxHeight, probably send to shader
+	float meanHeight{}, minHeight{}, maxHeight{}; // Used for snow and water effects
 
 	/* Fill vertex, texture coordinate and index array. */
 	for (x = 0; x < tex->width; x++) {
@@ -198,6 +199,7 @@ Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scal
 		vertexCount,
 		triangleCount * 3);
 
+	// TODO: This doesn't seem to scale properly with terrain scaling for unknown reason
 	unsigned int normalization = tex->width * tex->width;
 	if (meanHeight > 0) {
 		sea_y_pos = 0.80f * meanHeight / normalization;

@@ -11,7 +11,7 @@
 
 /* Settings for diamond square algorithm */
 // Base weight for randomized values in diamond-square algorithm.
-static const float BASE_WEIGHT = 5 * 128.0f;
+static const float BASE_WEIGHT = 5 * 128.0f; // TODO: Remove either this or world_y_scale
 // No random numbers will be added for steps with steps length shorter than LAST_STEP
 static const int LAST_STEP = 8;
 // Seeding for rand() in diamondsquare() (default 1).
