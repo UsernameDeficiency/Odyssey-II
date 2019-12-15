@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
+#include <float.h>
 
 /* Print welcome message */
 void greet()
@@ -78,34 +78,34 @@ void APIENTRY debugMessage(GLenum source, GLenum type, GLuint id, GLenum severit
 
 	switch (source)
 	{
-	case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
-	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window system"; break;
-	case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader compiler"; break;
-	case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third party"; break;
-	case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application"; break;
-	case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
-	} std::cout << std::endl;
+		case GL_DEBUG_SOURCE_API:             std::cout << "Source: API\n"; break;
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window system\n"; break;
+		case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader compiler\n"; break;
+		case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third party\n"; break;
+		case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application\n"; break;
+		case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other\n"; break;
+	}
 
 	switch (type)
 	{
-	case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
-	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated behaviour"; break;
-	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined behaviour"; break;
-	case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
-	case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
-	case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
-	case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push group"; break;
-	case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop group"; break;
-	case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
-	} std::cout << std::endl;
+		case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error\n"; break;
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated behaviour\n"; break;
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined behaviour\n"; break;
+		case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability\n"; break;
+		case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance\n"; break;
+		case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker\n"; break;
+		case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push group\n"; break;
+		case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop group\n"; break;
+		case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other\n"; break;
+	}
 
 	switch (severity)
 	{
-	case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: High"; break;
-	case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: Medium"; break;
-	case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: Low"; break;
-	case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: Notification"; break;
-	} std::cout << std::endl;
+		case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: High\n"; break;
+		case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: Medium\n"; break;
+		case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: Low\n"; break;
+		case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: Notification\n"; break;
+	}
 	std::cout << std::endl;
 }
 
@@ -119,19 +119,17 @@ void exit_on_error(const char* error)
 
 
 /* Load pre-generated heightmap from texture tex and add height values from procTerrain. */
-Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
+Model* generateTerrain(TextureData* tex, std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
 	const int vertexCount = tex->width * tex->height;
 	const int triangleCount = (tex->width - 1) * (tex->height - 1) * 2;
 	unsigned int x, z;
 	GLfloat texScaleX = tex->width / tex_scale;
 	GLfloat texScaleY = tex->height / tex_scale;
-	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount];
-	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount];
-	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount];
-	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3];
-	// TODO: Implement minHeight/maxHeight, probably send to shader
-	float meanHeight{}, minHeight{}, maxHeight{}; // Used for snow and water effects
+	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB TODO: Array sizes are much too large here
+	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB
+	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount]; // 130 MB
+	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3]; // 400 MB
 
 	/* Fill vertex, texture coordinate and index array. */
 	for (x = 0; x < tex->width; x++) {
@@ -140,7 +138,10 @@ Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scal
 
 			// Add pregenerated and diamond square heights
 			float y = (tex->imageData[index * (tex->bpp / 8)] + procTerrain[index]) * world_y_scale;
-			meanHeight += y;
+			if (y < minHeight)
+				minHeight = y;
+			if (y > maxHeight)
+				maxHeight = y;
 
 			vertexArray[index * 3 + 0] = x * world_xz_scale;
 			vertexArray[index * 3 + 1] = y;
@@ -199,16 +200,6 @@ Model* generateTerrain(TextureData* tex, float* procTerrain, float world_xz_scal
 		vertexCount,
 		triangleCount * 3);
 
-	// TODO: This doesn't seem to scale properly with terrain scaling for unknown reason
-	unsigned int normalization = tex->width * tex->width;
-	if (meanHeight > 0) {
-		sea_y_pos = 0.80f * meanHeight / normalization;
-		snow_y_pos = 1.25f * meanHeight / normalization;
-	}
-	else {
-		sea_y_pos = 1.25f * meanHeight / normalization;
-		snow_y_pos = 0.8f * meanHeight / normalization;
-	}
 	return model;
 }
 

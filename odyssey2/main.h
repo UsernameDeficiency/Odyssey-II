@@ -8,7 +8,7 @@
 
 
 /* Program settings */
-/* Terrain maps: fft-terrain (256), 512_flat, 512, 2048_flat, 16384_flat 
+/* Terrain maps: fft-terrain (256), 512, 2048_flat
 	For loadTGA, the image needs bottom-left origin, with or without RLE */
 const char terrainMap[] = "heightmap/2048_flat.tga";
 // Scaling values for terrain vertices/texture coordinates
@@ -19,7 +19,8 @@ const float tex_scale = 256.0f;
 
 /* Global variables */
 float world_size; // width = height of world map
-float sea_y_pos, snow_y_pos; // Set by generateTerrain using mean height of terrain
+// Used by generateTerrain to set heights for water and snow
+float minHeight{ FLT_MAX }, maxHeight{ -FLT_MAX }, sea_y_pos, snow_y_pos; 
 bool drawFog, extraWaves; // Shader effects
 glm::vec3 fogColor = glm::vec3(0.7, 0.7, 0.7);
 const bool DEBUG_CONTEXT = false; // Enable/disable debugging context and prints

@@ -7,6 +7,8 @@ in vec3 pixelPos; // Fragment position in world coordinates
 
 out vec4 outColor;
 
+uniform float minHeight;
+uniform float maxHeight;
 uniform float seaHeight;
 uniform float snowHeight;
 uniform sampler2D snowTex;
@@ -24,14 +26,14 @@ void main(void)
 	vec3 lightDir = mat3(worldToView) * vec3(1, 0.75, 1); // Direction to light source (sun)
 
 	// Calculate ambient and diffuse light
-	float ambient = 0.25;
+	float ambient = 0.025;
 	float diffuse = max(dot(normalize(lightDir), normalize(phongNormal)), 0.0);
 	float shade = ambient + (1 - ambient) * diffuse;
 	
 	// --------------- Multitexturing -----------------
 	// Lake bottom/shoreline
 	if (pixelPos.y < seaHeight + 1.0) {
-		// Approximate light loss through deep water by gradually darkening fragments
+		// TODO: Approximate light loss through deep water by gradually darkening fragments
 		float depthFac = max((1 + (pixelPos.y - seaHeight) / 256.0f), 0.05f);
 		outColor = vec4(shade * depthFac * vec3(texture(bottomTex, passTexCoord)), 1.0);
 	}
@@ -46,7 +48,7 @@ void main(void)
 			outColor = mix(outColor, vec4(shade * vec3(texture(grassTex, passTexCoord)), 1.0), grassBlend);
 		}
 		else if (pixelPos.y > snowHeight) {
-			// Gradually blend between rock/snow depending on angle of the surface and altitude
+			// TODO: Gradually blend between rock/snow depending on angle of the surface and altitude
 			float snowBlend = min((pixelPos.y - snowHeight) * normalize(passNormal).y / 256.0f, 1.0f);
 			outColor = mix(outColor, vec4(shade * vec3(texture(snowTex, passTexCoord)), 1.0), snowBlend);
 		}

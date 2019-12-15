@@ -44,9 +44,8 @@ void main()
 		vec3 I = normalize(Position - cameraPos);
 		vec3 R = reflect(I, normal);
 		// Blend cubemap (skybox) reflection and transparent water depending on reflection angle
-		float blend = dot(normal, R);
-		outColor = (1 - blend) * texture(skybox, R) + blend * vec4(0.21, 0.25, 0.3, 0.75);
-		//outColor = vec4(20*normal.x, 0.0, 20*normal.z, 1.0); // Normal animation debug
+		float blend = pow(dot(normal, R), 2);
+		outColor = max((1 - blend), 0.4) * texture(skybox, R);
 	}
 
 	else {

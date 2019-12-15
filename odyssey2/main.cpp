@@ -77,7 +77,7 @@ static void initTerrain()
 	   and add procTerrain values to the pregenerated map. */
 	LoadTGATextureData(terrainMap, &terrainTex); // TODO: Replace with loadStbTextureStruct
 	std::cout << ".";
-	float* procTerrain = diamondsquare(terrainTex.width, terrainTex.width);
+	std::vector<float> procTerrain = diamondsquare(terrainTex.width, terrainTex.width);
 	mTerrain = generateTerrain(&terrainTex, procTerrain, world_xz_scale, world_y_scale, tex_scale);
 	std::cout << ".";
 
@@ -95,6 +95,12 @@ static void initTerrain()
 	terrainShader->setInt("bottomTex", 3);
 	terrainShader->setBool("drawFog", drawFog);
 	terrainShader->setVec3("fogColor", fogColor);
+
+	float terrainHeight = maxHeight - minHeight;
+	sea_y_pos = minHeight + terrainHeight / 3;
+	snow_y_pos = maxHeight - terrainHeight / 3;
+	terrainShader->setFloat("minHeight", minHeight);
+	terrainShader->setFloat("maxHeight", maxHeight);
 	terrainShader->setFloat("seaHeight", sea_y_pos);
 	terrainShader->setFloat("snowHeight", snow_y_pos);
 }
