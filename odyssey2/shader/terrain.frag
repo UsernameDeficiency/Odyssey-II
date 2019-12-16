@@ -26,15 +26,15 @@ void main(void)
 	vec3 lightDir = mat3(worldToView) * vec3(1, 0.75, 1); // Direction to light source (sun)
 
 	// Calculate ambient and diffuse light
-	float ambient = 0.025;
+	float ambient = 0.25;
 	float diffuse = max(dot(normalize(lightDir), normalize(phongNormal)), 0.0);
 	float shade = ambient + (1 - ambient) * diffuse;
 	
 	// --------------- Multitexturing -----------------
 	// Lake bottom/shoreline
 	if (pixelPos.y < seaHeight + 1.0) {
-		// TODO: Approximate light loss through deep water by gradually darkening fragments
-		float depthFac = max((1 + (pixelPos.y - seaHeight) / 256.0f), 0.05f);
+		// Approximate light loss through deep water by gradually darkening fragments
+		float depthFac = max(1 + (pixelPos.y - seaHeight) / pow(pixelPos.y - minHeight, 0.85), 0.075f);
 		outColor = vec4(shade * depthFac * vec3(texture(bottomTex, passTexCoord)), 1.0);
 	}
 	else {
@@ -48,8 +48,8 @@ void main(void)
 			outColor = mix(outColor, vec4(shade * vec3(texture(grassTex, passTexCoord)), 1.0), grassBlend);
 		}
 		else if (pixelPos.y > snowHeight) {
-			// TODO: Gradually blend between rock/snow depending on angle of the surface and altitude
-			float snowBlend = min((pixelPos.y - snowHeight) * normalize(passNormal).y / 256.0f, 1.0f);
+			// Gradually blend between rock/snow depending on angle of the surface and altitude
+			float snowBlend = min((pixelPos.y - snowHeight) * normalize(passNormal).y / (maxHeight - pixelPos.y), 1.0f);
 			outColor = mix(outColor, vec4(shade * vec3(texture(snowTex, passTexCoord)), 1.0), snowBlend);
 		}
 	}

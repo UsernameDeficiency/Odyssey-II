@@ -45,7 +45,7 @@ void main()
 		vec3 R = reflect(I, normal);
 		// Blend cubemap (skybox) reflection and transparent water depending on reflection angle
 		float blend = pow(dot(normal, R), 2);
-		outColor = max((1 - blend), 0.4) * texture(skybox, R);
+		outColor = max((1 - blend), 0.5) * texture(skybox, R);
 	}
 
 	else {
