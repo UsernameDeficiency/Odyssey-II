@@ -12,7 +12,7 @@
 
 /* Settings for diamond square algorithm */
 // Base weight for randomized values in diamond-square algorithm.
-static const float BASE_WEIGHT = 7000.0f;
+static const float BASE_WEIGHT = 6000.0f;
 static const unsigned int SEED = 64;
 
 
@@ -20,26 +20,6 @@ static const unsigned int SEED = 64;
 float randnum(float max, float min)
 {
 	return (max - min) * (float)((double)(rand()) / (double)RAND_MAX) + min;
-}
-
-
-/* Calculate the scaling for random numbers
-	 For a "normal" implementation the amplitude is divided by sqrt(2) in each
-	 step. For this implementation the cutoff variable can be set, if it is set
-	 to >= 2 the amplitude for frequencies below the cutoff will be filtered out
-	 for use with pre-generated heightmaps describing the low frequency content. */
-// TODO: Remove this and always use sqrt(2) division
-static float calcweight(int step, int cutoff, float weight)
-{
-	return weight / (float)sqrt(2);
-	if (step <= cutoff / 8.0f) { // TODO: Why divide by 8 here?
-		/* High frequencies. Divide magnitude by sqrt(2) for each iteration */
-		return weight / (float)sqrt(2);
-	}
-	else {
-		/* Low frequencies, use constant filter amplitude up to cutoff frequency */
-		return weight; // TODO: This is not used if no divide by 8 above
-	}
 }
 
 
@@ -96,20 +76,20 @@ std::vector<float> diamondsquare(const int width, const int cutoff)
 	
 	/* Initialize corner values. Since the width for this implementation is 2^n rather than 2^n+1,
 	 * the right and lower edges are "cut off" and terrain[0] wraps around. */
-	float weight = calcweight(width, cutoff, BASE_WEIGHT);
+	float weight = BASE_WEIGHT;
 	(*terrain)[0] = randnum(weight, -weight);
 
 	// Iterate over step lengths.
 	for (int step = width; step > 1; step /= 2) {
 		// Do diamond part for current step length.
-		weight = calcweight(step, cutoff, weight);
+		weight /= (float)sqrt(2);
 		for (int row = 0; row < width; row += step) {
 			for (int col = 0; col < width; col += step) {
 				diamond(terrain, width, row, col, step, weight);
 			}
 		}
 		// Do square part for current step length.
-		weight = calcweight(step, cutoff, weight);
+		weight /= (float)sqrt(2);
 		for (int row = 0; row < width; row += step) {
 			for (int col = 0; col < width; col += step) {
 				square(terrain, width, row, col, step, weight);
@@ -117,5 +97,6 @@ std::vector<float> diamondsquare(const int width, const int cutoff)
 		}
 	}
 
+	mean(terrain, width);
 	return *terrain; // TODO: Will this return move terrain to the stack?
 }

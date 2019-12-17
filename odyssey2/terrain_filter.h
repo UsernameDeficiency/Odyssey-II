@@ -1,38 +1,43 @@
 /* Filters for terrain smoothing, designed for the square terrain maps from diamondsquare.h */
 #pragma once
 #include <algorithm>
+#include <vector>
 
 
 /* */
-static void mean(float arr[], const int width)
+static void mean(std::vector<float>* arr, const int filter_width)
 {
-	for (size_t i = 1; i < (double)width * width - 1; i++)
+	std::vector<float> *arr_temp = arr;
+	for (size_t i = filter_width; i < (double)arr->size() - 1; i++)
 	{
-		arr[i] = arr[i - 1] / 4 + arr[i] / 2 + arr[i + 1] / 4;
+		arr_temp->at(i) = arr->at(i - 1) / 4 + arr->at(i) / 2 + arr->at(i + 1) / 4;
+	}
+	for (size_t i = filter_width; i < (double)arr->size() - 1; i++)
+	{
+		arr->at(i) = arr_temp->at(i);
 	}
 }
 
 
 /* */
-static void median(float arr[], const int width)
+static void median(std::vector<float>* arr, const int filter_width)
 {
-	float* arr_tmp = (float*)malloc(sizeof(float) * width * width);
-	for (size_t i = width + 2; i < (double)width * (width - 1) - 2; i++)
+	float* arr_tmp = (float*)malloc(sizeof(float) * arr->size() * arr->size());
+	for (size_t i = arr->size() + 2; i < (double)arr->size() * (arr->size() - 1) - 2; i++)
 	{
-		float curr[5]{ arr[i - 2], arr[i - 1], arr[i], arr[i + 1], arr[i + 2] };
-		//float curr[3]{ arr[i - 1], arr[i], arr[i + 1] };
-		std::sort(curr, curr + 4);
-		arr_tmp[i] = curr[3];
+		std::vector<float> curr{ (*arr)[i - 2], (*arr)[i - 1], (*arr)[i], (*arr)[i + 1], (*arr)[i + 2] };
+		std::sort(curr.begin(), curr.end());
+		arr_tmp[i] = curr.at(curr.size() / 2);
 	}
 
-	for (size_t i = width + 2; i < (double)width * (width - 1) - 2; i++)
+	for (size_t i = arr->size() + filter_width; i < arr->size() * (arr->size() - 1) - 2; i++)
 	{
-		arr[i] = arr_tmp[i];
+		(*arr)[i] = arr_tmp[i];
 	}
 
-	for (size_t r = 0; r < width; r++)
+	for (size_t r = 0; r < arr->size(); r++)
 	{
-		for (size_t c = 0; r < width; c++)
+		for (size_t c = 0; r < arr->size(); c++)
 		{
 
 		}

@@ -49,7 +49,7 @@ void main(void)
 		}
 		else if (pixelPos.y > snowHeight) {
 			// Gradually blend between rock/snow depending on angle of the surface and altitude
-			float snowBlend = min((pixelPos.y - snowHeight) * normalize(passNormal).y / (maxHeight - pixelPos.y), 1.0f);
+			float snowBlend = min((pixelPos.y - snowHeight) * normalize(passNormal).y / pow(maxHeight - pixelPos.y, 0.85), 1.0f);
 			outColor = mix(outColor, vec4(shade * vec3(texture(snowTex, passTexCoord)), 1.0), snowBlend);
 		}
 	}
