@@ -9,6 +9,7 @@ Diamond-square:
 Implement filtering functions
 Change arrays to double indices?
 Sliding window average for terrain smoothing?
+Very filter strength with altitude?
 
 Optimization: 
 Don't draw vertices outside frustum. Decrease detail level of far away vertices? GLM SIMD? 

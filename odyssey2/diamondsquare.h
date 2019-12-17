@@ -81,7 +81,7 @@ std::vector<float> diamondsquare(const int width, const int cutoff)
 
 	// Iterate over step lengths.
 	for (int step = width; step > 1; step /= 2) {
-		// Do diamond part for current step length.
+		// Do diamond part for current step length
 		weight /= (float)sqrt(2);
 		for (int row = 0; row < width; row += step) {
 			for (int col = 0; col < width; col += step) {
@@ -96,7 +96,6 @@ std::vector<float> diamondsquare(const int width, const int cutoff)
 			}
 		}
 	}
-
-	mean(terrain, width);
-	return *terrain; // TODO: Will this return move terrain to the stack?
+	mean(terrain, 3); // Moving average filter
+	return *terrain;
 }
