@@ -96,6 +96,6 @@ std::vector<float> diamondsquare(const int width, const int cutoff)
 			}
 		}
 	}
-	mean(terrain, 3); // Moving average filter
+	mean(terrain, 5); // Moving average filter
 	return *terrain;
 }

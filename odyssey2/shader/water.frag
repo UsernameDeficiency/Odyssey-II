@@ -48,10 +48,10 @@ void main()
 	else {
 		// ---------------------------- Calculate fog -----------------------------
 		float zNear = 3.0f;
-		float zFar = 90.0f;
+		float zFar = 128.0f;
 		float z = gl_FragCoord.z * 2.0 - 1.0; // Normalized device coordinates
 		float depth = (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
-		depth = sqrt(depth / zFar);
+		depth = sqrt(depth / zFar); // sqrt gives a bit denser fog
 		outColor = vec4(depth * fogColor, depth) + (1 - depth) * vec4(0.5, 0.52, 0.55, 0.8);
 	}
 }
