@@ -6,15 +6,14 @@ https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
 https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
 
 Diamond-square:
-Implement filtering functions
+Implement median filtering
 Change arrays to double indices?
-Sliding window average for terrain smoothing?
 Very filter strength with altitude?
+Wrong distribution of random numbers from randnum?
 
 Optimization: 
 Don't draw vertices outside frustum. Decrease detail level of far away vertices? GLM SIMD? 
 Optimize terrain array size
 generateTerrain: Test GenerateNormals from loadobj?
 
-Add image to the Github page, link to learnopengl? Windows only?
-Make .zip file for textures
+Add image to the Github page, link to learnopengl? Windows only? Link to texture site

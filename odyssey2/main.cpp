@@ -177,6 +177,7 @@ static void initWaterSurface()
 	waterShader->setBool("draw_fog", drawFog);
 	waterShader->setBool("extraWaves", extraWaves);
 	waterShader->setVec3("fogColor", fogColor);
+	waterShader->setFloat("worldSize", world_xz_scale * world_size);
 }
 
 

@@ -34,7 +34,7 @@ void main(void)
 	// Lake bottom/shoreline
 	if (pixelPos.y < seaHeight + 1.0) {
 		// Approximate light loss through deep water by gradually darkening fragments
-		float depthFac = max(1 + (pixelPos.y - seaHeight) / pow(pixelPos.y - minHeight, 0.8), 0.075f);
+		float depthFac = max(1 + (pixelPos.y - seaHeight) / pow(pixelPos.y - minHeight, 0.8), 0.1f);
 		outColor = vec4(shade * depthFac * vec3(texture(bottomTex, passTexCoord)), 1.0);
 	}
 	else {
@@ -59,10 +59,10 @@ void main(void)
 	// -------------------- Fog -----------------------
 	if (drawFog) {
 		float zNear = 3.0f;
-		float zFar = 90.0f;
+		float zFar = 90.0f; // Fog distance
 		float z = gl_FragCoord.z * 2.0 - 1.0; // Normalized device coordinates
 		float depth = (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
-		depth = depth / zFar;
+		depth = sqrt(depth / zFar); // Normalization, gives a bit "denser" fog
 		outColor = vec4(depth * fogColor, depth) + vec4((1 - depth) * vec3(outColor), 1.0);
 	}
 }

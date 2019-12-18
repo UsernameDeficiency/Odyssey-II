@@ -7,6 +7,7 @@
 
 /* mean does filter_width-point moving average filtering of arr.
 	filter_width should be an odd positive integer, no sanity check done! */
+// TODO: Horizontal and vertical filtering should be done in same loop?
 static void mean(std::vector<float>* arr, const unsigned int filter_width)
 {
 	size_t arr_width = sqrt(arr->size()); // width = height of terrain array
@@ -70,22 +71,21 @@ static void mean(std::vector<float>* arr, const unsigned int filter_width)
 }
 
 
-/* */
+/* median does filter_width-point median filtering of arr.
+	filter_width should be an odd positive integer, no sanity check done! */
 static void median(std::vector<float>* arr, const int filter_width)
 {
-	std::vector<float>* arr_tmp = new std::vector<float>(arr->size());
+	//for (size_t i = arr->size() + 2; i < (double)arr->size() * (arr->size() - 1) - 2; i++)
+	//{
+	//	std::vector<float> curr{ (*arr)[i - 2], (*arr)[i - 1], (*arr)[i], (*arr)[i + 1], (*arr)[i + 2] };
+	//	std::sort(curr.begin(), curr.end());
+	//	arr_tmp->at(i) = curr.at(curr.size() / 2);
+	//}
 
-	for (size_t i = arr->size() + 2; i < (double)arr->size() * (arr->size() - 1) - 2; i++)
-	{
-		std::vector<float> curr{ (*arr)[i - 2], (*arr)[i - 1], (*arr)[i], (*arr)[i + 1], (*arr)[i + 2] };
-		std::sort(curr.begin(), curr.end());
-		arr_tmp->at(i) = curr.at(curr.size() / 2);
-	}
+	//for (size_t i = arr->size() + filter_width; i < arr->size() * (arr->size() - 1) - 2; i++)
+	//{
+	//	(*arr)[i] = arr_tmp->at(i);
+	//}
 
-	for (size_t i = arr->size() + filter_width; i < arr->size() * (arr->size() - 1) - 2; i++)
-	{
-		(*arr)[i] = arr_tmp->at(i);
-	}
 
-	delete arr_tmp;
 }

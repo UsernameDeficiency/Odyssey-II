@@ -10,10 +10,10 @@
 /* Program settings */
 /* Terrain maps: fft-terrain (256), 512, 2048_flat
 	For loadTGA, the image needs bottom-left origin, with or without RLE */
-const char terrainMap[] = "heightmap/512.tga";
+const char terrainMap[] = "heightmap/1024.tga";
 // Scaling values for terrain vertices/texture coordinates
 const float world_xz_scale = 8.0f;
-const float world_y_scale = 1.0f / 4;
+const float world_y_scale = 0.5f;
 const float tex_scale = 256.0f;
 
 

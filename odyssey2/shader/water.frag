@@ -10,32 +10,29 @@ uniform float time;
 uniform bool drawFog;
 uniform bool extraWaves;
 uniform vec3 fogColor;
+uniform float worldSize;
 
 void main()
 {
 	if (!drawFog) {
 		// ------------------ Calculate wave effect for normal --------------------
 		vec3 normal = vec3(0.0, 1.0, 0.0);
-		int numWaves = 96;
-		float world_size = 2048.0 * 8.0;
+		int numWaves = 64;
 
-		float normPos = sqrt(Position.x * Position.x + Position.z * Position.z) / (sqrt(2.0) * world_size); // [0, 1]
+		float normPos = sqrt(Position.x * Position.x + Position.z * Position.z) / (sqrt(2.0) * worldSize); // [0, 1]
 		normal.x = pow(abs(sin(2 * M_PI * (-time / 10 + normPos * numWaves))), 2) / 64;
 
 		// Add several waves with different velocity and amplitude
 		if (extraWaves)
 		{
-			normPos = Position.z / world_size;
+			normPos = Position.z / worldSize;
 			normal.z += pow(abs(sin(2 * M_PI * (time / 6 + normPos * numWaves * 2 + 0.2))), 2) / 64;
 
-			normPos = sqrt((world_size - Position.x) * (world_size - Position.x) + Position.z * Position.z) / (sqrt(2.0) * world_size);
-			normal.z = pow(abs(sin(2 * M_PI * (-time / 7 + normPos * numWaves * 2 + 0.6))), 2) / 96;
+			normPos = sqrt((worldSize - Position.x) * (worldSize - Position.x) + Position.z * Position.z) / (sqrt(2.0) * worldSize);
+			normal.z = pow(abs(sin(2 * M_PI * (-time / 8 + normPos * numWaves * 2 + 0.6))), 2) / 96;
 
-			normPos = (Position.x + Position.z) / (2.0 * world_size);
-			normal.x += pow(abs(sin(2 * M_PI * (-time / 8 + normPos * numWaves * 2 + 0.8))), 2) / 96;
-
-			//normPos = Position.x / world_size;
-			//normal.x += pow(abs(sin(2 * M_PI * (-time / 9 + normPos * numWaves + 0.4))), 2) / 96;
+			normPos = (Position.x + Position.z) / (2.0 * worldSize);
+			normal.x += pow(abs(sin(2 * M_PI * (time / 9 + normPos * numWaves * 2 + 0.8))), 2) / 96;
 		}
 
 		normal = normalize(normal); // Normal animation finished
@@ -54,7 +51,7 @@ void main()
 		float zFar = 90.0f;
 		float z = gl_FragCoord.z * 2.0 - 1.0; // Normalized device coordinates
 		float depth = (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
-		depth = depth / zFar;
-		outColor = vec4(depth * fogColor, depth) + (1 - depth) * vec4(0.5, 0.52, 0.56, 0.85);
+		depth = sqrt(depth / zFar);
+		outColor = vec4(depth * fogColor, depth) + (1 - depth) * vec4(0.5, 0.52, 0.55, 0.8);
 	}
 }
