@@ -76,7 +76,7 @@ static void median(std::vector<float>* arr, const int filter_width)
 {
 	size_t arr_width = sqrt(arr->size()); // width = height of terrain array
 	std::vector<float>* arr_tmp = new std::vector<float>(arr->size());
-	std::vector<float> median; // TODO: Fill this instead of calculate average
+	std::vector<float> median;
 
 	// Horizontal filter
 	for (size_t row = 0; row < arr_width; row++) {
