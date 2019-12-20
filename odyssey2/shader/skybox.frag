@@ -5,10 +5,12 @@ out vec4 outColor;
 
 uniform samplerCube skyboxTex;
 uniform bool drawFog;
+uniform vec3 fogColor;
 
 void main()
 {
 	if (!drawFog)
 		outColor = texture(skyboxTex, TexCoord);
-	// else, show background color (fog)
+	else
+		outColor = vec4(fogColor, 1.0f);
 }

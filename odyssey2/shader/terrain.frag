@@ -26,7 +26,7 @@ void main(void)
 	vec3 lightDir = mat3(worldToView) * vec3(1, 0.75, 1); // Direction to light source (sun)
 
 	// Calculate ambient and diffuse light
-	float ambient = 0.25;
+	float ambient = 0.35;
 	float diffuse = max(dot(normalize(lightDir), normalize(phongNormal)), 0.0);
 	float shade = ambient + (1 - ambient) * diffuse;
 	
