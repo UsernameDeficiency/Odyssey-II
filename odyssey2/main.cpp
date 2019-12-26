@@ -85,9 +85,9 @@ static void initTerrain()
 	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray, &terrainTex) + camera.height;
 	camera.Position = glm::vec3(world_size * world_xz_scale / 2, yPos, world_size * world_xz_scale / 2);
 	// Load terrain textures and upload to texture units
-	terrainShader->loadStbTextureRef("tex/snow_02_translucent.png", &snowTex, false);
-	terrainShader->loadStbTextureRef("tex/brown_mud_rocks_01.png", &grassTex, false);
-	terrainShader->loadStbTextureRef("tex/rock_03.png", &rockTex, false);
+	terrainShader->loadStbTextureRef("tex/rock_08.png", &snowTex, false); // Alt. rock_03
+	terrainShader->loadStbTextureRef("tex/mud_leaves.png", &grassTex, false);
+	terrainShader->loadStbTextureRef("tex/red_dirt_mud_01.png", &rockTex, false);
 	terrainShader->loadStbTextureRef("tex/brown_mud_rocks_01.png", &bottomTex, false);
 	terrainShader->setInt("snowTex", 0);
 	terrainShader->setInt("grassTex", 1);
