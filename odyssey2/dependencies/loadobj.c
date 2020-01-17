@@ -1261,8 +1261,7 @@ void DrawWireframeModel(Model *m, GLuint program, const char* vertexVariableName
 		glDrawElements(GL_LINE_STRIP, m->numIndices, GL_UNSIGNED_INT, 0L);
 	}
 }
-	
-// BuildModelVAO2
+
 
 // Called from LoadModelPlus and LoadDataToModel
 // VAO and VBOs must already exist!
@@ -1344,30 +1343,4 @@ Model* LoadDataToModel(
 	ReloadModelData(m);
 	
 	return m;
-}
-
-// Cleanup function, not tested!
-void DisposeModel(Model *m)
-{
-	if (m != NULL)
-	{
-		if (m->vertexArray != NULL)
-			free(m->vertexArray);
-		if (m->normalArray != NULL)
-			free(m->normalArray);
-		if (m->texCoordArray != NULL)
-			free(m->texCoordArray);
-		if (m->colorArray != NULL) // obsolete?
-			free(m->colorArray);
-		if (m->indexArray != NULL)
-			free(m->indexArray);
-			
-		// Lazy error checking heter since "glDeleteBuffers silently ignores 0's and names that do not correspond to existing buffer objects."
-		glDeleteBuffers(1, &m->vb);
-		glDeleteBuffers(1, &m->ib);
-		glDeleteBuffers(1, &m->nb);
-		glDeleteBuffers(1, &m->tb);
-		glDeleteBuffers(1, &m->vao);
-	}
-	free(m);
 }

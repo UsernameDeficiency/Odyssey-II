@@ -41,7 +41,7 @@ void updatePhysics()
 		else if (camera.Position.z > world_size * world_xz_scale - 2.0f)
 			camera.Position.z = world_size * world_xz_scale - 2.0f;
 
-		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray) + camera.height;
+		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray) + camera.height;  // TODO: Remove mTerrain
 		const float swim_height = sea_y_pos + camera.height / 3;
 
 		// Make sure player does not drown.

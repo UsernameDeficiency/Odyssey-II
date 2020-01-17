@@ -4,7 +4,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-//#include "Load_TGA_data.h" // TextureData
 #include <string>
 #include <fstream>
 #include <sstream>

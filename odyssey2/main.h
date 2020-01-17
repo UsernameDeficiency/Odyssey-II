@@ -2,21 +2,16 @@
 #include <vector>
 #include <string>
 #include "loadobj.h" // Model
-//#include "Load_TGA_data.h" // TextureData
 #include "util_camera.h" // Camera and camera settings
 #include "util_shader.h" // Shader
 
 
 /* Program settings */
-/* Terrain maps: fft-terrain (256), 512, 2048_flat
-	For loadTGA, the image needs bottom-left origin, with or without RLE */
-//const char terrainMap[] = "heightmap/1024.tga";
 // Scaling values for terrain vertices/texture coordinates
-const float world_xz_scale = 8.0f;
-const float world_y_scale = 0.55f;
+const float world_xz_scale = 16.0f;
+const float world_y_scale = 2.0f;
 const float tex_scale = 128.0f;
-int world_size = 1024; // TODO: width = height of world map
-//TextureData terrainTex; // Terrain height map
+int world_size = 2048; // width = height of world map
 
 
 /* Global variables */

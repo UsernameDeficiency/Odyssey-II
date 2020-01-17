@@ -17,7 +17,7 @@ void main()
 	if (!drawFog) {
 		// ------------------ Calculate wave effect for normal --------------------
 		vec3 normal = vec3(0.0, 1.0, 0.0);
-		int numWaves = 64;
+		int numWaves = 128;
 
 		float normPos = sqrt(Position.x * Position.x + Position.z * Position.z) / (sqrt(2.0) * worldSize); // [0, 1]
 		normal.x = pow(abs(sin(2 * M_PI * (-time / 10 + normPos * numWaves))), 2) / 64;

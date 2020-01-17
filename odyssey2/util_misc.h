@@ -121,11 +121,8 @@ void exit_on_error(const char* error)
 Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
 	const int vertexCount = world_size * world_size;
-	//const int triangleCount = (tex->width - 1) * (tex->height - 1) * 2;
 	const int triangleCount = (world_size - 1) * (world_size - 1) * 2;
 	unsigned int x, z;
-	//GLfloat texScaleX = tex->width / tex_scale;
-	//GLfloat texScaleY = tex->height / tex_scale;
 	GLfloat texScaleX = world_size / tex_scale;
 	GLfloat texScaleY = world_size / tex_scale;
 	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB TODO: Array sizes are very large here
