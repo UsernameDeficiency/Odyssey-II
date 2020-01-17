@@ -44,9 +44,7 @@ void main(void)
 		// Blend ground with snow/grass
 		if (pixelPos.y < snowHeight && normalize(passNormal).y > multiTexYLim) {
 			// Gradually blend between rock/grass depending on angle of the surface and proximity to snow height
-			// TODO: Blend out slower at high altitudes
-			// TODO: Should not be both max and min here, use clamp or remove unnecessary max/min
-			float grassBlend = max(min(8.0f * (normalize(passNormal).y - multiTexYLim) + 1.0f / (pixelPos.y - snowHeight), 1.0f), 0.0f);
+			float grassBlend = clamp(8.0f * (normalize(passNormal).y - multiTexYLim) + 1.0f / (pixelPos.y - snowHeight), 0.0f, 1.0f);
 			outColor = mix(outColor, vec4(shade * vec3(texture(grassTex, passTexCoord)), 1.0), grassBlend);
 		}
 		else if (pixelPos.y > snowHeight) {
