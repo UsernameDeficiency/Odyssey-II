@@ -1,6 +1,5 @@
 /* Miscellaneous utility functions for the main program */
 #pragma once
-#include "load_TGA_data.h" // TextureData*
 #include "util_shader.h"
 #include "loadobj.h" // Model*
 #include "glm/vec3.hpp"
@@ -24,8 +23,7 @@ void greet()
 		"Toggle fog: F1\n"
 		"Toggle water wave effect: F2\n"
 		"Toggle skybox: F3\n"
-		"------------------------------------\n"
-		"Loading";
+		"------------------------------------\n";
 }
 
 
@@ -45,7 +43,7 @@ void printFPS()
 
 
 /* Interpolate y values over the vertex at position (x, z). No bounds checking for x and z. */
-float getPosy(float x, float z, GLfloat* vertexArray, TextureData* tex)
+float getPosy(float x, float z, GLfloat* vertexArray)
 {
 	float yPos, y1, y2, y3;
 	x /= world_xz_scale;
@@ -57,9 +55,9 @@ float getPosy(float x, float z, GLfloat* vertexArray, TextureData* tex)
 
 	// Interpolate over the triangle at the current player position.
 	// Interpolation is done into higher x and z, therefore x and z must be below upper array bounds
-	y1 = vertexArray[(xtile + ztile * tex->width) * 3 + 1];
-	y2 = vertexArray[((xtile + 1) + ztile * tex->width) * 3 + 1];
-	y3 = vertexArray[(xtile + (ztile + 1) * tex->width) * 3 + 1];
+	y1 = vertexArray[(xtile + ztile * world_size) * 3 + 1];
+	y2 = vertexArray[((xtile + 1) + ztile * world_size) * 3 + 1];
+	y3 = vertexArray[(xtile + (ztile + 1) * world_size) * 3 + 1];
 
 	yPos = y1 + xPos * (y2 - y1) + zPos * (y3 - y1);
 
@@ -118,26 +116,31 @@ void exit_on_error(const char* error)
 }
 
 
+// TODO: Hard code Model contents here
 /* Load pre-generated heightmap from texture tex and add height values from procTerrain. */
-Model* generateTerrain(TextureData* tex, std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
+Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
-	const int vertexCount = tex->width * tex->height;
-	const int triangleCount = (tex->width - 1) * (tex->height - 1) * 2;
+	const int vertexCount = world_size * world_size;
+	//const int triangleCount = (tex->width - 1) * (tex->height - 1) * 2;
+	const int triangleCount = (world_size - 1) * (world_size - 1) * 2;
 	unsigned int x, z;
-	GLfloat texScaleX = tex->width / tex_scale;
-	GLfloat texScaleY = tex->height / tex_scale;
-	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB TODO: Array sizes are much too large here
+	//GLfloat texScaleX = tex->width / tex_scale;
+	//GLfloat texScaleY = tex->height / tex_scale;
+	GLfloat texScaleX = world_size / tex_scale;
+	GLfloat texScaleY = world_size / tex_scale;
+	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB TODO: Array sizes are very large here
 	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB
 	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount]; // 130 MB
 	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3]; // 400 MB
 
 	/* Fill vertex, texture coordinate and index array. */
-	for (x = 0; x < tex->width; x++) {
-		for (z = 0; z < tex->height; z++) {
-			int index = x + z * tex->width;
+	for (x = 0; x < world_size; x++) {
+		for (z = 0; z < world_size; z++) {
+			int index = x + z * world_size;
 
 			// Add pregenerated and diamond square heights
-			float y = (tex->imageData[index * (tex->bpp / 8)] + procTerrain[index]) * world_y_scale;
+			//float y = (tex->imageData[index * (tex->bpp / 8)] + procTerrain[index]) * world_y_scale;
+			float y = procTerrain[index] * world_y_scale;
 			if (y < minHeight)
 				minHeight = y;
 			if (y > maxHeight)
@@ -151,34 +154,34 @@ Model* generateTerrain(TextureData* tex, std::vector<float> procTerrain, float w
 			texCoordArray[index * 2 + 0] = (float)x / texScaleX;
 			texCoordArray[index * 2 + 1] = (float)z / texScaleY;
 
-			if ((x != tex->width - 1) && (z != tex->width - 1)) {
-				index = (x + z * (tex->width - 1)) * 6;
+			if ((x != world_size - 1) && (z != world_size - 1)) {
+				index = (x + z * (world_size - 1)) * 6;
 				// Triangle 1
-				indexArray[index] = x + z * tex->width;
-				indexArray[index + 1] = x + (z + 1) * tex->width;
-				indexArray[index + 2] = x + 1 + z * tex->width;
+				indexArray[index] = x + z * world_size;
+				indexArray[index + 1] = x + (z + 1) * world_size;
+				indexArray[index + 2] = x + 1 + z * world_size;
 				// Triangle 2
-				indexArray[index + 3] = x + 1 + z * tex->width;
-				indexArray[index + 4] = x + (z + 1) * tex->width;
-				indexArray[index + 5] = x + 1 + (z + 1) * tex->width;
+				indexArray[index + 3] = x + 1 + z * world_size;
+				indexArray[index + 4] = x + (z + 1) * world_size;
+				indexArray[index + 5] = x + 1 + (z + 1) * world_size;
 			}
 		}
 	}
 
 	/* Calculate normals (cross product of two vectors along current triangle) */
-	for (x = 0; x < tex->width; x++) {
-		for (z = 0; z < tex->height; z++) {
-			int index = (x + z * tex->width) * 3;
+	for (x = 0; x < world_size; x++) {
+		for (z = 0; z < world_size; z++) {
+			int index = (x + z * world_size) * 3;
 			// Initialize normals along edges to pointing straight up
-			if (x == 0 || (x == tex->width - 1) || z == 0 || (z == tex->width - 1)) {
+			if (x == 0 || (x == world_size - 1) || z == 0 || (z == world_size - 1)) {
 				normalArray[index] = 0.0;
 				normalArray[index + 1] = 1.0;
 				normalArray[index + 2] = 0.0;
 			}
 			// Inside edges, here the required indices are in bounds
 			else {
-				glm::vec3 p0(vertexArray[index + tex->width * 3], vertexArray[index + 1 + tex->width * 3], vertexArray[index + 2 + tex->width * 3]);
-				glm::vec3 p1(vertexArray[index - tex->width * 3], vertexArray[index - tex->width * 3 + 1], vertexArray[index - tex->width * 3 + 2]);
+				glm::vec3 p0(vertexArray[index + world_size * 3], vertexArray[index + 1 + world_size * 3], vertexArray[index + 2 + world_size * 3]);
+				glm::vec3 p1(vertexArray[index - world_size * 3], vertexArray[index - world_size * 3 + 1], vertexArray[index - world_size * 3 + 2]);
 				glm::vec3 p2(vertexArray[index - 3], vertexArray[index - 2], vertexArray[index - 1]);
 				glm::vec3 a(p1 - p0);
 				glm::vec3 b(p2 - p0);

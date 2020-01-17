@@ -4,7 +4,7 @@
 #include <glm/mat4x4.hpp>
 #include "main.h"
 #include "loadobj.h"
-#include "Load_TGA_data.h" // loadTGATextureData
+//#include "Load_TGA_data.h" // loadTGATextureData
 #include "diamondsquare.h"
 #include "util_misc.h" // generateTerrain, debugMessage, exit_on_error, loadSkyboxTex
 #include "util_callback.h" // GLFW callbacks, updatePhysics
@@ -75,14 +75,11 @@ static void initTerrain()
 
 	/* Load pregenerated terrain data from terrainMap, calculate procedural terrain
 	   and add procTerrain values to the pregenerated map. */
-	LoadTGATextureData(terrainMap, &terrainTex); // TODO: Replace with loadStbTextureStruct
-	std::cout << ".";
-	std::vector<float> procTerrain = diamondsquare(terrainTex.width, terrainTex.width);
-	mTerrain = generateTerrain(&terrainTex, procTerrain, world_xz_scale, world_y_scale, tex_scale);
-	std::cout << ".";
+	std::vector<float> procTerrain = diamondsquare(world_size);
+	mTerrain = generateTerrain(procTerrain, world_xz_scale, world_y_scale, tex_scale);
 
-	world_size = (float)terrainTex.width; // Assuming square terrain map
-	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray, &terrainTex) + camera.height;
+	//world_size = (float)terrainTex.width; // Assuming square terrain map
+	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray) + camera.height;
 	camera.Position = glm::vec3(world_size * world_xz_scale / 2, yPos, world_size * world_xz_scale / 2);
 	// Load terrain textures and upload to texture units
 	terrainShader->loadStbTextureRef("tex/rock_08.png", &snowTex, false); // Alt. rock_03
@@ -239,10 +236,8 @@ int main(int argc, char **argv)
 	greet();
 	initGL();
 	initTerrain();
-	std::cout << ".";
 	initSkybox();
 	initWaterSurface();
-	std::cout << " finished!\n\n";
 	glfwShowWindow(window);
 
 	// Main render loop

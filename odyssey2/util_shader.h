@@ -4,7 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "Load_TGA_data.h" // TextureData
+//#include "Load_TGA_data.h" // TextureData
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -118,13 +118,13 @@ public:
 	}
 
 	// Load a texture, using texture struct
-	void loadStbTextureStruct(const char* filename, TextureData* texture, bool alpha)
-	{
-		// TODO: Implement this function, properly set TextureData members
-		texture->bpp = 8;
-		texture->imageData = nullptr;
-		loadStbTexture(filename, &texture->texID, (int*)&texture->width, (int *)&texture->height, alpha);
-	}
+	//void loadStbTextureStruct(const char* filename, TextureData* texture, bool alpha)
+	//{
+	//	// TODO: Implement this function, properly set TextureData members
+	//	texture->bpp = 8;
+	//	texture->imageData = nullptr;
+	//	loadStbTexture(filename, &texture->texID, (int*)&texture->width, (int *)&texture->height, alpha);
+	//}
 
 	// Used by loadStbTextureRef and loadStbTextureStruct to load texture.
 	void loadStbTexture(const char* filename, GLuint* textureRef, int* width, int* height, bool alpha)

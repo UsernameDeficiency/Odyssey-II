@@ -67,7 +67,7 @@ static void square(std::vector<float> *arr, int width, int row, int col, int ste
 /* diamondsquare creates a heightmap of size width*width using the diamond square
 	 algorithm with base offset weight for the random numbers.
 	 filter_stop is the (HP) filter stop frequency described as a step length. */
-std::vector<float> diamondsquare(const int width, const int cutoff)
+std::vector<float> diamondsquare(const int width)
 {
 	// Set seeding for random numbers
 	srand(SEED);
