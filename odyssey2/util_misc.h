@@ -1,12 +1,11 @@
 /* Miscellaneous utility functions for the main program */
 #pragma once
-#include "util_shader.h"
-#include "loadobj.h" // Model*
-#include "glm/vec3.hpp"
 #include <iostream>
 #include <vector>
 #include <string>
-#include <float.h>
+#include "glm/vec3.hpp"
+#include "loadobj.h" // Model*
+#include "main.h"
 
 /* Print welcome message */
 void greet()
@@ -14,7 +13,6 @@ void greet()
 	std::cout << "------------------------------------\n"
 		"       Welcome to Odyssey II!\n"
 		"------------------------------------\n"
-		"The following controls are available\n"
 		"Move: W/A/S/D/Q/E\n"
 		"Run: Shift\n"
 		"Zoom: Ctrl\n"
@@ -30,6 +28,9 @@ void greet()
 /* Print average FPS once every second */
 void printFPS()
 {
+	static unsigned int accFrames;
+	static float accTime;
+
 	accTime += deltaTime;
 	accFrames++;
 
@@ -116,7 +117,6 @@ void exit_on_error(const char* error)
 }
 
 
-// TODO: Hard code Model contents here
 /* Load pre-generated heightmap from texture tex and add height values from procTerrain. */
 Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
@@ -125,10 +125,10 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 	unsigned int x, z;
 	GLfloat texScaleX = world_size / tex_scale;
 	GLfloat texScaleY = world_size / tex_scale;
-	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB TODO: Array sizes are very large here
-	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // 200 MB
-	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount]; // 130 MB
-	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3]; // 400 MB
+	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // TODO: Array sizes too large here?
+	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount];
+	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount];
+	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3];
 
 	/* Fill vertex, texture coordinate and index array. */
 	for (x = 0; x < world_size; x++) {
@@ -136,7 +136,6 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 			int index = x + z * world_size;
 
 			// Add pregenerated and diamond square heights
-			//float y = (tex->imageData[index * (tex->bpp / 8)] + procTerrain[index]) * world_y_scale;
 			float y = procTerrain[index] * world_y_scale;
 			if (y < minHeight)
 				minHeight = y;
@@ -190,12 +189,11 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 			}
 		}
 	}
-	// Create Model and upload to GPU:
+	// Create Model and upload to GPU
 	Model* model = LoadDataToModel(
 		vertexArray,
 		normalArray,
 		texCoordArray,
-		NULL,
 		indexArray,
 		vertexCount,
 		triangleCount * 3);
@@ -210,11 +208,13 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	// Make sure the wanted texture has not already been loaded. This method makes sure new memory is not allocated
 	// every time the skybox is changed but still loads the texture from disk every time.
 	unsigned int textureID;
-	if (skyboxTextureID.at(skyboxIndex) != -1)
-		textureID = skyboxTextureID.at(skyboxIndex);
-	else
-		glGenTextures(1, &textureID);
+	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	int width, height, nrChannels;
 	for (unsigned int i = 0; i < faces.size(); i++)
@@ -230,18 +230,12 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 			0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		stbi_image_free(data);
 	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
 }
 
 
-/* Load skybox texture in the given folder. 
-	Available skyboxes: ely_cloudtop, miramar, stormydays */
+/* Load skybox texture from the given folder. */
 void loadSkyboxTex(std::string skyboxPath)
 {
 	skyboxShader->use();
@@ -257,6 +251,5 @@ void loadSkyboxTex(std::string skyboxPath)
 	};
 
 	skyboxTex = loadCubemap(faces);
-	skyboxTextureID.at(skyboxIndex) = skyboxTex;
 	skyboxShader->setInt("skyboxTex", 0);
 }

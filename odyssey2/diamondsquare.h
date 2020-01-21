@@ -6,8 +6,6 @@
 #pragma once
 #include <vector>
 #include <cmath>
-#include <iostream> // cerr
-#include "terrain_filter.h"
 
 
 /* Settings for diamond square algorithm */
@@ -25,7 +23,7 @@ float randnum(float max, float min)
 
 /* diamond uses the current step length to calculate indices and do linear
 	 interpolation for the diamond step */
-static void diamond(std::vector<float> *arr, int width, int row, int col, int step, float weight)
+static void diamond(std::vector<float> *arr, unsigned int width, unsigned int row, unsigned int col, unsigned int step, float weight)
 {
 	// Indices for upper/lower right and left corners of the square area being worked on, the mean of the corner
 	// values give the base displacement for the current point being calculated. Wrap-around if out of bounds.
@@ -42,7 +40,7 @@ static void diamond(std::vector<float> *arr, int width, int row, int col, int st
 
 /* square uses the current step length to calculate indices and do linear
 	 interpolation for the upper and left points in the square step */
-static void square(std::vector<float> *arr, int width, int row, int col, int step, float weight)
+static void square(std::vector<float> *arr, unsigned int width, unsigned int row, unsigned int col, unsigned int step, float weight)
 {
 	int r_left = row + step / 2;
 	int c_up = col + step / 2;
@@ -67,7 +65,7 @@ static void square(std::vector<float> *arr, int width, int row, int col, int ste
 /* diamondsquare creates a heightmap of size width*width using the diamond square
 	 algorithm with base offset weight for the random numbers.
 	 filter_stop is the (HP) filter stop frequency described as a step length. */
-std::vector<float> diamondsquare(const int width)
+std::vector<float> diamondsquare(const unsigned int width)
 {
 	// Set seeding for random numbers
 	srand(SEED);
@@ -80,22 +78,22 @@ std::vector<float> diamondsquare(const int width)
 	(*terrain)[0] = randnum(weight, -weight);
 
 	// Iterate over step lengths.
-	for (int step = width; step > 1; step /= 2) {
+	for (unsigned int step = width; step > 1; step /= 2) {
 		// Do diamond part for current step length
 		weight /= (float)sqrt(2);
-		for (int row = 0; row < width; row += step) {
-			for (int col = 0; col < width; col += step) {
+		for (unsigned int row = 0; row < width; row += step) {
+			for (unsigned int col = 0; col < width; col += step) {
 				diamond(terrain, width, row, col, step, weight);
 			}
 		}
 		// Do square part for current step length.
 		weight /= (float)sqrt(2);
-		for (int row = 0; row < width; row += step) {
-			for (int col = 0; col < width; col += step) {
+		for (unsigned int row = 0; row < width; row += step) {
+			for (unsigned int col = 0; col < width; col += step) {
 				square(terrain, width, row, col, step, weight);
 			}
 		}
 	}
-	mean(terrain, 5); // Moving average filter
+
 	return *terrain;
 }

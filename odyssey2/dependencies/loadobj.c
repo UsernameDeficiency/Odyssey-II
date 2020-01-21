@@ -1,17 +1,4 @@
-// LoadOBJ
-// by Ingemar Ragnemalm 2005, 2008
-// Developed with CodeWarrior and Lightweight IDE on Mac OS/Mac OSX
-
-// Extended version with LoadModelPlus
-// 120913: Revised LoadModelPlus/DrawModel by Jens.
-// Partially corrected formatting. (It is a mess!)
-// 130227: Error reporting in DrawModel
-// 130422: Added ScaleModel
-// 150909: Frees up temporary "Mesh" memory i LoadModel. Thanks to Simon Keisala for finding this!
-// Added DisposeModel. Limited the number of error printouts, thanks to Rasmus Hytter for this suggestion!
-// 160302: Uses fopen_s on Windows, as suggested by Jesper Post. Should reduce warnings a bit.
-// 160510: Uses calloc instead of malloc (for safety) in many places where it could possibly cause problems.
-// 170406: Added "const" to string arguments to make C++ happier.
+// LoadOBJ by Ingemar Ragnemalm 2005, 2008
 
 #include "loadobj.h"
 #include <stdio.h>
@@ -35,15 +22,10 @@ typedef struct Mesh
 	int		*normalsIndex;
 	int		*textureIndex;
 	int		coordCount; // Number of indices in each index struct
-	
-//	int		*triangleCountList;
-//	int		**vertexToTriangleTable;
 
 	// Borders between groups
 	int		*coordStarts;
 	int		groupCount;
-//	int		*normalStarts;
-//	int		*texStarts;
 
 	GLfloat radius; // Enclosing sphere
 	GLfloat radiusXZ; // For cylindrical tests
@@ -71,7 +53,6 @@ static FILE *fp;
 static int intValue[3];
 static float floatValue[3] = { 0, 0, 0 };
 static int vertCount, texCount, normalsCount, coordCount;
-//static int groupCount; // Number of "g" found.
 
 #ifndef false
 #define false 0
@@ -209,11 +190,9 @@ static void OBJGetToken(int * tokenType)
 			*tokenType = mtllibToken;
 		if (strcmp(s, "usemtl") == 0)
 			*tokenType = usemtlToken;
-//		if (strcmp(s, "o") == 0) // "o" means...?
-//			*tokenType = oToken;
 	}
 	atLineEnd = (c == 13 || c == 10);
-} // ObjGetToken
+}
 
 static void SkipToCRLF()
 {
@@ -1159,12 +1138,9 @@ void ReportRerror(const char *caller, const char *name)
 }
 
 
-// NEW for lab 2 2012
-// Modified 2013, to do decent error reporting
 // This code makes a lot of calls for rebinding variables just in case,
 // and to get attribute locations. This is clearly not optimal, but the
 // goal is stability.
-
 void DrawModel(Model *m, GLuint program, const char* vertexVariableName, const char* normalVariableName, const char* texCoordVariableName)
 {
 	if (m != NULL)
@@ -1214,54 +1190,6 @@ void DrawModel(Model *m, GLuint program, const char* vertexVariableName, const c
 	}
 }
 
-void DrawWireframeModel(Model *m, GLuint program, const char* vertexVariableName, const char* normalVariableName, const char* texCoordVariableName)
-{
-	if (m != NULL)
-	{
-		GLint loc;
-		
-		glBindVertexArray(m->vao);	// Select VAO
-
-		glBindBuffer(GL_ARRAY_BUFFER, m->vb);
-		loc = glGetAttribLocation(program, vertexVariableName);
-		if (loc >= 0)
-		{
-			glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, 0); 
-			glEnableVertexAttribArray(loc);
-		}
-		else
-			ReportRerror("DrawWireframeModel", vertexVariableName);
-		
-		if (normalVariableName!=NULL)
-		{
-			loc = glGetAttribLocation(program, normalVariableName);
-			if (loc >= 0)
-			{
-				glBindBuffer(GL_ARRAY_BUFFER, m->nb);
-				glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-				glEnableVertexAttribArray(loc);
-			}
-			else
-				ReportRerror("DrawWireframeModel", normalVariableName);
-		}
-	
-		// VBO for texture coordinate data NEW for 5b
-		if ((m->texCoordArray != NULL)&&(texCoordVariableName != NULL))
-		{
-			loc = glGetAttribLocation(program, texCoordVariableName);
-			if (loc >= 0)
-			{
-				glBindBuffer(GL_ARRAY_BUFFER, m->tb);
-				glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
-				glEnableVertexAttribArray(loc);
-			}
-			else
-				ReportRerror("DrawWireframeModel", texCoordVariableName);
-		}
-		glDrawElements(GL_LINE_STRIP, m->numIndices, GL_UNSIGNED_INT, 0L);
-	}
-}
-
 
 // Called from LoadModelPlus and LoadDataToModel
 // VAO and VBOs must already exist!
@@ -1273,52 +1201,28 @@ void ReloadModelData(Model *m)
 	// VBO for vertex data
 	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
 	glBufferData(GL_ARRAY_BUFFER, m->numVertices*3*sizeof(GLfloat), m->vertexArray, GL_STATIC_DRAW);
-	//glVertexAttribPointer(glGetAttribLocation(program, vertexVariableName), 3, GL_FLOAT, GL_FALSE, 0, 0); 
-	//glEnableVertexAttribArray(glGetAttribLocation(program, vertexVariableName));
 	
 	// VBO for normal data
 	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
 	glBufferData(GL_ARRAY_BUFFER, m->numVertices*3*sizeof(GLfloat), m->normalArray, GL_STATIC_DRAW);
-	//glVertexAttribPointer(glGetAttribLocation(program, normalVariableName), 3, GL_FLOAT, GL_FALSE, 0, 0);
-	//glEnableVertexAttribArray(glGetAttribLocation(program, normalVariableName));
 	
 	// VBO for texture coordinate data NEW for 5b
 	if (m->texCoordArray != NULL)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m->tb);
 		glBufferData(GL_ARRAY_BUFFER, m->numVertices*2*sizeof(GLfloat), m->texCoordArray, GL_STATIC_DRAW);
-		//glVertexAttribPointer(glGetAttribLocation(program, texCoordVariableName), 2, GL_FLOAT, GL_FALSE, 0, 0);
-		//glEnableVertexAttribArray(glGetAttribLocation(program, texCoordVariableName));
 	}
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices*sizeof(GLuint), m->indexArray, GL_STATIC_DRAW);
 }
 
-Model* LoadModelPlus(const char* name)
-{
-	Model *m;
-	
-	m = LoadModel(name);
-	
-	glGenVertexArrays(1, &m->vao);
-	glGenBuffers(1, &m->vb);
-	glGenBuffers(1, &m->ib);
-	glGenBuffers(1, &m->nb);
-	if (m->texCoordArray != NULL)
-		glGenBuffers(1, &m->tb);
-		
-	ReloadModelData(m);
-	
-	return m;
-}
 
 // Loader for inline data to Model (almost same as LoadModelPlus)
 Model* LoadDataToModel(
 			GLfloat *vertices,
 			GLfloat *normals,
 			GLfloat *texCoords,
-			GLfloat *colors,
 			GLuint *indices,
 			int numVert,
 			int numInd)

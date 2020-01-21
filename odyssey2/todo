@@ -1,7 +1,6 @@
 Shaders:
 Rewrite shader lighting
 Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting-exercise2
-Make geometry shader visualizing normal vectors. How to create grass with geometry shader?
 https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
 https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
 
@@ -12,9 +11,7 @@ Wrong distribution of random numbers from randnum?
 
 Optimization: 
 Don't draw vertices outside frustum.
-Decrease detail level of far away vertices?
-GLM SIMD? 
 Optimize terrain array size
 generateTerrain: Test GenerateNormals from loadobj?
 
-Add image to the Github page, link to learnopengl? Windows only? Link to texture sites
+Add image to the Github page

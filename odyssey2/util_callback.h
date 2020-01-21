@@ -1,6 +1,4 @@
-/*
-	Callback definitions for GLFW
-*/
+/* Callback definitions for GLFW */
 #pragma once
 #include "main.h" // Constants and globals
 #include "util_misc.h" // getPosy
@@ -41,7 +39,7 @@ void updatePhysics()
 		else if (camera.Position.z > world_size * world_xz_scale - 2.0f)
 			camera.Position.z = world_size * world_xz_scale - 2.0f;
 
-		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray) + camera.height;  // TODO: Remove mTerrain
+		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray) + camera.height;
 		const float swim_height = sea_y_pos + camera.height / 3;
 
 		// Make sure player does not drown.
@@ -130,6 +128,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	// Toggle fog
 	else if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
 	{
+		static bool drawFog = false;
+
 		drawFog = !drawFog;
 		terrainShader->use();
 		terrainShader->setBool("drawFog", drawFog);
@@ -142,6 +142,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	// Toggle wave amount
 	else if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
 	{
+		static bool extraWaves = false;
+
 		extraWaves = !extraWaves;
 		waterShader->use();
 		waterShader->setBool("extraWaves", extraWaves);
@@ -150,6 +152,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	// Change skybox texture
 	else if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 	{
+		static unsigned int skyboxIndex;
+		
 		skyboxIndex = ++skyboxIndex % skyboxPaths.size();
 		loadSkyboxTex(skyboxPaths.at(skyboxIndex));
 	}
@@ -183,6 +187,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 // Called on mouse movement
 static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	static float mouseLastX = 0.0f;
+	static float mouseLastY = window_h / 2.0f;
+
 	float xoffset = xpos - mouseLastX;
 	float yoffset = mouseLastY - ypos; // reversed since y-coordinates go from bottom to top
 

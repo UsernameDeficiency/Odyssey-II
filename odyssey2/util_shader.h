@@ -113,21 +113,6 @@ public:
 	void loadStbTextureRef(const char* filename, GLuint* textureRef, bool alpha)
 	{
 		int width_temp, height_temp;
-		loadStbTexture(filename, textureRef, &width_temp, &height_temp, alpha);
-	}
-
-	// Load a texture, using texture struct
-	//void loadStbTextureStruct(const char* filename, TextureData* texture, bool alpha)
-	//{
-	//	// TODO: Implement this function, properly set TextureData members
-	//	texture->bpp = 8;
-	//	texture->imageData = nullptr;
-	//	loadStbTexture(filename, &texture->texID, (int*)&texture->width, (int *)&texture->height, alpha);
-	//}
-
-	// Used by loadStbTextureRef and loadStbTextureStruct to load texture.
-	void loadStbTexture(const char* filename, GLuint* textureRef, int* width, int* height, bool alpha)
-	{
 		glGenTextures(1, textureRef);
 		glBindTexture(GL_TEXTURE_2D, *textureRef);
 		// GL_LINEAR_MIPMAP_LINEAR usually seems to be recommended but is slightly more blurry?
@@ -138,16 +123,16 @@ public:
 		// Load image, create texture and generate mipmaps
 		int nrChannels;
 		//stbi_set_flip_vertically_on_load(true); // Tell stb_image.h to flip loaded texture y-axis
-		unsigned char* data = stbi_load(filename, (int *)width, (int *)height, &nrChannels, 0);
+		unsigned char* data = stbi_load(filename, &width_temp, &height_temp, &nrChannels, 0);
 		if (data)
 		{
 			/*  GL_RGB, GL_BGR, GL_RGBA, GL_BGRA
 				GL_RGB_INTEGER, GL_BGR_INTEGER, GL_RGBA_INTEGER, GL_BGRA_INTEGER */
 			if (alpha) // Does the texture have an alpha channel?
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *width, *height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data); // Unsure if GL_RGB or GL_RGBA in third argument
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_temp, height_temp, 0, GL_RGBA, GL_UNSIGNED_BYTE, data); // Unsure if GL_RGB or GL_RGBA in third argument
 			else
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, *width, *height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-			
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_temp, height_temp, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else
