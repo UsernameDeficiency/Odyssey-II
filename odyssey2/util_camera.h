@@ -13,7 +13,7 @@ static const float CAM_SENSITIVITY = 0.2f;
 static const float CAM_FOV = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
 static const float CAM_HEIGHT = 60.0f; // Camera height above ground
 static const float VP_NEAR = 3.0f; // Near distance for frustum
-static float VP_FAR = 13000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
+static float VP_FAR = 23000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
 int window_w = 1920;
 int window_h = 1080;
 

@@ -1,17 +1,15 @@
 Shaders:
 Rewrite shader lighting
 Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting-exercise2
-https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
+https://learnopengl.com/Advanced-OpenGL/Geometry-Shader Shader grass
 https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
 
 Diamond-square:
 Change arrays to double indices?
 Vary filter strength with altitude?
-Wrong distribution of random numbers from randnum?
 
 Optimization: 
-Don't draw vertices outside frustum.
+Don't draw vertices outside frustum
 Optimize terrain array size
-generateTerrain: Test GenerateNormals from loadobj?
 
 Add image to the Github page

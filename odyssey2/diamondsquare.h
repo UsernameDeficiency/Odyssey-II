@@ -6,6 +6,7 @@
 #pragma once
 #include <vector>
 #include <cmath>
+#include <random>
 
 
 /* Settings for diamond square algorithm */
@@ -18,6 +19,18 @@ static const unsigned int SEED = 64;
 float randnum(float max, float min)
 {
 	return (max - min) * (float)((double)(rand()) / (double)RAND_MAX) + min;
+}
+
+
+/* Returns a normally distributed random number, standard deviation stddev */
+float randnum_norm(float stddev, float min)
+{
+
+	std::random_device rd{};
+	std::mt19937 gen{ rd() };
+	std::normal_distribution<float> stddist{ 0, stddev / 2 };
+
+	return stddist(gen);
 }
 
 
