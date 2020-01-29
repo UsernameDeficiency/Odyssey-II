@@ -9,7 +9,7 @@
 	filter_width should be an odd positive integer, no sanity check done! */
 static void mean(std::vector<float>* arr, const unsigned int filter_width)
 {
-	size_t arr_width = sqrt(arr->size()); // width = height of terrain array
+	size_t arr_width = (size_t)sqrt(arr->size()); // width = height of terrain array
 	std::vector<float>* arr_tmp = new std::vector<float>(arr->size());
 
 	// Horizontal filter
@@ -20,7 +20,7 @@ static void mean(std::vector<float>* arr, const unsigned int filter_width)
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_width / 2; offset++) {
-				float scale = 1 / pow(2, offset); // Lower scaling for high offsets
+				float scale = 1 / (float)pow(2, offset); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
 				// Left value
@@ -47,7 +47,7 @@ static void mean(std::vector<float>* arr, const unsigned int filter_width)
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_width / 2; offset++) {
-				float scale = 1 / pow(2, offset); // Lower scaling for high offsets
+				float scale = 1 / (float)pow(2, offset); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
 				// Upper value
@@ -74,7 +74,7 @@ static void mean(std::vector<float>* arr, const unsigned int filter_width)
 	filter_width should be an odd positive integer, no sanity check done! */
 static void median(std::vector<float>* arr, const int filter_width)
 {
-	size_t arr_width = sqrt(arr->size()); // width = height of terrain array
+	size_t arr_width = (size_t)sqrt(arr->size()); // width = height of terrain array
 	std::vector<float>* arr_tmp = new std::vector<float>(arr->size());
 	std::vector<float> median;
 

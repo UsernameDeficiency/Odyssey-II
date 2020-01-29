@@ -190,11 +190,11 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 	static float mouseLastX = 0.0f;
 	static float mouseLastY = window_h / 2.0f;
 
-	float xoffset = xpos - mouseLastX;
-	float yoffset = mouseLastY - ypos; // reversed since y-coordinates go from bottom to top
+	float xoffset = (float)xpos - mouseLastX;
+	float yoffset = mouseLastY - (float)ypos; // reversed since y-coordinates go from bottom to top
 
-	mouseLastX = xpos;
-	mouseLastY = ypos;
+	mouseLastX = (float)xpos;
+	mouseLastY = (float)ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
 }

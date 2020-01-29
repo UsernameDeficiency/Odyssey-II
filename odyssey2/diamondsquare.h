@@ -55,22 +55,22 @@ static void diamond(std::vector<float> *arr, unsigned int width, unsigned int ro
 	 interpolation for the upper and left points in the square step */
 static void square(std::vector<float> *arr, unsigned int width, unsigned int row, unsigned int col, unsigned int step, float weight)
 {
-	int r_left = row + step / 2;
-	int c_up = col + step / 2;
+	size_t r_left = (size_t)row + step / 2;
+	size_t c_up = (size_t)col + step / 2;
 
 	// Being lazy here and making sure all indices are in bounds, even if some will never go out of bounds.
 	float mean_up = (
-		(*arr)[((row - step / 2 + width) % width) * width + c_up] + // Above, make sure it is not negative
-		(*arr)[row * width + (c_up - step / 2 + width) % width] +   // Left, make sure it is not negative
-		(*arr)[row * width + (c_up + step / 2) % width] +           // Right
-		(*arr)[(r_left % width) * width + c_up]) / 4;               // Below
+		(*arr)[(((size_t)row - step / 2 + width) % width) * width + c_up] + // Above, make sure it is not negative
+		(*arr)[(size_t)row * width + (c_up - step / 2 + width) % width] + // Left, make sure it is not negative
+		(*arr)[(size_t)row * width + (c_up + step / 2) % width] + // Right
+		(*arr)[(r_left % width) * width + c_up]) / 4; // Below
 	float mean_left = (
 		(*arr)[((r_left - step / 2 + width) % width) * width + col] +
 		(*arr)[r_left * width + (col - step / 2 + width) % width] +
 		(*arr)[r_left * width + c_up % width] +
 		(*arr)[((r_left + step / 2) % width) * width + col]) / 4;
 
-	(*arr)[row * width + c_up] = mean_up + randnum(weight, -weight);
+	(*arr)[(size_t)row * (size_t)width + c_up] = mean_up + randnum(weight, -weight);
 	(*arr)[r_left * width + col] = mean_left + randnum(weight, -weight);
 }
 
@@ -83,7 +83,7 @@ std::vector<float> diamondsquare(const unsigned int width)
 	// Set seeding for random numbers
 	srand(SEED);
 	// Allocate heightmap
-	auto terrain = new std::vector<float>(width * width);
+	auto terrain = new std::vector<float>((size_t)width * (size_t)width);
 	
 	/* Initialize corner values. Since the width for this implementation is 2^n rather than 2^n+1,
 	 * the right and lower edges are "cut off" and terrain[0] wraps around. */

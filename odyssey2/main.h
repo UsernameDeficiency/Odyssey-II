@@ -13,7 +13,7 @@ const bool DEBUG_CONTEXT = false; // Enable/disable debugging context and prints
 const float world_xz_scale = 16.0f;
 const float world_y_scale = 2.0f;
 const float tex_scale = 128.0f;
-int world_size = 2048; // width = height of world map
+const unsigned int world_size = 2048; // width = height of world map
 
 
 /* Global variables */

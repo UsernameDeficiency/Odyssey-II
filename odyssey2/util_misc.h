@@ -120,8 +120,8 @@ void exit_on_error(const char* error)
 /* Load pre-generated heightmap from texture tex and add height values from procTerrain. */
 Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
-	const int vertexCount = world_size * world_size;
-	const int triangleCount = (world_size - 1) * (world_size - 1) * 2;
+	const unsigned int vertexCount = world_size * world_size;
+	const unsigned int triangleCount = (world_size - 1) * (world_size - 1) * 2;
 	unsigned int x, z;
 	GLfloat texScaleX = world_size / tex_scale;
 	GLfloat texScaleY = world_size / tex_scale;
