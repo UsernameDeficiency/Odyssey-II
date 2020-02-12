@@ -5,7 +5,7 @@
 #include "main.h"
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-enum Camera_Movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
+enum class Cam_Movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
 
 // Default camera values
 static const float CAM_SPEED = 120.0f;
@@ -56,24 +56,24 @@ public:
     }
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void ProcessKeyboard(Camera_Movement direction, float deltaTime)
+    void ProcessKeyboard(Cam_Movement direction, float deltaTime)
     {
         float velocity = MovementSpeed * deltaTime;
 		if (flying)
 			velocity *= 4;
 
 		// Update position while making sure that the camera moves in the correct plane
-        if (direction == CAM_FORWARD)
+        if (direction == Cam_Movement::CAM_FORWARD)
 			Position += glm::normalize(glm::vec3(Front.x, 0.0f, Front.z)) * velocity;
-        if (direction == CAM_BACKWARD)
+        if (direction == Cam_Movement::CAM_BACKWARD)
             Position -= glm::normalize(glm::vec3(Front.x, 0.0f, Front.z)) * velocity;
-        if (direction == CAM_LEFT)
+        if (direction == Cam_Movement::CAM_LEFT)
             Position -= Right * velocity;
-        if (direction == CAM_RIGHT)
+        if (direction == Cam_Movement::CAM_RIGHT)
             Position += Right * velocity;
-		if (direction == CAM_UP)
+		if (direction == Cam_Movement::CAM_UP)
 			Position += glm::normalize(glm::vec3(0.0f, Up.y, 0.0f)) * velocity;
-		if (direction == CAM_DOWN)
+		if (direction == Cam_Movement::CAM_DOWN)
 			Position -= glm::normalize(glm::vec3(0.0f, Up.y, 0.0f)) * velocity;
     }
 

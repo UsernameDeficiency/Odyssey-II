@@ -94,12 +94,12 @@ static void initGraphics()
 	terrainShader->setBool("drawFog", false);
 	terrainShader->setVec3("fogColor", fogColor);
 
-	float terrainHeight = maxHeight - minHeight;
-	sea_y_pos = minHeight + terrainHeight / 3;
-	terrainShader->setFloat("minHeight", minHeight);
-	terrainShader->setFloat("maxHeight", maxHeight);
-	terrainShader->setFloat("seaHeight", sea_y_pos);
-	terrainShader->setFloat("snowHeight", maxHeight - terrainHeight / 3);
+	float terrainHeight = terrainStruct.maxHeight - terrainStruct.minHeight;
+	terrainStruct.sea_y_pos = terrainStruct.minHeight + terrainHeight / 3;
+	terrainShader->setFloat("minHeight", terrainStruct.minHeight);
+	terrainShader->setFloat("maxHeight", terrainStruct.maxHeight);
+	terrainShader->setFloat("seaHeight", terrainStruct.sea_y_pos);
+	terrainShader->setFloat("snowHeight", terrainStruct.maxHeight - terrainHeight / 3);
 
 	// Initialize skybox cubemap and vertices
 	skyboxShader = new Shader("shader/skybox.vert", "shader/skybox.frag");
@@ -146,13 +146,13 @@ static void initGraphics()
 
 	GLfloat waterSurfaceVert[] = {
 		// Triangle 1
-		0.0f, sea_y_pos, 0.0f,
-		0.0f, sea_y_pos, world_size * world_xz_scale,
-		world_size * world_xz_scale, sea_y_pos, 0.0f,
+		0.0f, terrainStruct.sea_y_pos, 0.0f,
+		0.0f, terrainStruct.sea_y_pos, world_size * world_xz_scale,
+		world_size * world_xz_scale, terrainStruct.sea_y_pos, 0.0f,
 		// Triangle 2
-		world_size * world_xz_scale, sea_y_pos, 0.0f,
-		0.0f, sea_y_pos, world_size * world_xz_scale,
-		world_size * world_xz_scale, sea_y_pos, world_size * world_xz_scale
+		world_size * world_xz_scale, terrainStruct.sea_y_pos, 0.0f,
+		0.0f, terrainStruct.sea_y_pos, world_size * world_xz_scale,
+		world_size * world_xz_scale, terrainStruct.sea_y_pos, world_size * world_xz_scale
 	};
 
 	// Allocate and activate VAO/VBO
@@ -235,13 +235,13 @@ int main(int argc, char **argv)
 	{
 		// Calculate frame time
 		float currentTime = (float)glfwGetTime();
-		deltaTime = currentTime - lastTime;
+		float deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
 		// Update physics and render screen
-		updatePhysics();
+		updatePhysics(deltaTime);
 		render();
-		printFPS();
+		printFPS(deltaTime);
 		glfwPollEvents();
 	}
 

@@ -5,42 +5,45 @@
 
 
 // Keyboard state for key_callback/updatePhysics
-enum keyEnum { KEY_FORWARD, KEY_BACKWARD, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN };
-bool keyState[KEY_DOWN + 1] = { false };
+struct
+{
+	enum { KEY_FORWARD, KEY_BACKWARD, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN };
+} keyEnum;
+bool keyState[keyEnum.KEY_DOWN + 1] = { false };
 
 // Reads keyboard state set by key_callback and updates player movement
-void updatePhysics()
+void updatePhysics(const float& deltaTime)
 {
-	if (keyState[KEY_FORWARD])
-		camera.ProcessKeyboard(CAM_FORWARD, deltaTime);
-	if (keyState[KEY_BACKWARD])
-		camera.ProcessKeyboard(CAM_BACKWARD, deltaTime);
-	if (keyState[KEY_LEFT])
-		camera.ProcessKeyboard(CAM_LEFT, deltaTime);
-	if (keyState[KEY_RIGHT])
-		camera.ProcessKeyboard(CAM_RIGHT, deltaTime);
+	if (keyState[keyEnum.KEY_FORWARD])
+		camera.ProcessKeyboard(Cam_Movement::CAM_FORWARD, deltaTime);
+	if (keyState[keyEnum.KEY_BACKWARD])
+		camera.ProcessKeyboard(Cam_Movement::CAM_BACKWARD, deltaTime);
+	if (keyState[keyEnum.KEY_LEFT])
+		camera.ProcessKeyboard(Cam_Movement::CAM_LEFT, deltaTime);
+	if (keyState[keyEnum.KEY_RIGHT])
+		camera.ProcessKeyboard(Cam_Movement::CAM_RIGHT, deltaTime);
 
 	if (camera.flying)
 	{
-		if (keyState[KEY_UP])
-			camera.ProcessKeyboard(CAM_UP, deltaTime);
-		if (keyState[KEY_DOWN])
-			camera.ProcessKeyboard(CAM_DOWN, deltaTime);
+		if (keyState[keyEnum.KEY_UP])
+			camera.ProcessKeyboard(Cam_Movement::CAM_UP, deltaTime);
+		if (keyState[keyEnum.KEY_DOWN])
+			camera.ProcessKeyboard(Cam_Movement::CAM_DOWN, deltaTime);
 	}
 	else
 	{
 		// Move player to terrain height, 2.0f padding ensures arrays stay in bound during interpolation (?)
 		if (camera.Position.x < 0)
 			camera.Position.x = 0;
-		else if (camera.Position.x > world_size * world_xz_scale - 2.0f)
+		else if (camera.Position.x > world_size* world_xz_scale - 2.0f)
 			camera.Position.x = world_size * world_xz_scale - 2.0f;
 		if (camera.Position.z < 0)
 			camera.Position.z = 0;
-		else if (camera.Position.z > world_size * world_xz_scale - 2.0f)
+		else if (camera.Position.z > world_size* world_xz_scale - 2.0f)
 			camera.Position.z = world_size * world_xz_scale - 2.0f;
 
 		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray) + camera.height;
-		const float swim_height = sea_y_pos + camera.height / 3;
+		const float swim_height = terrainStruct.sea_y_pos + camera.height / 3;
 
 		// Make sure player does not drown.
 		if (new_y_pos > swim_height)
@@ -57,30 +60,30 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_W)
 	{
 		if (action == GLFW_PRESS)
-			keyState[KEY_FORWARD] = true;
+			keyState[keyEnum.KEY_FORWARD] = true;
 		else if (action == GLFW_RELEASE)
-			keyState[KEY_FORWARD] = false;
+			keyState[keyEnum.KEY_FORWARD] = false;
 	}
 	else if (key == GLFW_KEY_S)
 	{
 		if (action == GLFW_PRESS)
-			keyState[KEY_BACKWARD] = true;
+			keyState[keyEnum.KEY_BACKWARD] = true;
 		else if (action == GLFW_RELEASE)
-			keyState[KEY_BACKWARD] = false;
+			keyState[keyEnum.KEY_BACKWARD] = false;
 	}
 	else if (key == GLFW_KEY_A)
 	{
 		if (action == GLFW_PRESS)
-			keyState[KEY_LEFT] = true;
+			keyState[keyEnum.KEY_LEFT] = true;
 		else if (action == GLFW_RELEASE)
-			keyState[KEY_LEFT] = false;
+			keyState[keyEnum.KEY_LEFT] = false;
 	}
 	else if (key == GLFW_KEY_D)
 	{
 		if (action == GLFW_PRESS)
-			keyState[KEY_RIGHT] = true;
+			keyState[keyEnum.KEY_RIGHT] = true;
 		else if (action == GLFW_RELEASE)
-			keyState[KEY_RIGHT] = false;
+			keyState[keyEnum.KEY_RIGHT] = false;
 	}
 
 	// Move faster is left shift held down
@@ -167,20 +170,20 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		if (key == GLFW_KEY_E)
 		{
 			if (action == GLFW_PRESS)
-				keyState[KEY_UP] = true;
+				keyState[keyEnum.KEY_UP] = true;
 			else if (action == GLFW_RELEASE)
-				keyState[KEY_UP] = false;
+				keyState[keyEnum.KEY_UP] = false;
 		}
 		else if (key == GLFW_KEY_Q)
 		{
 			if (action == GLFW_PRESS)
-				keyState[KEY_DOWN] = true;
+				keyState[keyEnum.KEY_DOWN] = true;
 			else if (action == GLFW_RELEASE)
-				keyState[KEY_DOWN] = false;
+				keyState[keyEnum.KEY_DOWN] = false;
 		}
 	}
 	else // Player walking
-		keyState[KEY_DOWN] = keyState[KEY_UP] = false;
+		keyState[keyEnum.KEY_DOWN] = keyState[keyEnum.KEY_UP] = false;
 }
 
 

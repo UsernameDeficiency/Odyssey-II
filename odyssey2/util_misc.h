@@ -26,7 +26,7 @@ void greet()
 
 
 /* Print average FPS once every second */
-void printFPS()
+void printFPS(float& deltaTime)
 {
 	static unsigned int accFrames;
 	static float accTime;
@@ -137,10 +137,10 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 
 			// Add pregenerated and diamond square heights
 			float y = procTerrain[index] * world_y_scale;
-			if (y < minHeight)
-				minHeight = y;
-			if (y > maxHeight)
-				maxHeight = y;
+			if (y < terrainStruct.minHeight)
+				terrainStruct.minHeight = y;
+			if (y > terrainStruct.maxHeight)
+				terrainStruct.maxHeight = y;
 
 			vertexArray[index * 3 + 0] = x * world_xz_scale;
 			vertexArray[index * 3 + 1] = y;
