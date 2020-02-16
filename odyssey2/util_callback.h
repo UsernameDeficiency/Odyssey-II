@@ -1,34 +1,35 @@
 /* Callback definitions for GLFW */
 #pragma once
 #include "main.h" // Constants and globals
-#include "util_misc.h" // getPosy
+#include "util_misc.h" // get_pos_y
 
 
-// Keyboard state for key_callback/updatePhysics
+// Keyboard state for key_callback/update_physics
 struct
 {
 	enum { KEY_FORWARD, KEY_BACKWARD, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN };
 } key_enum;
 bool key_state[key_enum.KEY_DOWN + 1] = { false };
 
+
 // Reads keyboard state set by key_callback and updates player movement
-void updatePhysics(const float delta_time, const float world_xz_scale)
+void update_physics(const float delta_time, const float world_xz_scale)
 {
 	if (key_state[key_enum.KEY_FORWARD])
-		camera.ProcessKeyboard(cam_movement::CAM_FORWARD, delta_time);
+		camera.process_keyboard(cam_movement::CAM_FORWARD, delta_time);
 	if (key_state[key_enum.KEY_BACKWARD])
-		camera.ProcessKeyboard(cam_movement::CAM_BACKWARD, delta_time);
+		camera.process_keyboard(cam_movement::CAM_BACKWARD, delta_time);
 	if (key_state[key_enum.KEY_LEFT])
-		camera.ProcessKeyboard(cam_movement::CAM_LEFT, delta_time);
+		camera.process_keyboard(cam_movement::CAM_LEFT, delta_time);
 	if (key_state[key_enum.KEY_RIGHT])
-		camera.ProcessKeyboard(cam_movement::CAM_RIGHT, delta_time);
+		camera.process_keyboard(cam_movement::CAM_RIGHT, delta_time);
 
 	if (camera.flying)
 	{
 		if (key_state[key_enum.KEY_UP])
-			camera.ProcessKeyboard(cam_movement::CAM_UP, delta_time);
+			camera.process_keyboard(cam_movement::CAM_UP, delta_time);
 		if (key_state[key_enum.KEY_DOWN])
-			camera.ProcessKeyboard(cam_movement::CAM_DOWN, delta_time);
+			camera.process_keyboard(cam_movement::CAM_DOWN, delta_time);
 	}
 	else
 	{
@@ -42,7 +43,7 @@ void updatePhysics(const float delta_time, const float world_xz_scale)
 		else if (camera.position.z > world_size* world_xz_scale - 2.0f)
 			camera.position.z = world_size * world_xz_scale - 2.0f;
 
-		const float new_y_pos = getPosy(camera.position.x, camera.position.z, m_terrain->vertexArray, world_xz_scale) + camera.height;
+		const float new_y_pos = get_pos_y(camera.position.x, camera.position.z, m_terrain->vertexArray, world_xz_scale) + camera.height;
 		const float swim_height = terrain_struct.sea_y_pos + camera.height / 3;
 
 		// Make sure player does not drown.
@@ -135,11 +136,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 		draw_fog = !draw_fog;
 		terrain_shader->use();
-		terrain_shader->setBool("drawFog", draw_fog);
+		terrain_shader->set_bool("drawFog", draw_fog);
 		skybox_shader->use();
-		skybox_shader->setBool("drawFog", draw_fog);
+		skybox_shader->set_bool("drawFog", draw_fog);
 		water_shader->use();
-		water_shader->setBool("drawFog", draw_fog);
+		water_shader->set_bool("drawFog", draw_fog);
 	}
 
 	// Toggle wave amount
@@ -149,7 +150,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 		extra_waves = !extra_waves;
 		water_shader->use();
-		water_shader->setBool("extraWaves", extra_waves);
+		water_shader->set_bool("extraWaves", extra_waves);
 	}
 
 	// Change skybox texture
@@ -158,7 +159,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		static unsigned int skybox_index;
 		
 		skybox_index = ++skybox_index % skybox_paths.size();
-		loadSkyboxTex(skybox_paths.at(skybox_index));
+		load_skybox_tex(skybox_paths.at(skybox_index));
 	}
 
 	// Toggle flight/walk mode
@@ -199,7 +200,7 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 	mouse_last_x = (float)xpos;
 	mouse_last_y = (float)ypos;
 
-	camera.ProcessMouseMovement(x_offset, y_offset);
+	camera.process_mouse_movement(x_offset, y_offset);
 }
 
 

@@ -53,18 +53,18 @@ public:
 		vertex = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertex, 1, &v_shader_code, NULL);
 		glCompileShader(vertex);
-		checkCompileErrors(vertex, "VERTEX");
+		check_compile_errors(vertex, "VERTEX");
 		// Fragment Shader
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragment, 1, &f_shader_code, NULL);
 		glCompileShader(fragment);
-		checkCompileErrors(fragment, "FRAGMENT");
+		check_compile_errors(fragment, "FRAGMENT");
 		// Shader Program
 		id = glCreateProgram();
 		glAttachShader(id, vertex);
 		glAttachShader(id, fragment);
 		glLinkProgram(id);
-		checkCompileErrors(id, "PROGRAM");
+		check_compile_errors(id, "PROGRAM");
 		// Delete the shaders as they're linked into our program now and no longer necessary
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
@@ -78,39 +78,39 @@ public:
 
 	/* --------- Uniform loading functions --------- */
 	// Utility uniform functions
-	void setBool(const std::string& name, bool value) const
+	void set_bool(const std::string& name, bool value) const
 	{
 		glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
 	}
 
-	void setInt(const std::string& name, int value) const
+	void set_int(const std::string& name, int value) const
 	{
 		glUniform1i(glGetUniformLocation(id, name.c_str()), value);
 	}
 
-	void setFloat(const std::string& name, float value) const
+	void set_float(const std::string& name, float value) const
 	{
 		glUniform1f(glGetUniformLocation(id, name.c_str()), value);
 	}
 
-	void setVec3(const std::string& name, const glm::vec3& value) const
+	void set_vec3(const std::string& name, const glm::vec3& value) const
 	{
 		glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 	}
-	void setVec3(const std::string& name, float x, float y, float z) const
+	void set_vec3(const std::string& name, float x, float y, float z) const
 	{
 		glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
 	}
 
 	// Upload a glm::mat4 to shader program
-	void setMatrix4f(const std::string& name, const glm::mat4 matrix) const
+	void set_mat4_f(const std::string& name, const glm::mat4 matrix) const
 	{
 		glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	/* --------- Texture loading functions --------- */
 	// Load a texture, using int reference to texture only
-	void loadStbTextureRef(const char* filename, GLuint* texture_ref, bool alpha)
+	void load_stb_texture_ref(const char* filename, GLuint* texture_ref, bool alpha)
 	{
 		int width_temp, height_temp;
 		glGenTextures(1, texture_ref);
@@ -142,7 +142,7 @@ public:
 
 private:
 	// Utility function for checking shader compilation/linking errors.
-	void checkCompileErrors(unsigned int shader, std::string type)
+	void check_compile_errors(unsigned int shader, std::string type)
 	{
 		int success;
 		char info_log[1024];

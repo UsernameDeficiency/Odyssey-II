@@ -47,17 +47,17 @@ public:
     {
         position = position;
 		projection = glm::perspective(glm::radians(fov), (GLfloat)window_w / (GLfloat)window_h, vp_near, vp_far);
-        updateCameraVectors();
+        update_camera_vectors();
     }
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-    glm::mat4 GetViewMatrix()
+    glm::mat4 get_view_matrix()
     {
         return glm::lookAt(position, position + front, up);
     }
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void ProcessKeyboard(cam_movement direction, float delta_time)
+    void process_keyboard(cam_movement direction, float delta_time)
     {
         float velocity = movement_speed * delta_time;
 		if (flying)
@@ -79,7 +79,7 @@ public:
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void ProcessMouseMovement(float x_offset, float y_offset)
+    void process_mouse_movement(float x_offset, float y_offset)
     {
         x_offset *= mouse_sens;
         y_offset *= mouse_sens;
@@ -94,11 +94,11 @@ public:
             pitch = -89.0f;
 
         // Update front, right and up Vectors using the updated Euler angles
-        updateCameraVectors();
+        update_camera_vectors();
     }
 
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    void ProcessMouseScroll(float y_offset)
+    void process_mouse_scroll(float y_offset)
     {
         if (fov >= 1.0f && fov <= 45.0f)
             fov -= y_offset;
@@ -110,7 +110,7 @@ public:
 
 private:
     // Calculates the front vector from the Camera's (updated) Euler Angles
-    void updateCameraVectors()
+    void update_camera_vectors()
     {
         // Calculate the new front vector
         glm::vec3 front_tmp{

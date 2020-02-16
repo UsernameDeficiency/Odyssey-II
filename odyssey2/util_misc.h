@@ -9,7 +9,7 @@
 
 
 /* Print average FPS once every second */
-void printFPS(float& delta_time)
+void print_fps(float& delta_time)
 {
 	static unsigned int acc_frames;
 	static float acc_time;
@@ -27,7 +27,7 @@ void printFPS(float& delta_time)
 
 
 /* Interpolate y values over the vertex at position (x, z). No bounds checking for x and z. */
-float getPosy(float x, float z, const GLfloat *vertex_array, const float world_xz_scale)
+float get_pos_y(float x, float z, const GLfloat* vertex_array, const float world_xz_scale)
 {
 	float y_pos, y1, y2, y3;
 	x /= world_xz_scale;
@@ -50,7 +50,7 @@ float getPosy(float x, float z, const GLfloat *vertex_array, const float world_x
 
 
 /* OpenGL debug callback modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com */
-void APIENTRY debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param)
+void APIENTRY debug_message(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param)
 {
 	// Ignore non-significant error codes
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -101,7 +101,7 @@ void exit_on_error(const char* error)
 
 
 /* Build Model from generated terrain. */
-Model* generateTerrain(std::vector<float> proc_terrain, float world_xz_scale, float world_y_scale, float tex_scale)
+Model* generate_terrain(std::vector<float> proc_terrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
 	const unsigned int vertex_count = world_size * world_size;
 	const unsigned int triangle_count = (world_size - 1) * (world_size - 1) * 2;
@@ -185,7 +185,7 @@ Model* generateTerrain(std::vector<float> proc_terrain, float world_xz_scale, fl
 
 
 /* Load a cubemap texture. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
-unsigned int loadCubemap(std::vector<std::string> faces)
+unsigned int load_cubemap(std::vector<std::string> faces)
 {
 	// Make sure the wanted texture has not already been loaded. This method makes sure new memory is not allocated
 	// every time the skybox is changed but still loads the texture from disk every time.
@@ -218,7 +218,7 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 
 
 /* Load skybox texture from the given folder. */
-void loadSkyboxTex(std::string skybox_path)
+void load_skybox_tex(std::string skybox_path)
 {
 	skybox_shader->use();
 	skybox_path = "tex/skybox/" + skybox_path;
@@ -232,6 +232,6 @@ void loadSkyboxTex(std::string skybox_path)
 		skybox_path + "/left.tga"
 	};
 
-	skybox_tex = loadCubemap(faces);
-	skybox_shader->setInt("skyboxTex", 0);
+	skybox_tex = load_cubemap(faces);
+	skybox_shader->set_int("skyboxTex", 0);
 }

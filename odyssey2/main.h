@@ -21,7 +21,7 @@ struct
 	float min_height{ FLT_MAX };
 	float max_height{ -FLT_MAX };
 	float sea_y_pos{};
-} terrain_struct; // Used by generateTerrain to set heights for water and snow
+} terrain_struct; // Used by generate_terrain to set heights for water and snow
 Camera camera = Camera();
 Model* m_terrain;
 Shader *terrain_shader, *skybox_shader, *water_shader;
