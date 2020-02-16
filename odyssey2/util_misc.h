@@ -9,48 +9,48 @@
 
 
 /* Print average FPS once every second */
-void printFPS(float& deltaTime)
+void printFPS(float& delta_time)
 {
-	static unsigned int accFrames;
-	static float accTime;
+	static unsigned int acc_frames;
+	static float acc_time;
 
-	accTime += deltaTime;
-	accFrames++;
+	acc_time += delta_time;
+	acc_frames++;
 
-	if (accTime > 1.0f)
+	if (acc_time > 1.0f)
 	{
-		std::cout << "FPS: " << accFrames / accTime << "\n";
-		accTime = 0.0f;
-		accFrames = 0;
+		std::cout << "FPS: " << acc_frames / acc_time << "\n";
+		acc_time = 0.0f;
+		acc_frames = 0;
 	}
 }
 
 
 /* Interpolate y values over the vertex at position (x, z). No bounds checking for x and z. */
-float getPosy(float x, float z, const GLfloat *vertexArray, const float world_xz_scale)
+float getPosy(float x, float z, const GLfloat *vertex_array, const float world_xz_scale)
 {
-	float yPos, y1, y2, y3;
+	float y_pos, y1, y2, y3;
 	x /= world_xz_scale;
 	z /= world_xz_scale;
-	int xtile = (int)x;
-	int ztile = (int)z;
-	float xPos = (x - xtile);
-	float zPos = (z - ztile);
+	int x_tile = (int)x;
+	int z_tile = (int)z;
+	float x_pos = (x - x_tile);
+	float z_pos = (z - z_tile);
 
 	// Interpolate over the triangle at the current player position.
 	// Interpolation is done into higher x and z, therefore x and z must be below upper array bounds
-	y1 = vertexArray[(xtile + ztile * world_size) * 3 + 1];
-	y2 = vertexArray[((xtile + 1) + ztile * world_size) * 3 + 1];
-	y3 = vertexArray[(xtile + (ztile + 1) * world_size) * 3 + 1];
+	y1 = vertex_array[(x_tile + z_tile * world_size) * 3 + 1];
+	y2 = vertex_array[((x_tile + 1) + z_tile * world_size) * 3 + 1];
+	y3 = vertex_array[(x_tile + (z_tile + 1) * world_size) * 3 + 1];
 
-	yPos = y1 + xPos * (y2 - y1) + zPos * (y3 - y1);
+	y_pos = y1 + x_pos * (y2 - y1) + z_pos * (y3 - y1);
 
-	return yPos;
+	return y_pos;
 }
 
 
 /* OpenGL debug callback modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com */
-void APIENTRY debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+void APIENTRY debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param)
 {
 	// Ignore non-significant error codes
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -101,16 +101,16 @@ void exit_on_error(const char* error)
 
 
 /* Build Model from generated terrain. */
-Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
+Model* generateTerrain(std::vector<float> proc_terrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
-	const unsigned int vertexCount = world_size * world_size;
-	const unsigned int triangleCount = (world_size - 1) * (world_size - 1) * 2;
+	const unsigned int vertex_count = world_size * world_size;
+	const unsigned int triangle_count = (world_size - 1) * (world_size - 1) * 2;
 	unsigned int x, z;
-	const GLfloat texScale = tex_scale / world_size;
-	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // TODO: Array sizes too large here?
-	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount];
-	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount];
-	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3];
+	GLfloat* vertex_array = new GLfloat[sizeof(GLfloat) * 3 * vertex_count]; // TODO: Array sizes too large here?
+	GLfloat* normal_array = new GLfloat[sizeof(GLfloat) * 3 * vertex_count];
+	GLfloat* tex_coord_array = new GLfloat[sizeof(GLfloat) * 2 * vertex_count];
+	GLuint* index_array = new GLuint[sizeof(GLuint) * triangle_count * 3];
+	tex_scale /= world_size;
 
 	// Fill vertex, texture coordinate and index array
 	for (x = 0; x < world_size; x++) {
@@ -118,30 +118,30 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 			int index = x + z * world_size;
 
 			// Add pregenerated and diamond square heights
-			float y = procTerrain[index] * world_y_scale;
-			if (y < terrainStruct.minHeight)
-				terrainStruct.minHeight = y;
-			if (y > terrainStruct.maxHeight)
-				terrainStruct.maxHeight = y;
+			float y = proc_terrain[index] * world_y_scale;
+			if (y < terrain_struct.min_height)
+				terrain_struct.min_height = y;
+			if (y > terrain_struct.max_height)
+				terrain_struct.max_height = y;
 
-			vertexArray[index * 3 + 0] = x * world_xz_scale;
-			vertexArray[index * 3 + 1] = y;
-			vertexArray[index * 3 + 2] = z * world_xz_scale;
+			vertex_array[index * 3 + 0] = x * world_xz_scale;
+			vertex_array[index * 3 + 1] = y;
+			vertex_array[index * 3 + 2] = z * world_xz_scale;
 
 			/* Scaled texture coordinates. */
-			texCoordArray[index * 2 + 0] = (float)x * texScale;
-			texCoordArray[index * 2 + 1] = (float)z * texScale;
+			tex_coord_array[index * 2 + 0] = (float)x * tex_scale;
+			tex_coord_array[index * 2 + 1] = (float)z * tex_scale;
 
 			if ((x != world_size - 1) && (z != world_size - 1)) {
 				index = (x + z * (world_size - 1)) * 6;
 				// Triangle 1
-				indexArray[index] = x + z * world_size;
-				indexArray[index + 1] = x + (z + 1) * world_size;
-				indexArray[index + 2] = x + 1 + z * world_size;
+				index_array[index] = x + z * world_size;
+				index_array[index + 1] = x + (z + 1) * world_size;
+				index_array[index + 2] = x + 1 + z * world_size;
 				// Triangle 2
-				indexArray[index + 3] = x + 1 + z * world_size;
-				indexArray[index + 4] = x + (z + 1) * world_size;
-				indexArray[index + 5] = x + 1 + (z + 1) * world_size;
+				index_array[index + 3] = x + 1 + z * world_size;
+				index_array[index + 4] = x + (z + 1) * world_size;
+				index_array[index + 5] = x + 1 + (z + 1) * world_size;
 			}
 		}
 	}
@@ -152,33 +152,33 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 			int index = (x + z * world_size) * 3;
 			// Initialize normals along edges to pointing straight up
 			if (x == 0 || (x == world_size - 1) || z == 0 || (z == world_size - 1)) {
-				normalArray[index] = 0.0;
-				normalArray[index + 1] = 1.0;
-				normalArray[index + 2] = 0.0;
+				normal_array[index] = 0.0;
+				normal_array[index + 1] = 1.0;
+				normal_array[index + 2] = 0.0;
 			}
 			// Inside edges, here the required indices are in bounds
 			else {
-				glm::vec3 p0(vertexArray[index + world_size * 3], vertexArray[index + 1 + world_size * 3], vertexArray[index + 2 + world_size * 3]);
-				glm::vec3 p1(vertexArray[index - world_size * 3], vertexArray[index - world_size * 3 + 1], vertexArray[index - world_size * 3 + 2]);
-				glm::vec3 p2(vertexArray[index - 3], vertexArray[index - 2], vertexArray[index - 1]);
+				glm::vec3 p0(vertex_array[index + world_size * 3], vertex_array[index + 1 + world_size * 3], vertex_array[index + 2 + world_size * 3]);
+				glm::vec3 p1(vertex_array[index - world_size * 3], vertex_array[index - world_size * 3 + 1], vertex_array[index - world_size * 3 + 2]);
+				glm::vec3 p2(vertex_array[index - 3], vertex_array[index - 2], vertex_array[index - 1]);
 				glm::vec3 a(p1 - p0);
 				glm::vec3 b(p2 - p0);
 				glm::vec3 normal = glm::cross(a, b);
 
-				normalArray[index] = normal.x;
-				normalArray[index + 1] = normal.y;
-				normalArray[index + 2] = normal.z;
+				normal_array[index] = normal.x;
+				normal_array[index + 1] = normal.y;
+				normal_array[index + 2] = normal.z;
 			}
 		}
 	}
 	// Create Model and upload to GPU
 	Model* model = LoadDataToModel(
-		vertexArray,
-		normalArray,
-		texCoordArray,
-		indexArray,
-		vertexCount,
-		triangleCount * 3);
+		vertex_array,
+		normal_array,
+		tex_coord_array,
+		index_array,
+		vertex_count,
+		triangle_count * 3);
 
 	return model;
 }
@@ -189,19 +189,19 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	// Make sure the wanted texture has not already been loaded. This method makes sure new memory is not allocated
 	// every time the skybox is changed but still loads the texture from disk every time.
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	unsigned int texture_id;
+	glGenTextures(1, &texture_id);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	int width, height, nrChannels;
+	int width, height, nr_channels;
 	for (unsigned int i = 0; i < faces.size(); i++)
 	{
-		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nr_channels, 0);
 		if (!data)
 		{
 			std::cerr << "loadCubemap failed: texture " << faces[i] << " failed to load\n";
@@ -213,25 +213,25 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 		stbi_image_free(data);
 	}
 
-	return textureID;
+	return texture_id;
 }
 
 
 /* Load skybox texture from the given folder. */
-void loadSkyboxTex(std::string skyboxPath)
+void loadSkyboxTex(std::string skybox_path)
 {
-	skyboxShader->use();
-	skyboxPath = "tex/skybox/" + skyboxPath;
+	skybox_shader->use();
+	skybox_path = "tex/skybox/" + skybox_path;
 	std::vector<std::string> faces
 	{
-		skyboxPath + "/front.tga",
-		skyboxPath + "/back.tga",
-		skyboxPath + "/top.tga",
-		skyboxPath + "/bottom.tga",
-		skyboxPath + "/right.tga",
-		skyboxPath + "/left.tga"
+		skybox_path + "/front.tga",
+		skybox_path + "/back.tga",
+		skybox_path + "/top.tga",
+		skybox_path + "/bottom.tga",
+		skybox_path + "/right.tga",
+		skybox_path + "/left.tga"
 	};
 
-	skyboxTex = loadCubemap(faces);
-	skyboxShader->setInt("skyboxTex", 0);
+	skybox_tex = loadCubemap(faces);
+	skybox_shader->setInt("skyboxTex", 0);
 }

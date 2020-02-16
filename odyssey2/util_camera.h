@@ -6,15 +6,15 @@
 
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-enum class Cam_Movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
+enum class cam_movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
 
 // Default camera values
-static const float CAM_SPEED = 120.0f;
-static const float CAM_SENSITIVITY = 0.2f;
-static const float CAM_FOV = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
-static const float CAM_HEIGHT = 60.0f; // Camera height above ground
-static const float VP_NEAR = 3.0f; // Near distance for frustum
-static float VP_FAR = 23000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
+static const float cam_speed = 120.0f;
+static const float cam_sensitivity = 0.2f;
+static const float cam_fov = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
+static const float cam_height = 60.0f; // Camera height above ground
+static const float vp_near = 3.0f; // Near distance for frustum
+static float vp_far = 23000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
 int window_w = 1920;
 int window_h = 1080;
 
@@ -24,84 +24,84 @@ class Camera
 {
 public:
     // Camera Attributes
-    glm::vec3 Position;
-    glm::vec3 Front;
-    glm::vec3 Up;
-    glm::vec3 Right;
-    glm::vec3 WorldUp;
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
+    glm::vec3 right;
+    glm::vec3 world_up;
 	glm::mat4 projection; // Projection matrix
     // Euler Angles
-    float Yaw;
-    float Pitch;
+    float yaw;
+    float pitch;
     // Camera options
-    float MovementSpeed;
-    float MouseSensitivity;
+    float movement_speed;
+    float mouse_sens;
     float fov;
 	float height;
 	bool flying;
 
     // Initialize with glm::vec3 position
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f))
-		: Front(glm::vec3(0.0f, 0.0f, -1.0f)), WorldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
-		Yaw(0.0f), Pitch(0.0f), MovementSpeed(CAM_SPEED), MouseSensitivity(CAM_SENSITIVITY), fov(CAM_FOV), height(CAM_HEIGHT), flying(false)
+		: front(glm::vec3(0.0f, 0.0f, -1.0f)), world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
+		yaw(0.0f), pitch(0.0f), movement_speed(cam_speed), mouse_sens(cam_sensitivity), fov(cam_fov), height(cam_height), flying(false)
     {
-        Position = position;
-		projection = glm::perspective(glm::radians(fov), (GLfloat)window_w / (GLfloat)window_h, VP_NEAR, VP_FAR);
+        position = position;
+		projection = glm::perspective(glm::radians(fov), (GLfloat)window_w / (GLfloat)window_h, vp_near, vp_far);
         updateCameraVectors();
     }
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
-        return glm::lookAt(Position, Position + Front, Up);
+        return glm::lookAt(position, position + front, up);
     }
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void ProcessKeyboard(Cam_Movement direction, float deltaTime)
+    void ProcessKeyboard(cam_movement direction, float delta_time)
     {
-        float velocity = MovementSpeed * deltaTime;
+        float velocity = movement_speed * delta_time;
 		if (flying)
 			velocity *= 4;
 
 		// Update position while making sure that the camera moves in the correct plane
-        if (direction == Cam_Movement::CAM_FORWARD)
-			Position += glm::normalize(glm::vec3(Front.x, 0.0f, Front.z)) * velocity;
-        if (direction == Cam_Movement::CAM_BACKWARD)
-            Position -= glm::normalize(glm::vec3(Front.x, 0.0f, Front.z)) * velocity;
-        if (direction == Cam_Movement::CAM_LEFT)
-            Position -= Right * velocity;
-        if (direction == Cam_Movement::CAM_RIGHT)
-            Position += Right * velocity;
-		if (direction == Cam_Movement::CAM_UP)
-			Position += glm::normalize(glm::vec3(0.0f, Up.y, 0.0f)) * velocity;
-		if (direction == Cam_Movement::CAM_DOWN)
-			Position -= glm::normalize(glm::vec3(0.0f, Up.y, 0.0f)) * velocity;
+        if (direction == cam_movement::CAM_FORWARD)
+			position += glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
+        if (direction == cam_movement::CAM_BACKWARD)
+            position -= glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
+        if (direction == cam_movement::CAM_LEFT)
+            position -= right * velocity;
+        if (direction == cam_movement::CAM_RIGHT)
+            position += right * velocity;
+		if (direction == cam_movement::CAM_UP)
+			position += glm::normalize(glm::vec3(0.0f, up.y, 0.0f)) * velocity;
+		if (direction == cam_movement::CAM_DOWN)
+			position -= glm::normalize(glm::vec3(0.0f, up.y, 0.0f)) * velocity;
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void ProcessMouseMovement(float xoffset, float yoffset)
+    void ProcessMouseMovement(float x_offset, float y_offset)
     {
-        xoffset *= MouseSensitivity;
-        yoffset *= MouseSensitivity;
+        x_offset *= mouse_sens;
+        y_offset *= mouse_sens;
 
-        Yaw += xoffset;
-        Pitch += yoffset;
+        yaw += x_offset;
+        pitch += y_offset;
 
         // Make sure that when pitch is out of bounds, screen doesn't get flipped
-        if (Pitch > 89.0f)
-            Pitch = 89.0f;
-        if (Pitch < -89.0f)
-            Pitch = -89.0f;
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
 
-        // Update Front, Right and Up Vectors using the updated Euler angles
+        // Update front, right and up Vectors using the updated Euler angles
         updateCameraVectors();
     }
 
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    void ProcessMouseScroll(float yoffset)
+    void ProcessMouseScroll(float y_offset)
     {
         if (fov >= 1.0f && fov <= 45.0f)
-            fov -= yoffset;
+            fov -= y_offset;
         if (fov <= 1.0f)
             fov = 1.0f;
         if (fov >= 45.0f)
@@ -112,14 +112,14 @@ private:
     // Calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors()
     {
-        // Calculate the new Front vector
-        glm::vec3 front;
-        front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-        front.y = sin(glm::radians(Pitch));
-        front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-        Front = glm::normalize(front);
-        // Also re-calculate the Right and Up vector
-        Right = glm::normalize(glm::cross(Front, WorldUp)); // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        Up = glm::normalize(glm::cross(Right, Front));
+        // Calculate the new front vector
+        glm::vec3 front_tmp{
+            cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
+            sin(glm::radians(pitch)),
+            sin(glm::radians(yaw)) * cos(glm::radians(pitch)) };
+        front = glm::normalize(front_tmp);
+        // Also re-calculate the right and up vector
+        right = glm::normalize(glm::cross(front, world_up)); // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        up = glm::normalize(glm::cross(right, front));
     }
 };
