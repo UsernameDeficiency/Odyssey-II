@@ -126,8 +126,6 @@ public:
 		unsigned char* data = stbi_load(filename, &width_temp, &height_temp, &nrChannels, 0);
 		if (data)
 		{
-			/*  GL_RGB, GL_BGR, GL_RGBA, GL_BGRA
-				GL_RGB_INTEGER, GL_BGR_INTEGER, GL_RGBA_INTEGER, GL_BGRA_INTEGER */
 			if (alpha) // Does the texture have an alpha channel?
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_temp, height_temp, 0, GL_RGBA, GL_UNSIGNED_BYTE, data); // Unsure if GL_RGB or GL_RGBA in third argument
 			else

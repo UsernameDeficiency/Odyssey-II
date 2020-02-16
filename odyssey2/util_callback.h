@@ -12,7 +12,7 @@ struct
 bool keyState[keyEnum.KEY_DOWN + 1] = { false };
 
 // Reads keyboard state set by key_callback and updates player movement
-void updatePhysics(const float& deltaTime)
+void updatePhysics(const float deltaTime, const float world_xz_scale)
 {
 	if (keyState[keyEnum.KEY_FORWARD])
 		camera.ProcessKeyboard(Cam_Movement::CAM_FORWARD, deltaTime);
@@ -42,7 +42,7 @@ void updatePhysics(const float& deltaTime)
 		else if (camera.Position.z > world_size* world_xz_scale - 2.0f)
 			camera.Position.z = world_size * world_xz_scale - 2.0f;
 
-		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray) + camera.height;
+		const float new_y_pos = getPosy(camera.Position.x, camera.Position.z, mTerrain->vertexArray, world_xz_scale) + camera.height;
 		const float swim_height = terrainStruct.sea_y_pos + camera.height / 3;
 
 		// Make sure player does not drown.
@@ -203,7 +203,7 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 
-/* fb_size_callback is called when the window is resized and updates the projection matrix and viewport size */
+// fb_size_callback is called when the window is resized and updates the projection matrix and viewport size
 static void fb_size_callback(GLFWwindow* window, int width, int height)
 {
 	window_w = width;
@@ -213,8 +213,7 @@ static void fb_size_callback(GLFWwindow* window, int width, int height)
 }
 
 
-/* error_callback is called on each glfw error, upon which it displays an error code 
-   and description */
+// error_callback is called on each glfw error, upon which it displays an error code and description
 static void error_callback(int code, const char* description)
 {
 	std::cerr << "GLFW error " << code << " : " << description << std::endl;

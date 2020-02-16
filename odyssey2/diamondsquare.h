@@ -9,12 +9,6 @@
 #include <random>
 
 
-/* Settings for diamond square algorithm */
-// Base weight for randomized values in diamond-square algorithm.
-static const float BASE_WEIGHT = 6000.0f;
-static const unsigned int SEED = 64;
-
-
  /* randnum returns a random float number between min and max, attempting to minimize rounding errors. */
 float randnum(float max, float min)
 {
@@ -80,6 +74,9 @@ static void square(std::vector<float> *arr, unsigned int width, unsigned int row
 	 filter_stop is the (HP) filter stop frequency described as a step length. */
 std::vector<float> diamondsquare(const unsigned int width)
 {
+	static const float BASE_WEIGHT = 6000.0f; // Base weight for randomized values in diamond-square algorithm
+	static const unsigned int SEED = 64;
+
 	// Set seeding for random numbers
 	srand(SEED);
 	// Allocate heightmap

@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+#include <iostream>
 #include <vector>
 #include "main.h"
 #include "loadobj.h"
@@ -11,9 +12,8 @@
 #include "util_callback.h" // GLFW callbacks, updatePhysics
 #include "util_shader.h"
 
-
 // Initialize openGL, GLAD and GLFW
-static void initGL()
+static GLFWwindow* initGL(const bool debug_context)
 {
 	// --------- Initialize GLFW ---------
 	if (!glfwInit())
@@ -21,7 +21,7 @@ static void initGL()
 
 	// Create GLFW window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	if (DEBUG_CONTEXT)
+	if (debug_context)
 	{
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -29,8 +29,7 @@ static void initGL()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
-	glfwWindowHint(GLFW_DEPTH_BITS, 32); // Request depth buffer size (doesn't seem to have any effect on my machine)
-	window = glfwCreateWindow(window_w, window_h, "Odyssey II", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(window_w, window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
 	glfwMakeContextCurrent(window);
@@ -51,7 +50,7 @@ static void initGL()
 	glEnable(GL_BLEND); // Enable transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// OpenGL debugging
-	if (DEBUG_CONTEXT)
+	if (debug_context)
 	{
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -64,13 +63,15 @@ static void initGL()
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetFramebufferSizeCallback(window, fb_size_callback);
 	glfwSetCursorPosCallback(window, cursor_pos_callback);
+
+	return window;
 }
 
 
 // Set up terrain, skybox and water
-static void initGraphics()
+static void initGraphics(const float world_xz_scale, const float world_y_scale, const float tex_scale, terrainTextureIDs &terrainTexIDs)
 {
-	/* Initialize procedural terrain. Size should be square with width 2^n for some integer n. */
+	// Initialize procedural terrain. Size should be square with width 2^n for some integer n.
 	terrainShader = new Shader("shader/terrain.vert", "shader/terrain.frag");
 	terrainShader->use();
 
@@ -80,13 +81,12 @@ static void initGraphics()
 	mean(&procTerrain, 5); // LP filter diamond-square terrain
 	mTerrain = generateTerrain(procTerrain, world_xz_scale, world_y_scale, tex_scale);
 
-	const float yPos = getPosy(world_size / 2, world_size / 2, mTerrain->vertexArray) + camera.height;
-	camera.Position = glm::vec3(world_size * world_xz_scale / 2, yPos, world_size * world_xz_scale / 2);
+	camera.Position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
 	// Load terrain textures and upload to texture units
-	terrainShader->loadStbTextureRef("tex/rock_08.png", &snowTex, false); // Alt. rock_03
-	terrainShader->loadStbTextureRef("tex/mud_leaves.png", &grassTex, false);
-	terrainShader->loadStbTextureRef("tex/red_dirt_mud_01.png", &rockTex, false);
-	terrainShader->loadStbTextureRef("tex/brown_mud_rocks_01.png", &bottomTex, false);
+	terrainShader->loadStbTextureRef("tex/rock_08.png", &terrainTexIDs.snowTex, false); // Alt. rock_03
+	terrainShader->loadStbTextureRef("tex/mud_leaves.png", &terrainTexIDs.grassTex, false);
+	terrainShader->loadStbTextureRef("tex/red_dirt_mud_01.png", &terrainTexIDs.rockTex, false);
+	terrainShader->loadStbTextureRef("tex/brown_mud_rocks_01.png", &terrainTexIDs.bottomTex, false);
 	terrainShader->setInt("snowTex", 0);
 	terrainShader->setInt("grassTex", 1);
 	terrainShader->setInt("rockTex", 2);
@@ -140,7 +140,7 @@ static void initGraphics()
 	skyboxShader->setBool("draw_fog", false);
 	skyboxShader->setVec3("fogColor", fogColor);
 
-	/* Add flat water vertex. generateTerrain must run before this. */
+	// Add flat water vertex, generateTerrain must run first
 	waterShader = new Shader("shader/water.vert", "shader/water.frag");
 	waterShader->use();
 
@@ -170,67 +170,38 @@ static void initGraphics()
 	waterShader->setFloat("worldSize", world_xz_scale * world_size);
 }
 
-// Draw screen
-static void render(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen and depth buffer
-
-	// --------- Draw skybox ---------
-	glDepthMask(GL_FALSE); // Disable depth writes
-	skyboxShader->use();
-	glBindVertexArray(skyboxVAO);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
-
-	glm::mat4 worldToView = glm::mat4(glm::mat3(camera.GetViewMatrix())); // Remove translation from the view matrix
-	skyboxShader->setMatrix4f("worldToView", worldToView);
-	skyboxShader->setMatrix4f("projection", camera.projection);
-
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glDepthMask(GL_TRUE);
-
-	// --------- Draw terrain ---------
-	terrainShader->use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, snowTex);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, grassTex);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, rockTex);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, bottomTex);
-
-	terrainShader->setMatrix4f("worldToView", camera.GetViewMatrix());
-	terrainShader->setMatrix4f("projection", camera.projection);
-
-	DrawModel(mTerrain, terrainShader->ID, "inPos", "inNormal", "inTexCoord");
-
-	// --------- Draw water surface ---------
-	waterShader->use();
-	glBindVertexArray(waterVAO);
-
-	waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
-	waterShader->setMatrix4f("projection", camera.projection);
-	waterShader->setVec3("cameraPos", camera.Position);
-	waterShader->setFloat("time", (float)glfwGetTime());
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	// --------- Swap buffers ---------
-	glfwSwapBuffers(window);
-}
-
 
 int main(int argc, char **argv)
 {
+	// Program settings and variables
+	const float world_xz_scale = 16.0f;
+	const float world_y_scale = 2.0f;
+	const float tex_scale = 200.0f;
+	const bool debug_context = true; // Enable/disable debugging context and prints
+	float lastTime = 0.0f;
+	terrainTextureIDs terrainTex;
+
+	// Print greeting
+	std::cout <<
+		"------------------------------------\n"
+		"       Welcome to Odyssey II!\n"
+		"------------------------------------\n"
+		"Move: W/A/S/D/Q/E\n"
+		"Run: Shift\n"
+		"Zoom: Ctrl\n"
+		"Crouch: C\n"
+		"Toggle flying/walking: F\n"
+		"Toggle fog: F1\n"
+		"Toggle water wave effect: F2\n"
+		"Toggle skybox: F3\n"
+		"------------------------------------\n";
+
 	// Initiate OpenGL and graphics
-	greet();
-	initGL();
-	initGraphics();
+	GLFWwindow* window = initGL(debug_context);
+	initGraphics(world_xz_scale, world_y_scale, tex_scale, terrainTex);
 	glfwShowWindow(window);
 
 	// Main render loop
-	float lastTime = 0.0f;
 	while (!glfwWindowShouldClose(window))
 	{
 		// Calculate frame time
@@ -239,8 +210,53 @@ int main(int argc, char **argv)
 		lastTime = currentTime;
 
 		// Update physics and render screen
-		updatePhysics(deltaTime);
-		render();
+		updatePhysics(deltaTime, world_xz_scale);
+		
+		// Clear screen and depth buffer
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// --------- Draw skybox ---------
+		glDepthMask(GL_FALSE); // Disable depth writes
+		skyboxShader->use();
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
+
+		glm::mat4 worldToView = glm::mat4(glm::mat3(camera.GetViewMatrix())); // Remove translation from the view matrix
+		skyboxShader->setMatrix4f("worldToView", worldToView);
+		skyboxShader->setMatrix4f("projection", camera.projection);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthMask(GL_TRUE);
+
+		// --------- Draw terrain ---------
+		terrainShader->use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, terrainTex.snowTex);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, terrainTex.grassTex);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, terrainTex.rockTex);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, terrainTex.bottomTex);
+
+		terrainShader->setMatrix4f("worldToView", camera.GetViewMatrix());
+		terrainShader->setMatrix4f("projection", camera.projection);
+
+		DrawModel(mTerrain, terrainShader->ID, "inPos", "inNormal", "inTexCoord");
+
+		// --------- Draw water surface ---------
+		waterShader->use();
+		glBindVertexArray(waterVAO);
+
+		waterShader->setMatrix4f("worldToView", camera.GetViewMatrix());
+		waterShader->setMatrix4f("projection", camera.projection);
+		waterShader->setVec3("cameraPos", camera.Position);
+		waterShader->setFloat("time", (float)glfwGetTime());
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		glfwSwapBuffers(window);
 		printFPS(deltaTime);
 		glfwPollEvents();
 	}

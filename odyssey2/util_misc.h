@@ -7,23 +7,6 @@
 #include "loadobj.h" // Model*
 #include "main.h"
 
-/* Print welcome message */
-void greet()
-{
-	std::cout << "------------------------------------\n"
-		"       Welcome to Odyssey II!\n"
-		"------------------------------------\n"
-		"Move: W/A/S/D/Q/E\n"
-		"Run: Shift\n"
-		"Zoom: Ctrl\n"
-		"Crouch: C\n"
-		"Toggle flying/walking: F\n"
-		"Toggle fog: F1\n"
-		"Toggle water wave effect: F2\n"
-		"Toggle skybox: F3\n"
-		"------------------------------------\n";
-}
-
 
 /* Print average FPS once every second */
 void printFPS(float& deltaTime)
@@ -44,7 +27,7 @@ void printFPS(float& deltaTime)
 
 
 /* Interpolate y values over the vertex at position (x, z). No bounds checking for x and z. */
-float getPosy(float x, float z, GLfloat* vertexArray)
+float getPosy(float x, float z, const GLfloat *vertexArray, const float world_xz_scale)
 {
 	float yPos, y1, y2, y3;
 	x /= world_xz_scale;
@@ -117,20 +100,19 @@ void exit_on_error(const char* error)
 }
 
 
-/* Load pre-generated heightmap from texture tex and add height values from procTerrain. */
+/* Build Model from generated terrain. */
 Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, float world_y_scale, float tex_scale)
 {
 	const unsigned int vertexCount = world_size * world_size;
 	const unsigned int triangleCount = (world_size - 1) * (world_size - 1) * 2;
 	unsigned int x, z;
-	GLfloat texScaleX = world_size / tex_scale;
-	GLfloat texScaleY = world_size / tex_scale;
+	const GLfloat texScale = tex_scale / world_size;
 	GLfloat* vertexArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount]; // TODO: Array sizes too large here?
 	GLfloat* normalArray = new GLfloat[sizeof(GLfloat) * 3 * vertexCount];
 	GLfloat* texCoordArray = new GLfloat[sizeof(GLfloat) * 2 * vertexCount];
 	GLuint* indexArray = new GLuint[sizeof(GLuint) * triangleCount * 3];
 
-	/* Fill vertex, texture coordinate and index array. */
+	// Fill vertex, texture coordinate and index array
 	for (x = 0; x < world_size; x++) {
 		for (z = 0; z < world_size; z++) {
 			int index = x + z * world_size;
@@ -147,8 +129,8 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 			vertexArray[index * 3 + 2] = z * world_xz_scale;
 
 			/* Scaled texture coordinates. */
-			texCoordArray[index * 2 + 0] = (float)x / texScaleX;
-			texCoordArray[index * 2 + 1] = (float)z / texScaleY;
+			texCoordArray[index * 2 + 0] = (float)x * texScale;
+			texCoordArray[index * 2 + 1] = (float)z * texScale;
 
 			if ((x != world_size - 1) && (z != world_size - 1)) {
 				index = (x + z * (world_size - 1)) * 6;
@@ -164,7 +146,7 @@ Model* generateTerrain(std::vector<float> procTerrain, float world_xz_scale, flo
 		}
 	}
 
-	/* Calculate normals (cross product of two vectors along current triangle) */
+	// Calculate normals (cross product of two vectors along current triangle)
 	for (x = 0; x < world_size; x++) {
 		for (z = 0; z < world_size; z++) {
 			int index = (x + z * world_size) * 3;

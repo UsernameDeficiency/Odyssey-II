@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "main.h"
 
+
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum class Cam_Movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
 
