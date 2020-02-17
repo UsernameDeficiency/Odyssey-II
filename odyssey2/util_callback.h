@@ -16,20 +16,20 @@ bool key_state[key_enum.KEY_DOWN + 1] = { false };
 void update_physics(const float delta_time, const float world_xz_scale)
 {
 	if (key_state[key_enum.KEY_FORWARD])
-		camera.process_keyboard(cam_movement::CAM_FORWARD, delta_time);
+		camera.process_keyboard(Camera::movement::CAM_FORWARD, delta_time);
 	if (key_state[key_enum.KEY_BACKWARD])
-		camera.process_keyboard(cam_movement::CAM_BACKWARD, delta_time);
+		camera.process_keyboard(Camera::movement::CAM_BACKWARD, delta_time);
 	if (key_state[key_enum.KEY_LEFT])
-		camera.process_keyboard(cam_movement::CAM_LEFT, delta_time);
+		camera.process_keyboard(Camera::movement::CAM_LEFT, delta_time);
 	if (key_state[key_enum.KEY_RIGHT])
-		camera.process_keyboard(cam_movement::CAM_RIGHT, delta_time);
+		camera.process_keyboard(Camera::movement::CAM_RIGHT, delta_time);
 
 	if (camera.flying)
 	{
 		if (key_state[key_enum.KEY_UP])
-			camera.process_keyboard(cam_movement::CAM_UP, delta_time);
+			camera.process_keyboard(Camera::movement::CAM_UP, delta_time);
 		if (key_state[key_enum.KEY_DOWN])
-			camera.process_keyboard(cam_movement::CAM_DOWN, delta_time);
+			camera.process_keyboard(Camera::movement::CAM_DOWN, delta_time);
 	}
 	else
 	{
@@ -91,9 +91,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	else if (key == GLFW_KEY_LEFT_SHIFT)
 	{
 		if (action == GLFW_PRESS)
-			camera.movement_speed = cam_speed * 8;
+			camera.movement_speed = camera.cam_speed * 8;
 		else if (action == GLFW_RELEASE)
-			camera.movement_speed = cam_speed;
+			camera.movement_speed = camera.cam_speed;
 	}
 
 	// Zoom by lowering fov
@@ -101,13 +101,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		if (action == GLFW_PRESS)
 		{
-			camera.projection = glm::perspective(glm::radians(camera.fov / 4), (GLfloat)window_w / (GLfloat)window_h, vp_near, 1.5f * vp_far);
-			camera.mouse_sens = cam_sensitivity / 3.0f;
+			camera.projection = glm::perspective(glm::radians(camera.fov / 4), (GLfloat)camera.window_w / (GLfloat)camera.window_h, camera.vp_near, 1.5f * camera.vp_far);
+			camera.mouse_sens = camera.cam_sensitivity / 3.0f;
 		}
 		else if (action == GLFW_RELEASE)
 		{
-			camera.projection = glm::perspective(glm::radians(camera.fov), (GLfloat)window_w / (GLfloat)window_h, vp_near, vp_far);
-			camera.mouse_sens = cam_sensitivity;
+			camera.projection = glm::perspective(glm::radians(camera.fov), (GLfloat)camera.window_w / (GLfloat)camera.window_h, camera.vp_near, camera.vp_far);
+			camera.mouse_sens = camera.cam_sensitivity;
 		}
 	}
 
@@ -116,13 +116,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		if (action == GLFW_PRESS)
 		{
-			camera.height = cam_height / 2.0f;
-			camera.movement_speed = cam_speed * 0.4;
+			camera.height = camera.cam_height / 2.0f;
+			camera.movement_speed = camera.cam_speed * 0.4;
 		}
 		else if (action == GLFW_RELEASE)
 		{
-			camera.height = cam_height;
-			camera.movement_speed = cam_speed;
+			camera.height = camera.cam_height;
+			camera.movement_speed = camera.cam_speed;
 		}
 	}
 
@@ -192,7 +192,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	static float mouse_last_x = 0.0f;
-	static float mouse_last_y = window_h / 2.0f;
+	static float mouse_last_y = camera.window_h / 2.0f;
 
 	float x_offset = (float)xpos - mouse_last_x;
 	float y_offset = mouse_last_y - (float)ypos; // reversed since y-coordinates go from bottom to top
@@ -207,9 +207,9 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 // fb_size_callback is called when the window is resized and updates the projection matrix and viewport size
 static void fb_size_callback(GLFWwindow* window, int width, int height)
 {
-	window_w = width;
-	window_h = height;
-	camera.projection = glm::perspective(glm::radians(camera.fov), (GLfloat)width / (GLfloat)height, vp_near, vp_far);
+	camera.window_w = width;
+	camera.window_h = height;
+	camera.projection = glm::perspective(glm::radians(camera.fov), (GLfloat)width / (GLfloat)height, camera.vp_near, camera.vp_far);
 	glViewport(0, 0, width, height);
 }
 

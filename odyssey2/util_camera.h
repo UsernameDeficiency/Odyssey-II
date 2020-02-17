@@ -1,22 +1,8 @@
 #pragma once
-#include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "main.h"
 
-
-// Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-enum class cam_movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
-
-// Default camera values
-static const float cam_speed = 120.0f;
-static const float cam_sensitivity = 0.2f;
-static const float cam_fov = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
-static const float cam_height = 60.0f; // Camera height above ground
-static const float vp_near = 3.0f; // Near distance for frustum
-static float vp_far = 23000.0f; // was world_size * world_xz_scale * 1.4f, probably tweak this later
-int window_w = 1920;
-int window_h = 1080;
 
 /* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
@@ -33,19 +19,31 @@ public:
     // Euler Angles
     float yaw;
     float pitch;
+    // Default camera values
+    int window_w = 1920;
+    int window_h = 1080;
     // Camera options
+    const float cam_speed = 120.0f;
+    const float cam_sensitivity = 0.2f;
+    const float cam_fov = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
+    const float cam_height = 60.0f; // Camera height above ground
+    const float vp_near = 3.0f; // Near distance for frustum
+    const float vp_far = 23000.0f; // Far distance for frustum
     float movement_speed;
     float mouse_sens;
     float fov;
 	float height;
 	bool flying;
 
+    // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
+    enum class movement { CAM_FORWARD, CAM_BACKWARD, CAM_LEFT, CAM_RIGHT, CAM_UP, CAM_DOWN };
+
     // Initialize with glm::vec3 position
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f))
-		: front(glm::vec3(0.0f, 0.0f, -1.0f)), world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
-		yaw(0.0f), pitch(0.0f), movement_speed(cam_speed), mouse_sens(cam_sensitivity), fov(cam_fov), height(cam_height), flying(false)
+    Camera()
+		: position{ 0.0f, 0.0f, 0.0f }, front{ 0.0f, 0.0f, -1.0f }, world_up{ 0.0f, 1.0f, 0.0f },
+		yaw(0.0f), pitch(0.0f), movement_speed(cam_speed), mouse_sens(cam_sensitivity), 
+        fov(cam_fov), height(cam_height), flying(false)
     {
-        position = position;
 		projection = glm::perspective(glm::radians(fov), (GLfloat)window_w / (GLfloat)window_h, vp_near, vp_far);
         update_camera_vectors();
     }
@@ -57,24 +55,24 @@ public:
     }
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void process_keyboard(cam_movement direction, float delta_time)
+    void process_keyboard(Camera::movement direction, float delta_time)
     {
         float velocity = movement_speed * delta_time;
-		if (flying)
-			velocity *= 4;
+        if (flying)
+            velocity *= 4;
 
-		// Update position while making sure that the camera moves in the correct plane
-        if (direction == cam_movement::CAM_FORWARD)
-			position += glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
-        if (direction == cam_movement::CAM_BACKWARD)
+        // Update position while making sure that the camera moves in the correct plane
+        if (direction == Camera::movement::CAM_FORWARD)
+            position += glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
+        if (direction == Camera::movement::CAM_BACKWARD)
             position -= glm::normalize(glm::vec3(front.x, 0.0f, front.z)) * velocity;
-        if (direction == cam_movement::CAM_LEFT)
+        if (direction == Camera::movement::CAM_LEFT)
             position -= right * velocity;
-        if (direction == cam_movement::CAM_RIGHT)
+        if (direction == Camera::movement::CAM_RIGHT)
             position += right * velocity;
-		if (direction == cam_movement::CAM_UP)
-			position += glm::normalize(glm::vec3(0.0f, up.y, 0.0f)) * velocity;
-		if (direction == cam_movement::CAM_DOWN)
+        if (direction == Camera::movement::CAM_UP)
+            position += glm::normalize(glm::vec3(0.0f, up.y, 0.0f)) * velocity;
+        if (direction == Camera::movement::CAM_DOWN)
 			position -= glm::normalize(glm::vec3(0.0f, up.y, 0.0f)) * velocity;
     }
 

@@ -10,14 +10,14 @@
 
 
  /* randnum returns a random float number between min and max, attempting to minimize rounding errors. */
-float randnum(float max, float min)
+float randnum(const float max, const float min)
 {
 	return (max - min) * (float)((double)(rand()) / (double)RAND_MAX) + min;
 }
 
 
 /* Returns a normally distributed random number, standard deviation stddev */
-float randnum_norm(float stddev, float min)
+float randnum_norm(const float stddev, const float min)
 {
 
 	std::random_device rd{};
@@ -33,12 +33,9 @@ float randnum_norm(float stddev, float min)
 	 filter_stop is the (HP) filter stop frequency described as a step length. */
 std::vector<float> diamondsquare(const unsigned int width)
 {
-	static const float base_weight = 6000.0f; // Base weight for randomized values in diamond-square algorithm
-	static const unsigned int seed = 64;
-
-	// Set seeding for random numbers
+	const float base_weight = 6000.0f; // Base weight for randomized values in diamond-square algorithm
+	const unsigned int seed = 64;
 	srand(seed);
-	// Allocate heightmap
 	auto terrain = new std::vector<float>((size_t)width * (size_t)width);
 	
 	/* Initialize corner values. Since the width for this implementation is 2^n rather than 2^n+1,
@@ -54,11 +51,11 @@ std::vector<float> diamondsquare(const unsigned int width)
 			for (unsigned int col = 0; col < width; col += step) {
 				// Indices for upper/lower right and left corners of the square area being worked on, the mean of the corner
 				// values give the base displacement for the current point being calculated. Wrap-around if out of bounds.
-				int ul = row * width + col; // Always in bounds
+				int ul = row * width + col;
 				int ur = row * width + (col + step) % width;
 				int ll = ((row + step) % width) * width + col;
 				int lr = ((row + step) % width) * width + (col + step) % width;
-				int mid = (row + step / 2) * width + col + step / 2; // Current point being calculated (always in bounds)
+				int mid = (row + step / 2) * width + col + step / 2; // Current point being calculated
 
 				// Mean of all 4 points
 				(*terrain)[mid] = ((*terrain)[ul] + (*terrain)[ur] + (*terrain)[ll] + (*terrain)[lr]) / 4 + randnum(weight, -weight);

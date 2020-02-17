@@ -29,7 +29,7 @@ static GLFWwindow* init_gl(const bool debug_context)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
-	GLFWwindow *window = glfwCreateWindow(window_w, window_h, "Odyssey II", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(camera.window_w, camera.window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
 	glfwMakeContextCurrent(window);
@@ -69,7 +69,7 @@ static GLFWwindow* init_gl(const bool debug_context)
 
 
 // Set up terrain, skybox and water
-static void init_graphics(const float world_xz_scale, const float world_y_scale, const float tex_scale, Terrain_texture_ids &terrain_tex_ids)
+static void init_graphics(const float world_xz_scale, const float world_y_scale, const float tex_scale, Terrain_texture_ids& terrain_tex_ids)
 {
 	// Initialize procedural terrain. Size should be square with width 2^n for some integer n.
 	terrain_shader = new Shader("shader/terrain.vert", "shader/terrain.frag");
@@ -177,7 +177,7 @@ int main()
 	const float world_xz_scale = 16.0f;
 	const float world_y_scale = 2.0f;
 	const float tex_scale = 200.0f;
-	const bool debug_context = true; // Enable/disable debugging context and prints
+	const bool debug_context = false; // Enable/disable debugging context and prints
 	float last_time = 0.0f;
 	Terrain_texture_ids terrain_tex;
 
@@ -204,12 +204,10 @@ int main()
 	// Main render loop
 	while (!glfwWindowShouldClose(window))
 	{
-		// Calculate frame time
+		// Calculate frame time and update physics state
 		float current_time = (float)glfwGetTime();
 		float delta_time = current_time - last_time;
 		last_time = current_time;
-
-		// Update physics and render screen
 		update_physics(delta_time, world_xz_scale);
 		
 		// Clear screen and depth buffer

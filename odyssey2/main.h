@@ -16,7 +16,7 @@ const std::vector<std::string> skybox_paths = {
 
 
 /* Global variables */
-struct
+struct Terrain_heights
 {
 	float min_height{ FLT_MAX };
 	float max_height{ -FLT_MAX };
