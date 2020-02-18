@@ -5,9 +5,9 @@
 #include <algorithm>
 
 
-/* mean does filter_width-point moving average filtering of arr.
-	filter_width should be an odd positive integer, no sanity check done! */
-static void mean(std::vector<float>* arr, const unsigned int filter_width)
+/* mean does filter_size-point moving average filtering of arr.
+	filter_size should be an odd positive integer, no sanity check done! */
+static void mean(std::vector<float>* arr, const unsigned int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr->size()); // width = height of terrain array
 	std::vector<float>* arr_tmp = new std::vector<float>(arr->size());
@@ -19,7 +19,7 @@ static void mean(std::vector<float>* arr, const unsigned int filter_width)
 			float avg = arr->at(i); // Initialize average with current element
 			float normalization = 1; // Normalize calculated average
 
-			for (size_t offset = 1; offset <= filter_width / 2; offset++) {
+			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
 				float scale = 1 / (float)pow(2, offset); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
@@ -46,7 +46,7 @@ static void mean(std::vector<float>* arr, const unsigned int filter_width)
 			float avg = arr_tmp->at(i); // Initialize average with current element
 			float normalization = 1; // Normalize calculated average
 
-			for (size_t offset = 1; offset <= filter_width / 2; offset++) {
+			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
 				float scale = 1 / (float)pow(2, offset); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
@@ -70,9 +70,10 @@ static void mean(std::vector<float>* arr, const unsigned int filter_width)
 }
 
 
-/* median does filter_width-point median filtering of arr.
-	filter_width should be an odd positive integer, no sanity check done! */
-static void median(std::vector<float>* arr, const int filter_width)
+/* median does filter_size-point median filtering of arr.
+	filter_size should be an odd positive integer, no sanity check done! */
+// TODO: Performance much worse than mean()
+static void median(std::vector<float>* arr, const int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr->size()); // width = height of terrain array
 	std::vector<float>* arr_tmp = new std::vector<float>(arr->size());
@@ -83,7 +84,7 @@ static void median(std::vector<float>* arr, const int filter_width)
 		for (size_t col = 0; col < arr_width; col++) {
 			size_t i = row * arr_width + col; // Index of element being smoothed
 			median.push_back(arr->at(i));
-			for (size_t offset = 1; offset <= filter_width / 2; offset++) {
+			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
 				// Left value
 				if (col < offset)
 					median.push_back(arr->at(i - offset + arr_width)); // Out of bounds, wrap to end of row
@@ -97,7 +98,7 @@ static void median(std::vector<float>* arr, const int filter_width)
 					median.push_back(arr->at(i + offset));
 			}
 			std::sort(median.begin(), median.end());
-			arr_tmp->at(i) = median.at(filter_width / 2);
+			arr_tmp->at(i) = median.at(filter_size / 2);
 			median.clear();
 		}
 	}
@@ -107,7 +108,7 @@ static void median(std::vector<float>* arr, const int filter_width)
 		for (size_t row = 0; row < arr_width; row++) {
 			size_t i = row * arr_width + col; // Index of element being smoothed
 			median.push_back(arr->at(i));
-			for (size_t offset = 1; offset <= filter_width / 2; offset++) {
+			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
 				// Upper value
 				if (row < offset)
 					median.push_back(arr_tmp->at(i - offset * arr_width + arr->size())); // Out of bounds, wrap to end of column
@@ -121,7 +122,7 @@ static void median(std::vector<float>* arr, const int filter_width)
 					median.push_back(arr_tmp->at(i + offset * arr_width));
 			}
 			std::sort(median.begin(), median.end());
-			arr->at(i) = median.at(filter_width / 2);
+			arr->at(i) = median.at(filter_size / 2);
 			median.clear();
 		}
 	}

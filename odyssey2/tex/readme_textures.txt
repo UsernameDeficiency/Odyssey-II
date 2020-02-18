@@ -15,27 +15,27 @@ textures for different skyboxes
 stormydays: Warm climate
 	Yellow
 	vec3(1, 0.75, 1)
-	terrainShader->loadStbTextureRef("tex/snow_02_translucent.png", &snowTex, false);
-	terrainShader->loadStbTextureRef("tex/burned_ground_01.png", &grassTex, false);
-	terrainShader->loadStbTextureRef("tex/rock_06.png", &rockTex, false);
+	terrain_shader->load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/burned_ground_01.png", &terrain_tex_ids.grass_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.rock_tex, false);
 	
 hw_morning: Mountains, rain forest
 	Green, blue
 	vec3(?, ?, ?)
-	terrainShader->loadStbTextureRef("tex/rock_06.png", &snowTex, false);
-	terrainShader->loadStbTextureRef("tex/mud_leaves.png", &grassTex, false);
-	terrainShader->loadStbTextureRef("tex/rock_03.png", &rockTex, false); // Alt. rock_08
+	terrain_shader->load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.snow_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/mud_leaves.png", &terrain_tex_ids.grass_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/rock_03.png", &terrain_tex_ids.rock_tex, false); // Alt. rock_08
 	
 sb_frozen: Snowy mountains
 	Blue
 	vec3(?, ?, ?)
-	terrainShader->loadStbTextureRef("tex/snow_02_translucent.png", &snowTex, false);
-	terrainShader->loadStbTextureRef("tex/brown_mud_rocks_01.png", &grassTex, false);
-	terrainShader->loadStbTextureRef("tex/rock_03.png", &rockTex, false);
+	terrain_shader->load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/brown_mud_rocks_01.png", &terrain_tex_ids.grass_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/rock_03.png", &terrain_tex_ids.rock_tex, false);
 	
 ame_starfield: Star sky
 	Dark
 	vec3(0, 1, 0)?
-	terrainShader->loadStbTextureRef("tex/rock_08.png", &snowTex, false); // Alt. rock_03
-	terrainShader->loadStbTextureRef("tex/mud_leaves.png", &grassTex, false);
-	terrainShader->loadStbTextureRef("tex/red_dirt_mud_01.png", &rockTex, false);
+	terrain_shader->load_stb_texture_ref("tex/rock_08.png", &terrain_tex_ids.snow_tex, false); // Alt. rock_03
+	terrain_shader->load_stb_texture_ref("tex/mud_leaves.png", &terrain_tex_ids.grass_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/red_dirt_mud_01.png", &terrain_tex_ids.rock_tex, false);

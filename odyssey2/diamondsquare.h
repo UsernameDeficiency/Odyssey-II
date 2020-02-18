@@ -9,7 +9,7 @@
 #include <random>
 
 
- /* randnum returns a random float number between min and max, attempting to minimize rounding errors. */
+/* randnum returns a random float number between min and max, attempting to minimize rounding errors. */
 float randnum(const float max, const float min)
 {
 	return (max - min) * (float)((double)(rand()) / (double)RAND_MAX) + min;

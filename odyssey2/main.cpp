@@ -8,8 +8,8 @@
 #include "loadobj.h"
 #include "diamondsquare.h"
 #include "terrain_filter.h"
-#include "util_misc.h" // generate_terrain, debug_message, exit_on_error, load_skybox_tex
-#include "util_callback.h" // GLFW callbacks, update_physics
+#include "util_misc.h" // generate_terrain, exit_on_error, load_skybox_tex
+#include "util_callback.h" // Callbacks, update_physics
 #include "util_shader.h"
 
 // Initialize openGL, GLAD and GLFW
@@ -78,14 +78,14 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	/* Load pregenerated terrain data from terrainMap, calculate procedural terrain
 	   and add proc_terrain values to the pregenerated map. */
 	std::vector<float> proc_terrain = diamondsquare(world_size);
-	mean(&proc_terrain, 5); // LP filter diamond-square terrain
+	median(&proc_terrain, 5); // LP filter diamond-square terrain
 	m_terrain = generate_terrain(proc_terrain, world_xz_scale, world_y_scale, tex_scale);
 
 	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
 	// Load terrain textures and upload to texture units
-	terrain_shader->load_stb_texture_ref("tex/rock_08.png", &terrain_tex_ids.snow_tex, false); // Alt. rock_03
-	terrain_shader->load_stb_texture_ref("tex/mud_leaves.png", &terrain_tex_ids.grass_tex, false);
-	terrain_shader->load_stb_texture_ref("tex/red_dirt_mud_01.png", &terrain_tex_ids.rock_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/burned_ground_01.png", &terrain_tex_ids.grass_tex, false);
+	terrain_shader->load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.rock_tex, false);
 	terrain_shader->load_stb_texture_ref("tex/brown_mud_rocks_01.png", &terrain_tex_ids.bottom_tex, false);
 	terrain_shader->set_int("snowTex", 0);
 	terrain_shader->set_int("grassTex", 1);
@@ -105,7 +105,7 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	skybox_shader = new Shader("shader/skybox.vert", "shader/skybox.frag");
 	skybox_shader->use();
 
-	float skybox_vertices[] = {
+	const float skybox_vertices[] = {
 		-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
 		 5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
 
@@ -135,16 +135,16 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
-	load_skybox_tex(skybox_paths.at(0));
+	load_cubemap(skybox_paths.at(0));
 
-	skybox_shader->set_bool("draw_fog", false);
+	skybox_shader->set_bool("drawFog", false);
 	skybox_shader->set_vec3("fogColor", fog_color);
 
 	// Add flat water vertex, generate_terrain must run first
 	water_shader = new Shader("shader/water.vert", "shader/water.frag");
 	water_shader->use();
 
-	GLfloat water_surface_vert[] = {
+	const GLfloat water_surface_vert[] = {
 		// Triangle 1
 		0.0f, terrain_struct.sea_y_pos, 0.0f,
 		0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
@@ -164,7 +164,7 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	glBufferData(GL_ARRAY_BUFFER, 2 * 9 * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(glGetAttribLocation(water_shader->id, "inPos"));
 	glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
-	water_shader->set_bool("draw_fog", false);
+	water_shader->set_bool("drawFog", false);
 	water_shader->set_bool("extraWaves", false);
 	water_shader->set_vec3("fogColor", fog_color);
 	water_shader->set_float("worldSize", world_xz_scale * world_size);

@@ -23,12 +23,14 @@ public:
     int window_w = 1920;
     int window_h = 1080;
     // Camera options
+    // Initial camera settings
     const float cam_speed = 120.0f;
     const float cam_sensitivity = 0.2f;
     const float cam_fov = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
     const float cam_height = 60.0f; // Camera height above ground
     const float vp_near = 3.0f; // Near distance for frustum
     const float vp_far = 23000.0f; // Far distance for frustum
+    // Variable camera settings set by actions like running, flying, zooming 
     float movement_speed;
     float mouse_sens;
     float fov;
