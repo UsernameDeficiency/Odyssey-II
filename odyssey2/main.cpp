@@ -71,18 +71,15 @@ static GLFWwindow* init_gl(const bool debug_context)
 // Set up terrain, skybox and water
 static void init_graphics(const float world_xz_scale, const float world_y_scale, const float tex_scale, Terrain_texture_ids& terrain_tex_ids)
 {
-	// Initialize procedural terrain. Size should be square with width 2^n for some integer n.
+	// Calculate procedural terrain, LP filter result and create Model object
+	std::vector<float> proc_terrain = diamondsquare(world_size);
+	mean(proc_terrain, 5);
+	m_terrain = generate_terrain(proc_terrain, world_xz_scale, world_y_scale, tex_scale);
+	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
+
+	// Load terrain textures and upload to texture units
 	terrain_shader = new Shader("shader/terrain.vert", "shader/terrain.frag");
 	terrain_shader->use();
-
-	/* Load pregenerated terrain data from terrainMap, calculate procedural terrain
-	   and add proc_terrain values to the pregenerated map. */
-	std::vector<float> proc_terrain = diamondsquare(world_size);
-	median(&proc_terrain, 5); // LP filter diamond-square terrain
-	m_terrain = generate_terrain(proc_terrain, world_xz_scale, world_y_scale, tex_scale);
-
-	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
-	// Load terrain textures and upload to texture units
 	terrain_shader->load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
 	terrain_shader->load_stb_texture_ref("tex/burned_ground_01.png", &terrain_tex_ids.grass_tex, false);
 	terrain_shader->load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.rock_tex, false);
@@ -94,6 +91,7 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	terrain_shader->set_bool("drawFog", false);
 	terrain_shader->set_vec3("fogColor", fog_color);
 
+	// Set multitexturing height limits
 	float terrain_height = terrain_struct.max_height - terrain_struct.min_height;
 	terrain_struct.sea_y_pos = terrain_struct.min_height + terrain_height / 3;
 	terrain_shader->set_float("minHeight", terrain_struct.min_height);
@@ -104,8 +102,12 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	// Initialize skybox cubemap and vertices
 	skybox_shader = new Shader("shader/skybox.vert", "shader/skybox.frag");
 	skybox_shader->use();
+	skybox_shader->set_bool("drawFog", false);
+	skybox_shader->set_vec3("fogColor", fog_color);
+	load_cubemap(skybox_paths.at(0));
 
-	const float skybox_vertices[] = {
+	// Allocate and activate skybox VAO/VBO
+	const GLfloat skybox_vertices[] = {
 		-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
 		 5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
 
@@ -124,8 +126,6 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 		-5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f, -5.0f,
 		 5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f,  5.0f
 	};
-
-	// Allocate and activate VAO/VBO
 	unsigned int skybox_vbo;
 	glGenVertexArrays(1, &skybox_vao);
 	glGenBuffers(1, &skybox_vbo);
@@ -135,15 +135,15 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
-	load_cubemap(skybox_paths.at(0));
-
-	skybox_shader->set_bool("drawFog", false);
-	skybox_shader->set_vec3("fogColor", fog_color);
-
-	// Add flat water vertex, generate_terrain must run first
+	// Initialize water surface
 	water_shader = new Shader("shader/water.vert", "shader/water.frag");
 	water_shader->use();
+	water_shader->set_bool("drawFog", false);
+	water_shader->set_bool("extraWaves", false);
+	water_shader->set_vec3("fogColor", fog_color);
+	water_shader->set_float("worldSize", world_xz_scale * world_size);
 
+	// Allocate and activate VAO/VBO
 	const GLfloat water_surface_vert[] = {
 		// Triangle 1
 		0.0f, terrain_struct.sea_y_pos, 0.0f,
@@ -154,8 +154,6 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 		0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
 		world_size * world_xz_scale, terrain_struct.sea_y_pos, world_size * world_xz_scale
 	};
-
-	// Allocate and activate VAO/VBO
 	unsigned int surface_vbo;
 	glGenVertexArrays(1, &water_vao);
 	glBindVertexArray(water_vao);
@@ -164,10 +162,6 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	glBufferData(GL_ARRAY_BUFFER, 2 * 9 * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(glGetAttribLocation(water_shader->id, "inPos"));
 	glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
-	water_shader->set_bool("drawFog", false);
-	water_shader->set_bool("extraWaves", false);
-	water_shader->set_vec3("fogColor", fog_color);
-	water_shader->set_float("worldSize", world_xz_scale * world_size);
 }
 
 
@@ -175,8 +169,8 @@ int main()
 {
 	// Program settings and variables
 	const float world_xz_scale = 16.0f;
-	const float world_y_scale = 2.0f;
-	const float tex_scale = 200.0f;
+	const float world_y_scale = 1.0f;
+	const float tex_scale = 100.0f;
 	const bool debug_context = false; // Enable/disable debugging context and prints
 	float last_time = 0.0f;
 	Terrain_texture_ids terrain_tex;

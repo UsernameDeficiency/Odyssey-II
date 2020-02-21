@@ -47,7 +47,7 @@ Model* generate_terrain(std::vector<float> proc_terrain, const float world_xz_sc
 			if (y > terrain_struct.max_height)
 				terrain_struct.max_height = y;
 
-			vertex_array[index * 3 + 0] = x * world_xz_scale;
+			vertex_array[index * 3] = x * world_xz_scale;
 			vertex_array[index * 3 + 1] = y;
 			vertex_array[index * 3 + 2] = z * world_xz_scale;
 
@@ -94,15 +94,10 @@ Model* generate_terrain(std::vector<float> proc_terrain, const float world_xz_sc
 			}
 		}
 	}
-	// Create Model and upload to GPU
-	Model* model = LoadDataToModel(
-		vertex_array,
-		normal_array,
-		tex_coord_array,
-		index_array,
-		vertex_count,
-		triangle_count * 3);
 
+	// Create Model and upload to GPU
+	Model* model = LoadDataToModel(vertex_array, normal_array, tex_coord_array,
+		index_array, vertex_count, triangle_count * 3);
 	return model;
 }
 
@@ -151,4 +146,12 @@ void load_cubemap(std::string skybox_path)
 
 	skybox_tex = texture_id;
 	skybox_shader->set_int("skyboxTex", 0); // TODO: No effect?
+}
+
+
+/* Exits the program on unrecoverable error, printing an error string to stderr */
+void exit_on_error(const char* error)
+{
+	std::cerr << "Unrecoverable error: " << error << std::endl;
+	exit(EXIT_FAILURE);
 }

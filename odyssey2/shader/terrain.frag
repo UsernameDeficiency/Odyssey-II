@@ -34,7 +34,7 @@ void main(void)
 	// Lake bottom/shoreline
 	if (pixelPos.y < seaHeight + 1.0) {
 		// Approximate light loss through deep water by gradually darkening fragments
-		float depthFac = max(1 + (pixelPos.y - seaHeight) / pow(pixelPos.y - minHeight, 0.8), 0.1f);
+		float depthFac = max(1 + (pixelPos.y - seaHeight) / pow(pixelPos.y - minHeight, 0.8), 0.15f);
 		outColor = vec4(shade * depthFac * vec3(texture(bottomTex, passTexCoord)), 1.0);
 	}
 	else {

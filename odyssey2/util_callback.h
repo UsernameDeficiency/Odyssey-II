@@ -1,7 +1,6 @@
-/* Callback definitions for GLFW */
+/* Callback definitions for GLFW and related functions */
 #pragma once
 #include "main.h" // Constants and globals
-#include "util_misc.h" // get_pos_y
 
 
 // Keyboard state for key_callback/update_physics
@@ -12,7 +11,7 @@ struct
 bool key_state[key_enum.KEY_DOWN + 1] = { false };
 
 
-/* Interpolate y values over the vertex at position (x, z). No bounds checking for x and z. */
+// Interpolate y values over the vertex at position (x, z). No bounds checking for x and z.
 float get_pos_y(float x, float z, const GLfloat* vertex_array, const float world_xz_scale)
 {
 	x /= world_xz_scale;
@@ -88,8 +87,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		key_state[key_enum.KEY_LEFT] = (action == GLFW_PRESS || action == GLFW_REPEAT);
 	else if (key == GLFW_KEY_D)
 		key_state[key_enum.KEY_RIGHT] = (action == GLFW_PRESS || action == GLFW_REPEAT);
+	else if (key == GLFW_KEY_E)
+		key_state[key_enum.KEY_UP] = (action == GLFW_PRESS || action == GLFW_REPEAT);
+	else if (key == GLFW_KEY_Q)
+		key_state[key_enum.KEY_DOWN] = (action == GLFW_PRESS || action == GLFW_REPEAT);
 
-	// Move faster is left shift held down
+	// Move faster
 	else if (key == GLFW_KEY_LEFT_SHIFT)
 	{
 		if (action == GLFW_PRESS)
@@ -167,26 +170,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	// Toggle flight/walk mode
 	else if (key == GLFW_KEY_F && action == GLFW_PRESS)
 		camera.flying = !camera.flying;
-
-	if (camera.flying) // Player flying
-	{
-		if (key == GLFW_KEY_E)
-		{
-			if (action == GLFW_PRESS)
-				key_state[key_enum.KEY_UP] = true;
-			else if (action == GLFW_RELEASE)
-				key_state[key_enum.KEY_UP] = false;
-		}
-		else if (key == GLFW_KEY_Q)
-		{
-			if (action == GLFW_PRESS)
-				key_state[key_enum.KEY_DOWN] = true;
-			else if (action == GLFW_RELEASE)
-				key_state[key_enum.KEY_DOWN] = false;
-		}
-	}
-	else // Player walking
-		key_state[key_enum.KEY_DOWN] = key_state[key_enum.KEY_UP] = false;
 }
 
 
@@ -221,7 +204,6 @@ static void error_callback(int code, const char* description)
 {
 	std::cerr << "GLFW error " << code << " : " << description << std::endl;
 }
-
 
 
 /* OpenGL debug callback modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com */
@@ -264,12 +246,4 @@ void APIENTRY debug_message(GLenum source, GLenum type, GLuint id, GLenum severi
 	case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: Notification\n"; break;
 	}
 	std::cout << std::endl;
-}
-
-
-/* Exits the program on unrecoverable error, printing an error string to stderr */
-void exit_on_error(const char* error)
-{
-	std::cerr << "Unrecoverable error: " << error << std::endl;
-	exit(EXIT_FAILURE);
 }
