@@ -57,9 +57,9 @@ public:
     }
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void process_keyboard(Camera::movement direction, float delta_time)
+    void process_keyboard(Camera::movement direction, double delta_time)
     {
-        float velocity = movement_speed * delta_time;
+        float velocity = movement_speed * (float)delta_time;
         if (flying)
             velocity *= 4;
 

@@ -17,8 +17,7 @@ float randnum(const float max, const float min)
 
 
 /* diamondsquare creates a heightmap of size width*width using the diamond square
-	 algorithm with base offset weight for the random numbers.
-	 filter_stop is the (HP) filter stop frequency described as a step length. */
+	algorithm with base offset weight for the random numbers. */
 std::vector<float> diamondsquare(const unsigned int width)
 {
 	float weight = 6000.0f; // Base weight for randomized values in diamond-square algorithm

@@ -5,12 +5,10 @@
 #include <algorithm>
 
 
-/* mean does filter_size-point moving average filtering of arr.
-	filter_size should be an odd positive integer, no sanity check done! */
+/* mean does filter_size-point moving average filtering of arr. */
 static void mean(std::vector<float>& arr, const unsigned int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
-	//std::vector<float>* arr_tmp = new std::vector<float>(arr.size());
 	std::vector<float> arr_tmp(arr.size());
 
 	// Horizontal filter
@@ -66,66 +64,50 @@ static void mean(std::vector<float>& arr, const unsigned int filter_size)
 			arr.at(i) = avg / normalization;
 		}
 	}
-
-	//delete arr_tmp;
 }
 
 
-/* median does filter_size-point median filtering of arr.
-	filter_size should be an odd positive integer, no sanity check done! */
-// TODO: Performance much worse than mean(). From worst to less worse: sort, push_back, emplace_back (called by push_back?)
-// TODO: Replace push_back with emplace_back?
-static void median(std::vector<float>& arr, const int filter_size)
+/* Do median filtering on arr with filter_size number of elements in each direction. */
+static void median(std::vector<float>& arr, const unsigned int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
 	std::vector<float> arr_tmp = std::vector<float>(arr.size());
-	std::vector<float> median;
+	std::vector<float> median(4 * ((size_t)filter_size / 2) + 1);
 
 	// Horizontal filter
 	for (size_t row = 0; row < arr_width; row++) {
 		for (size_t col = 0; col < arr_width; col++) {
 			size_t i = row * arr_width + col; // Index of element being smoothed
-			median.push_back(arr.at(i));
+			median.at(0) = arr.at(i);
 			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
+				size_t j = 4 * (offset - 1); // Index for median vector
 				// Left value
 				if (col < offset)
-					median.push_back(arr.at(i - offset + arr_width)); // Out of bounds, wrap to end of row
+					median.at(j + 1) = arr.at(i - offset + arr_width); // Out of bounds, wrap to end of row
 				else
-					median.push_back(arr.at(i - offset));
+					median.at(j + 1) = arr.at(i - offset);
 
 				// Right value
 				if (col + offset >= arr_width)
-					median.push_back(arr.at(i + offset - arr_width)); // Out of bounds, wrap to start of row
+					median.at(j + 2) = arr.at(i + offset - arr_width); // Out of bounds, wrap to start of row
 				else
-					median.push_back(arr.at(i + offset));
-			}
-			std::sort(median.begin(), median.end());
-			arr_tmp.at(i) = median.at(filter_size / 2);
-			median.clear();
-		}
-	}
+					median.at(j + 2) = arr.at(i + offset);
 
-	// Vertical filter
-	for (size_t col = 0; col < arr_width; col++) {
-		for (size_t row = 0; row < arr_width; row++) {
-			size_t i = row * arr_width + col; // Index of element being smoothed
-			median.push_back(arr.at(i));
-			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
 				// Upper value
 				if (row < offset)
-					median.push_back(arr_tmp.at(i - offset * arr_width + arr.size())); // Out of bounds, wrap to end of column
+					median.at(j + 3) = arr.at(i - offset * arr_width + arr.size()); // Out of bounds, wrap to end of column
 				else
-					median.push_back(arr_tmp.at(i - offset * arr_width));
+					median.at(j + 3) = arr.at(i - offset * arr_width);
 
 				// Lower value
 				if (row + offset >= arr_width)
-					median.push_back(arr_tmp.at(i + offset * arr_width - arr.size())); // Out of bounds, wrap to start of column
+					median.at(j + 4) = arr.at(i + offset * arr_width - arr.size()); // Out of bounds, wrap to start of column
 				else
-					median.push_back(arr_tmp.at(i + offset * arr_width));
+					median.at(j + 4) = arr.at(i + offset * arr_width);
 			}
 			std::sort(median.begin(), median.end());
-			arr.at(i) = median.at(filter_size / 2);
-			median.clear();
+			arr_tmp.at(i) = median.at(median.size() / 2);
 		}
 	}
+	arr.swap(arr_tmp);
 }

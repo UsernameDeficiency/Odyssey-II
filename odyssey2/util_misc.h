@@ -9,10 +9,10 @@
 
 
 /* Print average FPS once every second */
-void print_fps(float& delta_time)
+void print_fps(double& delta_time)
 {
 	static unsigned int acc_frames;
-	static float acc_time;
+	static double acc_time;
 
 	acc_time += delta_time;
 	acc_frames++;

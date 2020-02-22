@@ -172,7 +172,7 @@ int main()
 	const float world_y_scale = 1.0f;
 	const float tex_scale = 100.0f;
 	const bool debug_context = false; // Enable/disable debugging context and prints
-	float last_time = 0.0f;
+	double last_time{};
 	Terrain_texture_ids terrain_tex;
 
 	// Print greeting
@@ -199,8 +199,8 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		// Calculate frame time and update physics state
-		float current_time = (float)glfwGetTime();
-		float delta_time = current_time - last_time;
+		double current_time = glfwGetTime();
+		double delta_time = current_time - last_time;
 		last_time = current_time;
 		update_physics(delta_time, world_xz_scale);
 		

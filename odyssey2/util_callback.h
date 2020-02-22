@@ -33,7 +33,7 @@ float get_pos_y(float x, float z, const GLfloat* vertex_array, const float world
 
 
 // Reads keyboard state set by key_callback and updates player movement
-void update_physics(const float delta_time, const float world_xz_scale)
+void update_physics(const double delta_time, const float world_xz_scale)
 {
 	if (key_state[key_enum.KEY_FORWARD])
 		camera.process_keyboard(Camera::movement::CAM_FORWARD, delta_time);
