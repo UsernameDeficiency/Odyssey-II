@@ -164,6 +164,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		static unsigned int skybox_index;
 		
 		skybox_index = ++skybox_index % skybox_paths.size();
+		skybox_shader->use();
 		load_cubemap(skybox_paths.at(skybox_index));
 	}
 

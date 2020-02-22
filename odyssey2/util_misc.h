@@ -105,8 +105,6 @@ Model* generate_terrain(std::vector<float> proc_terrain, const float world_xz_sc
 /* Load a cubemap texture. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
 void load_cubemap(std::string skybox_path)
 {
-	// TODO: Move shader related code outside this function?
-	skybox_shader->use();
 	skybox_path = "tex/skybox/" + skybox_path;
 	std::vector<std::string> faces
 	{
@@ -145,7 +143,6 @@ void load_cubemap(std::string skybox_path)
 	}
 
 	skybox_tex = texture_id;
-	skybox_shader->set_int("skyboxTex", 0); // TODO: No effect?
 }
 
 

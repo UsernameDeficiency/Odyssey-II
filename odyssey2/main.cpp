@@ -105,6 +105,7 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	skybox_shader->set_bool("drawFog", false);
 	skybox_shader->set_vec3("fogColor", fog_color);
 	load_cubemap(skybox_paths.at(0));
+	skybox_shader->set_int("skyboxTex", 0); // TODO: No effect?
 
 	// Allocate and activate skybox VAO/VBO
 	const GLfloat skybox_vertices[] = {
