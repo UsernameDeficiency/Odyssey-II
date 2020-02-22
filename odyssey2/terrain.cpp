@@ -1,12 +1,12 @@
 /* Filters for terrain smoothing, designed for the square terrain maps from diamondsquare.h */
-#pragma once
+#include "terrain.h"
 #include <vector>
 #include <cmath>
 #include <algorithm>
 
 
 /* mean does filter_size-point moving average filtering of arr. */
-static void mean(std::vector<float>& arr, const unsigned int filter_size)
+void mean(std::vector<float>& arr, const unsigned int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
 	std::vector<float> arr_tmp(arr.size());
@@ -68,7 +68,7 @@ static void mean(std::vector<float>& arr, const unsigned int filter_size)
 
 
 /* Do median filtering on arr with filter_size number of elements in each direction. */
-static void median(std::vector<float>& arr, const unsigned int filter_size)
+void median(std::vector<float>& arr, const unsigned int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
 	std::vector<float> arr_tmp = std::vector<float>(arr.size());
@@ -110,4 +110,72 @@ static void median(std::vector<float>& arr, const unsigned int filter_size)
 		}
 	}
 	arr.swap(arr_tmp);
+}
+
+
+/* randnum returns a random float number between min and max, attempting to minimize rounding errors. */
+static float randnum(const float max, const float min)
+{
+	return (max - min) * (float)((double)(rand()) / (double)RAND_MAX) + min;
+}
+
+
+/* diamondsquare creates a heightmap of size width*width using the diamond square
+	algorithm with base offset weight for the random numbers.
+	width must be (2^n)*(2^n) in size for some integer n.*/
+std::vector<float> diamondsquare(const unsigned int width)
+{
+	float weight = 6000.0f; // Base weight for randomized values in diamond-square algorithm
+	const unsigned int seed = 64;
+	srand(seed);
+	std::vector<float> terrain((size_t)width * width);
+
+	/* Initialize corner values. Since the width for this implementation is 2^n rather than 2^n+1,
+	 * the right and lower edges are "cut off" and terrain[0] wraps around. */
+	terrain[0] = randnum(weight, -weight);
+
+	// Iterate over step lengths.
+	for (unsigned int step = width; step > 1; step /= 2) {
+		// Do diamond part for current step length
+		weight /= (float)sqrt(2);
+		for (unsigned int row = 0; row < width; row += step) {
+			for (unsigned int col = 0; col < width; col += step) {
+				// Indices for upper/lower right and left corners of the square area being worked on, the mean of the corner
+				// values give the base displacement for the current point being calculated. Wrap-around if out of bounds.
+				int ul = row * width + col;
+				int ur = row * width + (col + step) % width;
+				int ll = ((row + step) % width) * width + col;
+				int lr = ((row + step) % width) * width + (col + step) % width;
+				int mid = (row + step / 2) * width + col + step / 2; // Current point being calculated
+
+				// Mean of all 4 points
+				terrain[mid] = (terrain[ul] + terrain[ur] + terrain[ll] + terrain[lr]) / 4 + randnum(weight, -weight);
+			}
+		}
+		// Do square step for the upper and left points
+		weight /= (float)sqrt(2);
+		for (unsigned int row = 0; row < width; row += step) {
+			for (unsigned int col = 0; col < width; col += step) {
+				size_t r_left = (size_t)row + step / 2;
+				size_t c_up = (size_t)col + step / 2;
+
+				// Being lazy here and making sure all indices are in bounds, even if some will never go out of bounds.
+				float mean_up = (
+					terrain[(((size_t)row - step / 2 + width) % width) * width + c_up] + // Above, make sure it is not negative
+					terrain[(size_t)row * width + (c_up - step / 2 + width) % width] + // Left, make sure it is not negative
+					terrain[(size_t)row * width + (c_up + step / 2) % width] + // Right
+					terrain[(r_left % width) * width + c_up]) / 4; // Below
+				float mean_left = (
+					terrain[((r_left - step / 2 + width) % width) * width + col] +
+					terrain[r_left * width + (col - step / 2 + width) % width] +
+					terrain[r_left * width + c_up % width] +
+					terrain[((r_left + step / 2) % width) * width + col]) / 4;
+
+				terrain[(size_t)row * (size_t)width + c_up] = mean_up + randnum(weight, -weight);
+				terrain[r_left * width + col] = mean_left + randnum(weight, -weight);
+			}
+		}
+	}
+
+	return terrain;
 }

@@ -23,11 +23,11 @@
     <ClCompile Include="dependencies\loadobj.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="diamondsquare.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -43,10 +43,7 @@
     <ClInclude Include="util_shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="terrain_filter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

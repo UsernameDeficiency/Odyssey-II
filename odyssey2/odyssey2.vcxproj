@@ -22,11 +22,11 @@
     <ClCompile Include="dependencies\glad\src\glad.c" />
     <ClCompile Include="dependencies\loadobj.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="diamondsquare.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="terrain_filter.h" />
+    <ClInclude Include="terrain.h" />
     <ClInclude Include="util_callback.h" />
     <ClInclude Include="util_camera.h" />
     <ClInclude Include="util_misc.h" />

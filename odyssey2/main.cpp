@@ -6,8 +6,7 @@
 #include <vector>
 #include "main.h"
 #include "loadobj.h"
-#include "diamondsquare.h"
-#include "terrain_filter.h"
+#include "terrain.h"
 #include "util_misc.h" // generate_terrain, exit_on_error, load_skybox_tex
 #include "util_callback.h" // Callbacks, update_physics
 #include "util_shader.h"
