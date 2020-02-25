@@ -23,6 +23,10 @@
     <ClCompile Include="dependencies\loadobj.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="terrain.cpp" />
+    <ClCompile Include="util_callback.cpp" />
+    <ClCompile Include="util_camera.cpp" />
+    <ClCompile Include="util_misc.cpp" />
+    <ClCompile Include="util_shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

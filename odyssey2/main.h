@@ -1,10 +1,8 @@
 #pragma once
-#include <vector>
-#include <string>
+#define GLFW_INCLUDE_NONE
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <float.h>
-#include "loadobj.h" // Model
-#include "util_camera.h" // Camera and camera settings
-#include "util_shader.h" // Shader
 
 struct Terrain_heights
 {
@@ -13,22 +11,12 @@ struct Terrain_heights
 	float sea_y_pos{};
 };
 
-struct Terrain_texture_ids
-{
-	GLuint snow_tex, grass_tex, rock_tex, bottom_tex;
-};
-
-/* Program settings */
-// Scaling values for terrain vertices/texture coordinates
-const unsigned int world_size = 1024; // width = height of world map
-const glm::vec3 fog_color = glm::vec3(0.7, 0.7, 0.7);
-const std::vector<std::string> skybox_paths = {
-	"stormydays", "hw_morning", "sb_frozen", "ame_starfield" };
+class Camera;
+class Shader;
 
 /* Global variables */
-Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-Camera camera = Camera();
-Model* m_terrain;
-Shader *terrain_shader, *skybox_shader, *water_shader;
-GLuint skybox_tex;
-unsigned int water_vao, skybox_vao;
+extern const unsigned int world_size; // width = height of world map
+extern Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
+extern Shader* terrain_shader, *skybox_shader, *water_shader;
+extern GLuint skybox_tex;
+extern Camera camera;

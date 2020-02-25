@@ -3,13 +3,26 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <iostream>
-#include <vector>
-#include "main.h"
 #include "loadobj.h"
-#include "terrain.h"
-#include "util_misc.h" // generate_terrain, exit_on_error, load_skybox_tex
-#include "util_callback.h" // Callbacks, update_physics
+#include "util_misc.h"
+#include "util_callback.h"
+#include "util_camera.h"
 #include "util_shader.h"
+#include "main.h"
+
+const unsigned int world_size = 1024;
+Camera camera = Camera();
+Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
+Shader* terrain_shader;
+Shader* skybox_shader;
+Shader* water_shader;
+GLuint skybox_tex;
+
+struct Terrain_texture_ids
+{
+	GLuint snow_tex, grass_tex, rock_tex, bottom_tex;
+};
+
 
 // Initialize openGL, GLAD and GLFW
 static GLFWwindow* init_gl(const bool debug_context)
@@ -42,7 +55,6 @@ static GLFWwindow* init_gl(const bool debug_context)
 		exit_on_error("Failed to initialize GLAD");
 
 	// --------- Initialize OpenGL and callbacks ---------
-	glClearColor(fog_color.r, fog_color.g, fog_color.b, 1.0f); // Fog color
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE); // Enable MSAA
@@ -67,14 +79,10 @@ static GLFWwindow* init_gl(const bool debug_context)
 }
 
 
-// Set up terrain, skybox and water
-static void init_graphics(const float world_xz_scale, const float world_y_scale, const float tex_scale, Terrain_texture_ids& terrain_tex_ids)
+// Set up terrain, skybox and water shaders
+static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids, unsigned int& water_vao, unsigned int& skybox_vao)
 {
-	// Calculate procedural terrain, LP filter result and create Model object
-	std::vector<float> proc_terrain = diamondsquare(world_size);
-	mean(proc_terrain, 5);
-	m_terrain = generate_terrain(proc_terrain, world_xz_scale, world_y_scale, tex_scale);
-	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
+	const glm::vec3 fog_color = glm::vec3(0.7, 0.7, 0.7);
 
 	// Load terrain textures and upload to texture units
 	terrain_shader = new Shader("shader/terrain.vert", "shader/terrain.frag");
@@ -103,7 +111,7 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 	skybox_shader->use();
 	skybox_shader->set_bool("drawFog", false);
 	skybox_shader->set_vec3("fogColor", fog_color);
-	load_cubemap(skybox_paths.at(0));
+	load_cubemap(); // Load inital skybox
 	skybox_shader->set_int("skyboxTex", 0); // TODO: No effect?
 
 	// Allocate and activate skybox VAO/VBO
@@ -168,12 +176,14 @@ static void init_graphics(const float world_xz_scale, const float world_y_scale,
 int main()
 {
 	// Program settings and variables
-	const float world_xz_scale = 16.0f;
-	const float world_y_scale = 1.0f;
+	const float world_xz_scale = 16.0f; // TODO: Move scaling parameters into terrain generation code
 	const float tex_scale = 100.0f;
 	const bool debug_context = false; // Enable/disable debugging context and prints
+	const bool print_fps = true;
 	double last_time{};
 	Terrain_texture_ids terrain_tex;
+	unsigned int water_vao{}, skybox_vao{};
+	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
 
 	// Print greeting
 	std::cout <<
@@ -192,7 +202,8 @@ int main()
 
 	// Initiate OpenGL and graphics
 	GLFWwindow* window = init_gl(debug_context);
-	init_graphics(world_xz_scale, world_y_scale, tex_scale, terrain_tex);
+	Model* m_terrain = generate_terrain(world_size, world_xz_scale, tex_scale);
+	init_graphics(world_xz_scale, terrain_tex, water_vao, skybox_vao);
 	glfwShowWindow(window);
 
 	// Main render loop
@@ -202,7 +213,22 @@ int main()
 		double current_time = glfwGetTime();
 		double delta_time = current_time - last_time;
 		last_time = current_time;
-		update_physics(delta_time, world_xz_scale);
+		camera.process_keyboard(m_terrain->vertexArray, world_xz_scale, delta_time); // Update player state
+		if (print_fps)
+		{
+			static unsigned int acc_frames;
+			static double acc_time;
+
+			acc_time += delta_time;
+			acc_frames++;
+
+			if (acc_time > 1.0f)
+			{
+				std::cout << "FPS: " << acc_frames / acc_time << "\n";
+				acc_time = 0.0f;
+				acc_frames = 0;
+			}
+		}
 		
 		// Clear screen and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -249,7 +275,6 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		glfwSwapBuffers(window);
-		print_fps(delta_time);
 		glfwPollEvents();
 	}
 
