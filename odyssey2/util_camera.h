@@ -5,8 +5,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <unordered_map>
-#include "main.h"
 
+extern const unsigned int world_size; // width = height of world map
 
 /* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */

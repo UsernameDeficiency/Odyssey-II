@@ -9,8 +9,9 @@
 #include "stb_image.h"
 #include "loadobj.h" // Model*
 #include "terrain.h"
-#include "main.h"
 
+extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
+extern GLuint skybox_tex;
 
 /* Build Model from generated terrain. */
 Model* generate_terrain(const unsigned int world_size, const float world_xz_scale, float tex_scale)

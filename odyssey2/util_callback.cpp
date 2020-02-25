@@ -6,8 +6,9 @@
 #include "util_camera.h"
 #include "util_shader.h"
 #include "util_misc.h"
-#include "main.h"
 
+extern Shader* terrain_shader, *skybox_shader, *water_shader;
+extern Camera camera;
 
 // Handle keyboard actions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

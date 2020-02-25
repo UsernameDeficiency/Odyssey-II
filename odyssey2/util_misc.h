@@ -3,7 +3,14 @@
 #include <unordered_map>
 #include "loadobj.h" // Model*
 
-// Keyboard state for controls
+struct Terrain_heights
+{
+	float min_height{ FLT_MAX };
+	float max_height{ -FLT_MAX };
+	float sea_y_pos{};
+};
+
+// Keyboard state for controls (TODO?)
 extern std::unordered_map<int, int> key_state;
 
 /* Build Model from generated terrain. */

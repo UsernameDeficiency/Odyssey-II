@@ -2,7 +2,10 @@
 #include "util_camera.h"
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "main.h"
+#include "util_misc.h" // Terrain_heights
+
+extern const unsigned int world_size; // width = height of world map
+extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 
 /* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
@@ -28,9 +31,9 @@ void Camera::process_keyboard(const GLfloat* terrain, const float world_xz_scale
 	if (flying)
 		velocity *= 4;
 	if (key_state[GLFW_KEY_LEFT_SHIFT])
-		velocity *= 8.0f;
+		velocity *= 8;
 	if (key_state[GLFW_KEY_C] == GLFW_PRESS || key_state[GLFW_KEY_C] == GLFW_REPEAT)
-		velocity *= 0.4f;
+		velocity /= 2;
 
 	// Crouch
 	if (key_state[GLFW_KEY_C] == GLFW_PRESS)
