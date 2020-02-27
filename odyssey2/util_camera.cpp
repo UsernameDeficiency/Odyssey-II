@@ -1,4 +1,3 @@
-#pragma once
 #include "util_camera.h"
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -14,7 +13,7 @@ Camera::Camera()
 yaw(0.0f), pitch(0.0f), movement_speed(cam_speed), mouse_sens(cam_sensitivity),
 height(cam_height), flying(false)
 {
-	projection = glm::perspective(glm::radians(cam_fov), (float)window_w / (float)window_h, vp_near, vp_far);
+	projection = glm::perspective(glm::radians(cam_fov), static_cast<float>(window_w) / window_h, vp_near, vp_far);
 	update_camera_vectors();
 }
 
@@ -27,7 +26,7 @@ glm::mat4 Camera::get_view_matrix()
 // Processes input received from any keyboard-like input system.
 void Camera::process_keyboard(const GLfloat* terrain, const float world_xz_scale, const double delta_time)
 {
-	float velocity = movement_speed * (float)delta_time;
+	float velocity = movement_speed * static_cast<float>(delta_time);
 	if (flying)
 		velocity *= 4;
 	if (key_state[GLFW_KEY_LEFT_SHIFT])
@@ -47,13 +46,13 @@ void Camera::process_keyboard(const GLfloat* terrain, const float world_xz_scale
 	// Zoom by lowering fov
 	if (key_state[GLFW_KEY_LEFT_CONTROL] == GLFW_PRESS)
 	{
-		projection = glm::perspective(glm::radians(cam_fov / 4), (float)window_w / (float)window_h, vp_near, 1.5f * vp_far);
+		projection = glm::perspective(glm::radians(cam_fov / 4), static_cast<float>(window_w) / window_h, vp_near, 1.5f * vp_far);
 		mouse_sens = cam_sensitivity / 3.0f;
 		key_state[GLFW_KEY_C] = GLFW_REPEAT;
 	}
 	else if (key_state[GLFW_KEY_LEFT_CONTROL] == GLFW_RELEASE)
 	{
-		projection = glm::perspective(glm::radians(cam_fov), (float)window_w / (float)window_h, vp_near, vp_far);
+		projection = glm::perspective(glm::radians(cam_fov), static_cast<float>(window_w) / window_h, vp_near, vp_far);
 		mouse_sens = cam_sensitivity;
 	}
 
@@ -126,8 +125,8 @@ float Camera::get_pos_y(float x, float z, const GLfloat* vertex_array, const flo
 {
 	x /= world_xz_scale;
 	z /= world_xz_scale;
-	int x_tile = (int)x;
-	int z_tile = (int)z;
+	int x_tile = static_cast<int>(x);
+	int z_tile = static_cast<int>(z);
 	float x_pos = (x - x_tile);
 	float z_pos = (z - z_tile);
 

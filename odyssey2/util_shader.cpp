@@ -1,4 +1,4 @@
-#pragma once
+/* Shader utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders */
 #include "util_shader.h"
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
@@ -8,9 +8,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-
-
-/* Shader utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders */
 
 Shader::Shader(const char* vertex_path, const char* fragment_path)
 {
@@ -76,7 +73,7 @@ void Shader::use()
 // Utility uniform functions
 void Shader::set_bool(const std::string& name, bool value) const
 {
-	glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
+	glUniform1i(glGetUniformLocation(id, name.c_str()), static_cast<int>(value));
 }
 
 void Shader::set_int(const std::string& name, int value) const

@@ -57,11 +57,11 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 	static float mouse_last_x = 0.0f;
 	static float mouse_last_y = camera.window_h / 2.0f;
 
-	float x_offset = (float)xpos - mouse_last_x;
-	float y_offset = mouse_last_y - (float)ypos; // reversed since y-coordinates go from bottom to top
+	float x_offset = static_cast<float>(xpos) - mouse_last_x;
+	float y_offset = mouse_last_y - static_cast<float>(ypos); // reversed since y-coordinates go from bottom to top
 
-	mouse_last_x = (float)xpos;
-	mouse_last_y = (float)ypos;
+	mouse_last_x = static_cast<float>(xpos);
+	mouse_last_y = static_cast<float>(ypos);
 
 	camera.process_mouse_movement(x_offset, y_offset);
 }
@@ -72,7 +72,7 @@ void fb_size_callback(GLFWwindow* window, int width, int height)
 {
 	camera.window_w = width;
 	camera.window_h = height;
-	camera.projection = glm::perspective(glm::radians(camera.cam_fov), (float)width / (float)height, camera.vp_near, camera.vp_far);
+	camera.projection = glm::perspective(glm::radians(camera.cam_fov), static_cast<float>(width) / height, camera.vp_near, camera.vp_far);
 	glViewport(0, 0, width, height);
 }
 

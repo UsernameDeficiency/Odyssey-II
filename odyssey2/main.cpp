@@ -269,7 +269,7 @@ int main()
 		water_shader->set_mat4_f("worldToView", camera.get_view_matrix());
 		water_shader->set_mat4_f("projection", camera.projection);
 		water_shader->set_vec3("cameraPos", camera.position);
-		water_shader->set_float("time", (float)glfwGetTime());
+		water_shader->set_float("time", static_cast<float>(glfwGetTime()));
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 

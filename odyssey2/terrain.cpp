@@ -19,7 +19,7 @@ void mean(std::vector<float>& arr, const unsigned int filter_size)
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
-				float scale = 1 / (float)pow(2, offset); // Lower scaling for high offsets
+				float scale = 1 / static_cast<float>(pow(2, offset)); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
 				// Left value
@@ -46,7 +46,7 @@ void mean(std::vector<float>& arr, const unsigned int filter_size)
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
-				float scale = 1 / (float)pow(2, offset); // Lower scaling for high offsets
+				float scale = 1 / static_cast<float>(pow(2, offset)); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
 				// Upper value
@@ -116,7 +116,7 @@ void median(std::vector<float>& arr, const unsigned int filter_size)
 /* randnum returns a random float number between min and max, attempting to minimize rounding errors. */
 static float randnum(const float max, const float min)
 {
-	return (max - min) * (float)((double)(rand()) / (double)RAND_MAX) + min;
+	return (max - min) * static_cast<float>(rand()) / RAND_MAX + min;
 }
 
 
@@ -137,7 +137,7 @@ std::vector<float> diamondsquare(const unsigned int width)
 	// Iterate over step lengths.
 	for (unsigned int step = width; step > 1; step /= 2) {
 		// Do diamond part for current step length
-		weight /= (float)sqrt(2);
+		weight /= static_cast<float>(sqrt(2));
 		for (unsigned int row = 0; row < width; row += step) {
 			for (unsigned int col = 0; col < width; col += step) {
 				// Indices for upper/lower right and left corners of the square area being worked on, the mean of the corner
@@ -153,7 +153,7 @@ std::vector<float> diamondsquare(const unsigned int width)
 			}
 		}
 		// Do square step for the upper and left points
-		weight /= (float)sqrt(2);
+		weight /= static_cast<float>(sqrt(2));
 		for (unsigned int row = 0; row < width; row += step) {
 			for (unsigned int col = 0; col < width; col += step) {
 				size_t r_left = (size_t)row + step / 2;

@@ -43,8 +43,8 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 			vertex_array[index * 3 + 2] = z * world_xz_scale;
 
 			/* Scaled texture coordinates. */
-			tex_coord_array[index * 2 + 0] = (float)x * tex_scale;
-			tex_coord_array[index * 2 + 1] = (float)z * tex_scale;
+			tex_coord_array[index * 2 + 0] = static_cast<float>(x) * tex_scale;
+			tex_coord_array[index * 2 + 1] = static_cast<float>(z) * tex_scale;
 
 			if ((x != world_size - 1) && (z != world_size - 1)) {
 				index = (x + z * (world_size - 1)) * 6;
