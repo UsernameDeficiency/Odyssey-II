@@ -1,4 +1,5 @@
 /* Shader utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders */
+#include <glad/glad.h>
 #include "util_shader.h"
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>

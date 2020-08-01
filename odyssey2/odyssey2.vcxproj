@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dependencies\glad\src\glad.c" />
-    <ClCompile Include="dependencies\loadobj.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="terrain.cpp" />
     <ClCompile Include="util_callback.cpp" />

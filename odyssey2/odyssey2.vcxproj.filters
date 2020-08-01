@@ -20,9 +20,6 @@
     <ClCompile Include="dependencies\glad\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dependencies\loadobj.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

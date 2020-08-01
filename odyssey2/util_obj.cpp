@@ -1,71 +1,25 @@
 // Based on LoadOBJ by Ingemar Ragnemalm 2005, 2008
-#include "loadobj.h"
+#include "util_obj.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-// How many error messages do you want before it stops?
-//#define PI 3.141592
-//
-//typedef struct Mesh
-//{
-//	GLfloat* vertices;
-//	int		vertexCount;
-//	GLfloat* vertexNormals;
-//	int		normalsCount; // Same as vertexCount for generated normals
-//	GLfloat* textureCoords;
-//	int		texCount;
-//
-//	int* coordIndex;
-//	int* normalsIndex;
-//	int* textureIndex;
-//	int		coordCount; // Number of indices in each index struct
-//
-//	// Borders between groups
-//	int* coordStarts;
-//	int		groupCount;
-//
-//	GLfloat radius; // Enclosing sphere
-//	GLfloat radiusXZ; // For cylindrical tests
-//} Mesh, * MeshPtr;
-//
-//#define vToken			1
-//#define vnToken			2
-//#define vtToken			3
-//#define kReal			4
-//#define kInt			5
-//#define tripletToken	6
-//#define fToken			7
-//#define crlfToken		8
-//#define kEOF			9
-//#define kUnknown		10
-//#define gToken		11
-//#define mtllibToken		12
-//#define usemtlToken		13
-//
-//static FILE* fp;
-//static int intValue[3];
-//static float floatValue[3] = { 0, 0, 0 };
-//static int vertCount, texCount, normalsCount, coordCount;
-//static bool hasPositionIndices;
-//static bool hasNormalIndices;
-//static bool hasTexCoordIndices;
-//static bool atLineEnd; // Helps SkipToCRLF
 
-
+// TODO: Possibly remove this function
 void ReportRerror(const char* caller, const char* name)
 {
+	unsigned int num_drawmodel_error = 8;
 	static unsigned int draw_error_counter = 0;
-	// Report error - but not more than NUM_DRAWMODEL_ERROR
-	if (draw_error_counter < NUM_DRAWMODEL_ERROR)
+	// Report error - but not more than num_drawmodel_error
+	if (draw_error_counter < num_drawmodel_error)
 	{
 		fprintf(stderr, "%s warning: '%s' not found in shader!\n", caller, name);
 		draw_error_counter++;
 	}
-	else if (draw_error_counter == NUM_DRAWMODEL_ERROR)
+	else if (draw_error_counter == num_drawmodel_error)
 	{
-		fprintf(stderr, "%s: Number of error bigger than %i. No more vill be printed.\n", caller, NUM_DRAWMODEL_ERROR);
+		fprintf(stderr, "%s: Number of error bigger than %i. No more vill be printed.\n", caller, num_drawmodel_error);
 		draw_error_counter++;
 	}
 }
@@ -74,7 +28,8 @@ void ReportRerror(const char* caller, const char* name)
 // This code makes a lot of calls for rebinding variables just in case,
 // and to get attribute locations. This is clearly not optimal, but the
 // goal is stability.
-void DrawModel2(Model* m, GLuint program, const char* vertexVariableName, const char* normalVariableName, const char* texCoordVariableName)
+void DrawModel(Model* m, GLuint program, const char* vertexVariableName, 
+	const char* normalVariableName, const char* texCoordVariableName)
 {
 	if (m != NULL)
 	{
@@ -122,17 +77,38 @@ void DrawModel2(Model* m, GLuint program, const char* vertexVariableName, const 
 }
 
 
-// Loader for inline data to Model
-Model* LoadDataToModel2(
-	GLfloat* vertices,
-	GLfloat* normals,
-	GLfloat* texCoords,
-	GLuint* indices,
-	int numVert,
-	int numInd)
+// Called from LoadDataToModel. Useful by its own when the model changes on CPU
+// VAO and VBOs must already exist!
+void ReloadModelData(Model* m)
 {
-	Model* m = static_cast<Model*>(malloc(sizeof(Model))); // TODO: malloc -> new
-	memset(m, 0, sizeof(Model));
+	glBindVertexArray(m->vao);
+
+	// VBO for vertex data
+	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m->numVertices) * 3 * sizeof(GLfloat), m->vertexArray, GL_STATIC_DRAW);
+
+	// VBO for normal data
+	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m->numVertices) * 3 * sizeof(GLfloat), m->normalArray, GL_STATIC_DRAW);
+
+	// VBO for texture coordinate data
+	if (m->texCoordArray != NULL)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m->tb);
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m->numVertices) * 2 * sizeof(GLfloat), m->texCoordArray, GL_STATIC_DRAW);
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), m->indexArray, GL_STATIC_DRAW);
+}
+
+
+// Loader for inline data to Model
+Model* LoadDataToModel(GLfloat* vertices, GLfloat* normals,
+	GLfloat* texCoords, GLuint* indices, int numVert, int numInd)
+{
+	Model* m = new Model;
+	//memset(m, 0, sizeof(Model));
 
 	m->vertexArray = vertices;
 	m->texCoordArray = texCoords;

@@ -17,3 +17,5 @@ Optimize terrain array size (store only y coordinates?)
 DrawModel: glGetAttribLocation calls should only be needed once?
 
 Add image to the Github page
+
+Make sure headers files are not being compiled? Clang complains about pragmas in .h files

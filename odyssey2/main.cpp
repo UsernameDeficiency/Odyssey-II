@@ -261,7 +261,7 @@ int main()
 		terrain_shader->set_mat4_f("worldToView", camera.get_view_matrix());
 		terrain_shader->set_mat4_f("projection", camera.projection);
 
-		DrawModel2(m_terrain, terrain_shader->id, "inPos", "inNormal", "inTexCoord"); // TODO!
+		DrawModel(m_terrain, terrain_shader->id, "inPos", "inNormal", "inTexCoord");
 
 		// --------- Draw water surface ---------
 		water_shader->use();

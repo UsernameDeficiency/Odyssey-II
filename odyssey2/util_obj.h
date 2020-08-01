@@ -17,8 +17,10 @@ typedef struct
 
 // Extended, load model and upload to arrays!
 // DrawModel is for drawing such preloaded models.
-void DrawModel2(Model* m, GLuint program, const char* vertexVariableName, 
+void DrawModel(Model* m, GLuint program, const char* vertexVariableName, 
     const char* normalVariableName, const char* texCoordVariableName);
 
-Model* LoadDataToModel2(GLfloat* vertices, GLfloat* normals,
+void ReloadModelData(Model* m);
+
+Model* LoadDataToModel(GLfloat* vertices, GLfloat* normals,
     GLfloat* texCoords, GLuint* indices, int numVert, int numInd);
