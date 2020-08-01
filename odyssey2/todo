@@ -1,5 +1,6 @@
 Shaders:
 Rewrite shader lighting
+How to make independent fog shader?
 Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting-exercise2
 https://learnopengl.com/Advanced-OpenGL/Geometry-Shader Shader grass
 https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
@@ -8,9 +9,11 @@ terrain.frag snowBlend should use normal.y or 1 - normal.y depending on texture 
 Diamond-square:
 Change arrays to double indices?
 Vary filter strength with altitude?
+Save result to file
 
 Optimization: 
 Don't draw vertices outside frustum
 Optimize terrain array size (store only y coordinates?)
+DrawModel: glGetAttribLocation calls should only be needed once?
 
 Add image to the Github page

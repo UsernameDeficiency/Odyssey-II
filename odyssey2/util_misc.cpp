@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "loadobj.h" // Model*
+#include "util_obj.h" // Model*
 #include "terrain.h"
 
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
@@ -87,7 +87,8 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	}
 
 	// Create Model and upload to GPU
-	Model* model = LoadDataToModel(vertex_array, normal_array, tex_coord_array,
+	// TODO!
+	Model* model = LoadDataToModel2(vertex_array, normal_array, tex_coord_array,
 		index_array, vertex_count, triangle_count * 3);
 	return model;
 }

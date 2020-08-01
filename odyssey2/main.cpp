@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <iostream>
-#include "loadobj.h"
+#include "util_obj.h"
 #include "util_misc.h"
 #include "util_callback.h"
 #include "util_camera.h"
@@ -45,9 +45,6 @@ static GLFWwindow* init_gl(const bool debug_context)
 		exit_on_error("GLFW window creation failed");
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // 1 = Vsync
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Give window mouse pointer control
-	if (glfwRawMouseMotionSupported())
-		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 	// --------- Initialize GLAD ---------
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -203,6 +200,10 @@ int main()
 	GLFWwindow* window = init_gl(debug_context);
 	Model* m_terrain = generate_terrain(world_size, world_xz_scale, tex_scale);
 	init_graphics(world_xz_scale, terrain_tex, water_vao, skybox_vao);
+	// Give GLFW mouse pointer control and show window
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported())
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	glfwShowWindow(window);
 
 	// Main render loop
@@ -260,7 +261,7 @@ int main()
 		terrain_shader->set_mat4_f("worldToView", camera.get_view_matrix());
 		terrain_shader->set_mat4_f("projection", camera.projection);
 
-		DrawModel(m_terrain, terrain_shader->id, "inPos", "inNormal", "inTexCoord");
+		DrawModel2(m_terrain, terrain_shader->id, "inPos", "inNormal", "inTexCoord"); // TODO!
 
 		// --------- Draw water surface ---------
 		water_shader->use();

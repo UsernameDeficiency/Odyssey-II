@@ -1,7 +1,7 @@
 /* Miscellaneous utility functions for the main program */
 #pragma once
 #include <unordered_map>
-#include "loadobj.h" // Model*
+#include "util_obj.h" // Model*
 
 struct Terrain_heights
 {
