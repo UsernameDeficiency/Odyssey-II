@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "util_obj.h" // Model*
+#include "util_misc.h" // Model*
 #include "terrain.h"
 
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
@@ -22,11 +22,15 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 
 	const unsigned int vertex_count = world_size * world_size;
 	const unsigned int triangle_count = (world_size - 1) * (world_size - 1) * 2;
-	GLfloat* vertex_array = new GLfloat[sizeof(GLfloat) * 3 * vertex_count]; // TODO: Array sizes too large here?
-	GLfloat* normal_array = new GLfloat[sizeof(GLfloat) * 3 * vertex_count];
-	GLfloat* tex_coord_array = new GLfloat[sizeof(GLfloat) * 2 * vertex_count];
+	GLsizeiptr vert_size = vertex_count * sizeof(GLfloat);
+	// TODO: Array sizes too large here?
+	// Since vertices are ordered in a cartesian grid the x and y positions might not be needed?
+	// It might be possible to lower precision for the height values
+	// It might be possible to use integer types for some or all of these values
+	GLfloat* vertex_array = new GLfloat[vert_size * 3];
+	GLfloat* normal_array = new GLfloat[vert_size * 3];
+	GLfloat* tex_coord_array = new GLfloat[vert_size * 2];
 	GLuint* index_array = new GLuint[sizeof(GLuint) * 3 * triangle_count];
-	tex_scale /= world_size;
 
 	// Fill vertex, texture coordinate and index array
 	for (unsigned int x = 0; x < world_size; x++) {
@@ -86,10 +90,43 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 		}
 	}
 
-	// Create Model and upload to GPU
-	Model* model = LoadDataToModel(vertex_array, normal_array, tex_coord_array,
-		index_array, vertex_count, triangle_count * 3);
-	return model;
+	// Create Model and upload to GPU (formerly LoadModelData)
+	Model* m = new Model;
+	//*m = Model(); // TODO: Initialize memory. This was done in the original code but unclear if it is necessary.
+
+	// TODO: Move into Model constructor
+	m->vertexArray = vertex_array;
+	m->texCoordArray = tex_coord_array;
+	m->normalArray = normal_array;
+	m->indexArray = index_array;
+	m->numVertices = vertex_count;
+	m->numIndices = triangle_count * 3;
+
+	glGenVertexArrays(1, &m->vao);
+	glGenBuffers(1, &m->vb);
+	glGenBuffers(1, &m->ib);
+	glGenBuffers(1, &m->nb);
+	glGenBuffers(1, &m->tb);
+
+	// ReloadModelData() functionality below
+	glBindVertexArray(m->vao);
+
+	// VBO for vertex data
+	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->vertexArray, GL_STATIC_DRAW);
+
+	// VBO for normal data
+	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->normalArray, GL_STATIC_DRAW);
+
+	// VBO for texture coordinate data
+	glBindBuffer(GL_ARRAY_BUFFER, m->tb);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 2, m->texCoordArray, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), m->indexArray, GL_STATIC_DRAW);
+
+	return m;
 }
 
 

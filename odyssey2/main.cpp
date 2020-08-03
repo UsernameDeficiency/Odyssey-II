@@ -3,13 +3,12 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <iostream>
-#include "util_obj.h"
 #include "util_misc.h"
 #include "util_callback.h"
 #include "util_camera.h"
 #include "util_shader.h"
 
-const unsigned int world_size = 1024;
+const unsigned int world_size = 256;
 Camera camera = Camera();
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 Shader* terrain_shader;
@@ -173,7 +172,7 @@ int main()
 {
 	// Program settings and variables
 	const float world_xz_scale = 16.0f; // TODO: Move scaling parameters into terrain generation code
-	const float tex_scale = 100.0f;
+	const float tex_scale = 100.0f / world_size;
 	const bool debug_context = false; // Enable/disable debugging context and prints
 	const bool print_fps = true;
 	double last_time{};
@@ -205,6 +204,11 @@ int main()
 	if (glfwRawMouseMotionSupported())
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	glfwShowWindow(window);
+
+	// Save shader locations for terrain
+	GLint terr_vert_loc = glGetAttribLocation(terrain_shader->id, "inPos");
+	GLint terr_normal_loc = glGetAttribLocation(terrain_shader->id, "inNormal");
+	GLint terr_tex_loc = glGetAttribLocation(terrain_shader->id, "inTexCoord");
 
 	// Main render loop
 	while (!glfwWindowShouldClose(window))
@@ -261,7 +265,23 @@ int main()
 		terrain_shader->set_mat4_f("worldToView", camera.get_view_matrix());
 		terrain_shader->set_mat4_f("projection", camera.projection);
 
-		DrawModel(m_terrain, terrain_shader->id, "inPos", "inNormal", "inTexCoord");
+		glBindVertexArray(m_terrain->vao); // Select VAO
+		glBindBuffer(GL_ARRAY_BUFFER, m_terrain->vb);
+
+		glVertexAttribPointer(terr_vert_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(terr_vert_loc);
+
+		// Normals
+		glBindBuffer(GL_ARRAY_BUFFER, m_terrain->nb);
+		glVertexAttribPointer(terr_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(terr_normal_loc);
+
+		// VBO for texture coordinate data
+		glBindBuffer(GL_ARRAY_BUFFER, m_terrain->tb);
+		glVertexAttribPointer(terr_tex_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(terr_tex_loc);
+
+		glDrawElements(GL_TRIANGLES, m_terrain->numIndices, GL_UNSIGNED_INT, 0L);
 
 		// --------- Draw water surface ---------
 		water_shader->use();

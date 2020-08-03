@@ -1,7 +1,7 @@
 /* Miscellaneous utility functions for the main program */
 #pragma once
+#include <glad/glad.h>
 #include <unordered_map>
-#include "util_obj.h" // Model*
 
 struct Terrain_heights
 {
@@ -9,6 +9,20 @@ struct Terrain_heights
 	float max_height{ -FLT_MAX };
 	float sea_y_pos{};
 };
+
+typedef struct
+{
+    GLfloat* vertexArray;
+    GLfloat* normalArray;
+    GLfloat* texCoordArray;
+    GLuint* indexArray;
+    int numVertices;
+    int numIndices;
+
+    // VBO and VAO IDs
+    GLuint vao;
+    GLuint vb, ib, nb, tb; // VBOs
+} Model;
 
 // Keyboard state for controls (TODO?)
 extern std::unordered_map<int, int> key_state;

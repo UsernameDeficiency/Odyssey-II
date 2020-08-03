@@ -25,7 +25,6 @@
     <ClCompile Include="util_callback.cpp" />
     <ClCompile Include="util_camera.cpp" />
     <ClCompile Include="util_misc.cpp" />
-    <ClCompile Include="util_obj.cpp" />
     <ClCompile Include="util_shader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -33,7 +32,6 @@
     <ClInclude Include="util_callback.h" />
     <ClInclude Include="util_camera.h" />
     <ClInclude Include="util_misc.h" />
-    <ClInclude Include="util_obj.h" />
     <ClInclude Include="util_shader.h" />
   </ItemGroup>
   <ItemGroup>
