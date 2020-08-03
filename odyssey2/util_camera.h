@@ -6,8 +6,6 @@
 #include <glm/mat4x4.hpp>
 #include <unordered_map>
 
-extern const unsigned int world_size; // width = height of world map
-
 /* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
 class Camera
@@ -20,6 +18,7 @@ public:
     glm::vec3 right;
     glm::vec3 world_up;
 	glm::mat4 projection; // Projection matrix
+    const unsigned int world_size;
     // Euler Angles
     float yaw;
     float pitch;
@@ -55,7 +54,7 @@ public:
         {GLFW_KEY_LEFT_CONTROL, GLFW_RELEASE},
     };
 
-	Camera();
+	Camera(const unsigned int world_size);
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 	glm::mat4 get_view_matrix();

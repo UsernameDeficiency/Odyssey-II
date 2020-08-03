@@ -4,15 +4,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "util_misc.h" // Terrain_heights
 
-extern const unsigned int world_size; // width = height of world map
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 
 /* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
-Camera::Camera()
+Camera::Camera(const unsigned int world_size)
 : position{ 0.0f, 0.0f, 0.0f }, front{ 0.0f, 0.0f, -1.0f }, world_up{ 0.0f, 1.0f, 0.0f },
-yaw(0.0f), pitch(0.0f), movement_speed(cam_speed), mouse_sens(cam_sensitivity),
-height(cam_height), flying(false)
+world_size(world_size), yaw(0.0f), pitch(0.0f), movement_speed(cam_speed),
+mouse_sens(cam_sensitivity), height(cam_height), flying(false)
 {
 	projection = glm::perspective(glm::radians(cam_fov), static_cast<float>(window_w) / window_h, vp_near, vp_far);
 	update_camera_vectors();

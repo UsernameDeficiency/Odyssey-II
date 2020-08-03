@@ -9,7 +9,7 @@
 #include "util_shader.h"
 
 const unsigned int world_size = 256;
-Camera camera = Camera();
+Camera camera = Camera(world_size);
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 Shader* terrain_shader;
 Shader* skybox_shader;
