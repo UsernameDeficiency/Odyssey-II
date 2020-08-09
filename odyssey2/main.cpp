@@ -74,7 +74,7 @@ static GLFWwindow* init_gl(const bool debug_context)
 
 
 // Set up terrain, skybox and water shaders
-static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids, unsigned int& water_vao, unsigned int& skybox_vao)
+static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids)
 {
 	const glm::vec3 fog_color = glm::vec3(0.7, 0.7, 0.7);
 
@@ -129,9 +129,9 @@ static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terra
 		 5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f,  5.0f
 	};
 	unsigned int skybox_vbo;
-	glGenVertexArrays(1, &skybox_vao);
+	glGenVertexArrays(1, &skybox_shader->vao);
 	glGenBuffers(1, &skybox_vbo);
-	glBindVertexArray(skybox_vao);
+	glBindVertexArray(skybox_shader->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), &skybox_vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
@@ -157,8 +157,8 @@ static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terra
 		world_size * world_xz_scale, terrain_struct.sea_y_pos, world_size * world_xz_scale
 	};
 	unsigned int surface_vbo;
-	glGenVertexArrays(1, &water_vao);
-	glBindVertexArray(water_vao);
+	glGenVertexArrays(1, &water_shader->vao);
+	glBindVertexArray(water_shader->vao);
 	glGenBuffers(1, &surface_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, surface_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 2 * 9 * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
@@ -176,7 +176,6 @@ int main()
 	const bool print_fps = true;
 	double last_time{};
 	Terrain_texture_ids terrain_tex;
-	unsigned int water_vao{}, skybox_vao{};
 	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
 
 	// Print greeting
@@ -197,7 +196,7 @@ int main()
 	// Initiate OpenGL and graphics
 	GLFWwindow* window = init_gl(debug_context);
 	Model* m_terrain = generate_terrain(world_size, world_xz_scale, tex_scale);
-	init_graphics(world_xz_scale, terrain_tex, water_vao, skybox_vao);
+	init_graphics(world_xz_scale, terrain_tex);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported())
@@ -238,7 +237,7 @@ int main()
 		// --------- Draw skybox ---------
 		glDepthMask(GL_FALSE); // Disable depth writes
 		skybox_shader->use();
-		glBindVertexArray(skybox_vao);
+		glBindVertexArray(skybox_shader->vao);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_tex);
 
@@ -283,7 +282,7 @@ int main()
 
 		// --------- Draw water surface ---------
 		water_shader->use();
-		glBindVertexArray(water_vao);
+		glBindVertexArray(water_shader->vao);
 
 		water_shader->set_mat4_f("worldToView", camera.get_view_matrix());
 		water_shader->set_mat4_f("projection", camera.projection);

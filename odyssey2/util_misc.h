@@ -11,7 +11,7 @@ struct Terrain_heights
 	float sea_y_pos{};
 };
 
-typedef struct
+struct Model
 {
     std::vector<GLfloat> vertexArray;
     std::vector<GLfloat> normalArray;
@@ -23,7 +23,11 @@ typedef struct
     // VBO and VAO IDs
     GLuint vao;
     GLuint vb, ib, nb, tb; // VBOs
-} Model;
+
+    Model(std::vector<GLfloat> vertexArray, std::vector<GLfloat> normalArray, 
+        std::vector<GLfloat> texCoordArray, std::vector<GLuint> indexArray, 
+        GLsizei numVertices, GLsizei numIndices);
+};
 
 // Keyboard state for controls (TODO?)
 extern std::unordered_map<int, int> key_state;

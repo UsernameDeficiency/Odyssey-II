@@ -13,6 +13,17 @@
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 extern GLuint skybox_tex;
 
+
+/* Construct Model with full set of vectors, std::move all vectors */
+Model::Model(std::vector<GLfloat> vertexArray, std::vector<GLfloat> normalArray, 
+	std::vector<GLfloat> texCoordArray, std::vector<GLuint> indexArray,
+	GLsizei numVertices, GLsizei numIndices)
+	: vertexArray(std::move(vertexArray)), normalArray(std::move(normalArray)), 
+	texCoordArray(std::move(texCoordArray)), indexArray(std::move(indexArray)),
+	numVertices(numVertices), numIndices(numIndices), vao(0), vb(0), ib(0), nb(0), tb(0)
+{ }
+
+
 /* Build Model from generated terrain. */
 Model* generate_terrain(const unsigned int world_size, const float world_xz_scale, float tex_scale)
 {
@@ -26,7 +37,6 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	// Since vertices are ordered in a cartesian grid the x and y positions might not be needed?
 	// It might be possible to lower precision for the height values
 	// It might be possible to use integer types for some or all of these values
-	// TODO: Use Model members directly
 	std::vector<GLfloat> vertex_array(vertex_count * 3);
 	std::vector<GLfloat> normal_array(vertex_count * 3);
 	std::vector<GLfloat> tex_coord_array(vertex_count * 2);
@@ -92,16 +102,9 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	}
 
 	// Create Model and upload to GPU (formerly LoadModelData)
-	Model* m = new Model;
-	//*m = Model(); // TODO: Initialize memory. This was done in the original code but unclear if it is necessary.
-
-	// TODO: Move into Model constructor
-	m->vertexArray = vertex_array;
-	m->texCoordArray = tex_coord_array;
-	m->normalArray = normal_array;
-	m->indexArray = index_array;
-	m->numVertices = static_cast<GLsizei>(vertex_count);
-	m->numIndices = static_cast<GLsizei>(triangle_count) * 3;
+	Model* m = new Model(std::move(vertex_array), std::move(normal_array), 
+		std::move(tex_coord_array), std::move(index_array), 
+		static_cast<GLsizei>(vertex_count), static_cast<GLsizei>(triangle_count) * 3);
 
 	glGenVertexArrays(1, &m->vao);
 	glGenBuffers(1, &m->vb);
@@ -110,23 +113,16 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	glGenBuffers(1, &m->tb);
 
 	// ReloadModelData() functionality below
+	const GLsizeiptr vert_size = m->numVertices * sizeof(GLfloat);
 	glBindVertexArray(m->vao);
-
-	// VBO for vertex data
-	const GLsizeiptr vert_size = vertex_count * sizeof(GLfloat);
 	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
 	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->vertexArray.data(), GL_STATIC_DRAW);
-
-	// VBO for normal data
-	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->normalArray.data(), GL_STATIC_DRAW);
-
-	// VBO for texture coordinate data
-	glBindBuffer(GL_ARRAY_BUFFER, m->tb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 2, m->texCoordArray.data(), GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), m->indexArray.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->normalArray.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m->tb);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 2, m->texCoordArray.data(), GL_STATIC_DRAW);
 
 	return m;
 }
