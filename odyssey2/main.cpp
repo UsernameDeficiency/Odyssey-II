@@ -31,11 +31,10 @@ static GLFWwindow* init_gl(const bool debug_context)
 
 	// Create GLFW window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 	if (debug_context)
-	{
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-	}
+
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
@@ -94,7 +93,7 @@ static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terra
 	terrain_shader->set_vec3("fogColor", fog_color);
 
 	// Set multitexturing height limits
-	float terrain_height = terrain_struct.max_height - terrain_struct.min_height;
+	const float terrain_height = terrain_struct.max_height - terrain_struct.min_height;
 	terrain_struct.sea_y_pos = terrain_struct.min_height + terrain_height / 3;
 	terrain_shader->set_float("minHeight", terrain_struct.min_height);
 	terrain_shader->set_float("maxHeight", terrain_struct.max_height);
@@ -178,7 +177,7 @@ int main()
 	double last_time{};
 	Terrain_texture_ids terrain_tex;
 	unsigned int water_vao{}, skybox_vao{};
-	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
+	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
 
 	// Print greeting
 	std::cout <<
@@ -217,12 +216,11 @@ int main()
 		double current_time = glfwGetTime();
 		double delta_time = current_time - last_time;
 		last_time = current_time;
-		camera.process_keyboard(m_terrain->vertexArray, world_xz_scale, delta_time); // Update player state
+		camera.process_keyboard(m_terrain->vertexArray.data(), world_xz_scale, delta_time); // Update player state
 		if (print_fps)
 		{
 			static unsigned int acc_frames;
 			static double acc_time;
-
 			acc_time += delta_time;
 			acc_frames++;
 

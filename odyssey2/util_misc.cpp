@@ -20,22 +20,22 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	std::vector<float> proc_terrain = diamondsquare(world_size);
 	mean(proc_terrain, 5);
 
-	const unsigned int vertex_count = world_size * world_size;
-	const unsigned int triangle_count = (world_size - 1) * (world_size - 1) * 2;
-	GLsizeiptr vert_size = vertex_count * sizeof(GLfloat);
+	const size_t vertex_count = static_cast<size_t>(world_size) * world_size;
+	const size_t triangle_count = static_cast<size_t>(world_size - 1) * (world_size - 1) * 2;
 	// TODO: Array sizes too large here?
 	// Since vertices are ordered in a cartesian grid the x and y positions might not be needed?
 	// It might be possible to lower precision for the height values
 	// It might be possible to use integer types for some or all of these values
-	GLfloat* vertex_array = new GLfloat[vert_size * 3];
-	GLfloat* normal_array = new GLfloat[vert_size * 3];
-	GLfloat* tex_coord_array = new GLfloat[vert_size * 2];
-	GLuint* index_array = new GLuint[sizeof(GLuint) * 3 * triangle_count];
+	// TODO: Use Model members directly
+	std::vector<GLfloat> vertex_array(vertex_count * 3);
+	std::vector<GLfloat> normal_array(vertex_count * 3);
+	std::vector<GLfloat> tex_coord_array(vertex_count * 2);
+	std::vector<GLuint> index_array(triangle_count * 3);
 
 	// Fill vertex, texture coordinate and index array
 	for (unsigned int x = 0; x < world_size; x++) {
 		for (unsigned int z = 0; z < world_size; z++) {
-			unsigned int index = x + z * world_size;
+			size_t index = x + z * static_cast<size_t>(world_size);
 			float y = proc_terrain[index];
 			if (y < terrain_struct.min_height)
 				terrain_struct.min_height = y;
@@ -51,7 +51,7 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 			tex_coord_array[index * 2 + 1] = static_cast<float>(z) * tex_scale;
 
 			if ((x != world_size - 1) && (z != world_size - 1)) {
-				index = (x + z * (world_size - 1)) * 6;
+				index = (x + z * static_cast<size_t>(world_size - 1)) * 6;
 				// Triangle 1
 				index_array[index] = x + z * world_size;
 				index_array[index + 1] = x + (z + 1) * world_size;
@@ -65,9 +65,10 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	}
 
 	// Calculate normals (cross product of two vectors along current triangle)
+	const size_t offset = static_cast<size_t>(world_size) * 3;
 	for (unsigned int x = 0; x < world_size; x++) {
 		for (unsigned int z = 0; z < world_size; z++) {
-			unsigned int index = (x + z * world_size) * 3;
+			size_t index = (x + z * static_cast<size_t>(world_size)) * 3;
 			// Initialize normals along edges to pointing straight up
 			if (x == 0 || (x == world_size - 1) || z == 0 || (z == world_size - 1)) {
 				normal_array[index] = 0.0;
@@ -76,8 +77,8 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 			}
 			// Inside edges, here the required indices are in bounds
 			else {
-				glm::vec3 p0(vertex_array[index + world_size * 3], vertex_array[index + 1 + world_size * 3], vertex_array[index + 2 + world_size * 3]);
-				glm::vec3 p1(vertex_array[index - world_size * 3], vertex_array[index - world_size * 3 + 1], vertex_array[index - world_size * 3 + 2]);
+				glm::vec3 p0(vertex_array[index + offset], vertex_array[index + 1 + offset], vertex_array[index + 2 + offset]);
+				glm::vec3 p1(vertex_array[index - offset], vertex_array[index - offset + 1], vertex_array[index - offset + 2]);
 				glm::vec3 p2(vertex_array[index - 3], vertex_array[index - 2], vertex_array[index - 1]);
 				glm::vec3 a(p1 - p0);
 				glm::vec3 b(p2 - p0);
@@ -99,8 +100,8 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	m->texCoordArray = tex_coord_array;
 	m->normalArray = normal_array;
 	m->indexArray = index_array;
-	m->numVertices = vertex_count;
-	m->numIndices = triangle_count * 3;
+	m->numVertices = static_cast<GLsizei>(vertex_count);
+	m->numIndices = static_cast<GLsizei>(triangle_count) * 3;
 
 	glGenVertexArrays(1, &m->vao);
 	glGenBuffers(1, &m->vb);
@@ -112,19 +113,20 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	glBindVertexArray(m->vao);
 
 	// VBO for vertex data
+	const GLsizeiptr vert_size = vertex_count * sizeof(GLfloat);
 	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->vertexArray, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->vertexArray.data(), GL_STATIC_DRAW);
 
 	// VBO for normal data
 	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->normalArray, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->normalArray.data(), GL_STATIC_DRAW);
 
 	// VBO for texture coordinate data
 	glBindBuffer(GL_ARRAY_BUFFER, m->tb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 2, m->texCoordArray, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 2, m->texCoordArray.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), m->indexArray, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), m->indexArray.data(), GL_STATIC_DRAW);
 
 	return m;
 }

@@ -2,6 +2,7 @@
 #pragma once
 #include <glad/glad.h>
 #include <unordered_map>
+#include <vector>
 
 struct Terrain_heights
 {
@@ -12,12 +13,12 @@ struct Terrain_heights
 
 typedef struct
 {
-    GLfloat* vertexArray;
-    GLfloat* normalArray;
-    GLfloat* texCoordArray;
-    GLuint* indexArray;
-    int numVertices;
-    int numIndices;
+    std::vector<GLfloat> vertexArray;
+    std::vector<GLfloat> normalArray;
+    std::vector<GLfloat> texCoordArray;
+    std::vector<GLuint> indexArray;
+    GLsizei numVertices;
+    GLsizei numIndices;
 
     // VBO and VAO IDs
     GLuint vao;

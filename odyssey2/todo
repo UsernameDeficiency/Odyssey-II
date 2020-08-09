@@ -15,6 +15,5 @@ How to make texture repetition less obvious?
 Optimization: 
 Don't draw vertices outside frustum
 Optimize terrain array size (store only y coordinates?)
-DrawModel: glGetAttribLocation calls should only be needed once?
 
 Add image to the Github page
