@@ -22,17 +22,17 @@
     <ClCompile Include="dependencies\glad\src\glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="terrain.cpp" />
-    <ClCompile Include="util_callback.cpp" />
-    <ClCompile Include="util_camera.cpp" />
+    <ClCompile Include="callback.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="util_misc.cpp" />
-    <ClCompile Include="util_shader.cpp" />
+    <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terrain.h" />
-    <ClInclude Include="util_callback.h" />
-    <ClInclude Include="util_camera.h" />
+    <ClInclude Include="callback.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="util_misc.h" />
-    <ClInclude Include="util_shader.h" />
+    <ClInclude Include="shader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\skybox.frag" />

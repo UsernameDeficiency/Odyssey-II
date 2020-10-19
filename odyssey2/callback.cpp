@@ -1,10 +1,10 @@
 /* Callback definitions, mainly for GLFW */
-#include "util_callback.h"
+#include "callback.h"
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include "util_camera.h"
-#include "util_shader.h"
+#include "camera.h"
+#include "shader.h"
 #include "util_misc.h"
 
 extern Shader* terrain_shader, *skybox_shader, *water_shader;

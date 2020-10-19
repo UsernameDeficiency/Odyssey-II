@@ -4,9 +4,9 @@
 #include <glm/mat4x4.hpp>
 #include <iostream>
 #include "util_misc.h"
-#include "util_callback.h"
-#include "util_camera.h"
-#include "util_shader.h"
+#include "callback.h"
+#include "camera.h"
+#include "shader.h"
 
 const unsigned int world_size = 256;
 Camera camera = Camera(world_size);

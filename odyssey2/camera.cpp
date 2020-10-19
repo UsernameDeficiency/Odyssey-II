@@ -1,5 +1,5 @@
 #include <glad/glad.h>
-#include "util_camera.h"
+#include "camera.h"
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "util_misc.h" // Terrain_heights
