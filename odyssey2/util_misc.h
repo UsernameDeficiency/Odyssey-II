@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <unordered_map>
 #include <vector>
+#include <cfloat>
 
 struct Terrain_heights
 {
