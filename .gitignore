@@ -1,0 +1,9 @@
+.vs/
+Debug/
+*.user
+*.swp
+odyssey2/Debug/
+odyssey2/x64/
+x64/
+*.o
+*.out
