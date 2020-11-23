@@ -171,7 +171,7 @@ int main()
 {
 	// Program settings and variables
 	const float world_xz_scale = 16.0f; // TODO: Move scaling parameters into terrain generation code
-	const float tex_scale = 100.0f / world_size;
+	const float tex_scale = 64.0f / world_size;
 	const bool debug_context = false; // Enable/disable debugging context and prints
 	const bool print_fps = true;
 	double last_time{};

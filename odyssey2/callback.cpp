@@ -7,7 +7,7 @@
 #include "shader.h"
 #include "util_misc.h"
 
-extern Shader* terrain_shader, *skybox_shader, *water_shader;
+extern Shader *terrain_shader, *skybox_shader, *water_shader;
 extern Camera camera;
 
 // Handle keyboard actions

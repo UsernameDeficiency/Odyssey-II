@@ -15,5 +15,3 @@ How to make texture repetition less obvious?
 Optimization: 
 Don't draw vertices outside frustum
 Optimize terrain array size (store only y coordinates?)
-
-Add image to the Github page

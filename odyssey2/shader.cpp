@@ -108,11 +108,13 @@ void Shader::load_stb_texture_ref(const char* filename, GLuint* texture_ref, boo
 	int width_temp, height_temp;
 	glGenTextures(1, texture_ref);
 	glBindTexture(GL_TEXTURE_2D, *texture_ref);
-	// GL_LINEAR_MIPMAP_LINEAR usually seems to be recommended but is slightly more blurry?
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 8);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
+	// GL_MIRRORED_REPEAT could potentially be used for one coordinate to slightly reduce repeating pattern
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	// Load image, create texture and generate mipmaps
 	int nr_channels;
 	//stbi_set_flip_vertically_on_load(true); // Tell stb_image.h to flip loaded texture y-axis
