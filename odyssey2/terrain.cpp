@@ -1,4 +1,4 @@
-/* Filters for terrain smoothing, designed for the square terrain maps from diamondsquare.h */
+/* Code for terrain generation and filtering */
 #include "terrain.h"
 #include <vector>
 #include <cmath>
@@ -15,7 +15,7 @@ void mean(std::vector<float>& arr, const unsigned int filter_size)
 	for (size_t row = 0; row < arr_width; row++) {
 		for (size_t col = 0; col < arr_width; col++) {
 			size_t i = row * arr_width + col; // Index of element being smoothed
-			float avg = arr.at(i); // Initialize average with current element
+			float avg = arr[i]; // Initialize average with current element
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
@@ -24,17 +24,17 @@ void mean(std::vector<float>& arr, const unsigned int filter_size)
 
 				// Left value
 				if (col < offset)
-					avg += arr.at(i - offset + arr_width) * scale; // Out of bounds, wrap to end of row
+					avg += arr[i - offset + arr_width] * scale; // Out of bounds, wrap to end of row
 				else
-					avg += arr.at(i - offset) * scale;
+					avg += arr[i - offset] * scale;
 
 				// Right value
 				if (col + offset >= arr_width)
-					avg += arr.at(i + offset - arr_width) * scale; // Out of bounds, wrap to start of row
+					avg += arr[i + offset - arr_width] * scale; // Out of bounds, wrap to start of row
 				else
-					avg += arr.at(i + offset) * scale;
+					avg += arr[i + offset] * scale;
 			}
-			arr_tmp.at(i) = avg / normalization;
+			arr_tmp[i] = avg / normalization;
 		}
 	}
 
@@ -42,7 +42,7 @@ void mean(std::vector<float>& arr, const unsigned int filter_size)
 	for (size_t col = 0; col < arr_width; col++) {
 		for (size_t row = 0; row < arr_width; row++) {
 			size_t i = row * arr_width + col; // Index of element being smoothed
-			float avg = arr_tmp.at(i); // Initialize average with current element
+			float avg = arr_tmp[i]; // Initialize average with current element
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
@@ -51,17 +51,17 @@ void mean(std::vector<float>& arr, const unsigned int filter_size)
 
 				// Upper value
 				if (row < offset)
-					avg += arr_tmp.at(i - offset * arr_width + arr.size()) * scale; // Out of bounds, wrap to end of column
+					avg += arr_tmp[i - offset * arr_width + arr.size()] * scale; // Out of bounds, wrap to end of column
 				else
-					avg += arr_tmp.at(i - offset * arr_width) * scale;
+					avg += arr_tmp[i - offset * arr_width] * scale;
 
 				// Lower value
 				if (row + offset >= arr_width)
-					avg += arr_tmp.at(i + offset * arr_width - arr.size()) * scale; // Out of bounds, wrap to start of column
+					avg += arr_tmp[i + offset * arr_width - arr.size()] * scale; // Out of bounds, wrap to start of column
 				else
-					avg += arr_tmp.at(i + offset * arr_width) * scale;
+					avg += arr_tmp[i + offset * arr_width] * scale;
 			}
-			arr.at(i) = avg / normalization;
+			arr[i] = avg / normalization;
 		}
 	}
 }
@@ -78,35 +78,35 @@ void median(std::vector<float>& arr, const unsigned int filter_size)
 	for (size_t row = 0; row < arr_width; row++) {
 		for (size_t col = 0; col < arr_width; col++) {
 			size_t i = row * arr_width + col; // Index of element being smoothed
-			median.at(0) = arr.at(i);
+			median[0] = arr[i];
 			for (size_t offset = 1; offset <= filter_size / 2; offset++) {
 				size_t j = 4 * (offset - 1); // Index for median vector
 				// Left value
 				if (col < offset)
-					median.at(j + 1) = arr.at(i - offset + arr_width); // Out of bounds, wrap to end of row
+					median[j + 1] = arr[i - offset + arr_width]; // Out of bounds, wrap to end of row
 				else
-					median.at(j + 1) = arr.at(i - offset);
+					median[j + 1] = arr[i - offset];
 
 				// Right value
 				if (col + offset >= arr_width)
-					median.at(j + 2) = arr.at(i + offset - arr_width); // Out of bounds, wrap to start of row
+					median[j + 2] = arr[i + offset - arr_width]; // Out of bounds, wrap to start of row
 				else
-					median.at(j + 2) = arr.at(i + offset);
+					median[j + 2] = arr[i + offset];
 
 				// Upper value
 				if (row < offset)
-					median.at(j + 3) = arr.at(i - offset * arr_width + arr.size()); // Out of bounds, wrap to end of column
+					median[j + 3] = arr[i - offset * arr_width + arr.size()]; // Out of bounds, wrap to end of column
 				else
-					median.at(j + 3) = arr.at(i - offset * arr_width);
+					median[j + 3] = arr[i - offset * arr_width];
 
 				// Lower value
 				if (row + offset >= arr_width)
-					median.at(j + 4) = arr.at(i + offset * arr_width - arr.size()); // Out of bounds, wrap to start of column
+					median[j + 4] = arr[i + offset * arr_width - arr.size()]; // Out of bounds, wrap to start of column
 				else
-					median.at(j + 4) = arr.at(i + offset * arr_width);
+					median[j + 4] = arr[i + offset * arr_width];
 			}
 			std::sort(median.begin(), median.end());
-			arr_tmp.at(i) = median.at(median.size() / 2);
+			arr_tmp[i] = median[median.size() / 2];
 		}
 	}
 	arr.swap(arr_tmp);
