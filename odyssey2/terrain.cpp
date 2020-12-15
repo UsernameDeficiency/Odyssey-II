@@ -120,9 +120,8 @@ static float randnum(const float max, const float min)
 }
 
 
-/* diamondsquare creates a heightmap of size width*width using the diamond square
-	algorithm with base offset weight for the random numbers.
-	width must be (2^n)*(2^n) in size for some integer n.*/
+/* diamondsquare creates a heightmap of size width*width using the diamond square algorithm with base offset weight 
+	for the random numbers. width must be (2^n)*(2^n) in size for some integer n.*/
 std::vector<float> diamondsquare(const unsigned int width)
 {
 	float weight = 2000.0f; // Base weight for randomized values in diamond-square algorithm

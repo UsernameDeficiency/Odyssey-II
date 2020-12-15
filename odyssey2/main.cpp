@@ -176,7 +176,6 @@ int main()
 	const bool print_fps = true;
 	double last_time{};
 	Terrain_texture_ids terrain_tex;
-	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
 
 	// Print greeting
 	std::cout <<
@@ -197,6 +196,7 @@ int main()
 	GLFWwindow* window = init_gl(debug_context);
 	Model* m_terrain = generate_terrain(world_size, world_xz_scale, tex_scale);
 	init_graphics(world_xz_scale, terrain_tex);
+	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported())
@@ -216,10 +216,12 @@ int main()
 		double delta_time = current_time - last_time;
 		last_time = current_time;
 		camera.process_keyboard(m_terrain->vertexArray.data(), world_xz_scale, delta_time); // Update player state
+
+		// Print FPS once every second
 		if (print_fps)
 		{
-			static unsigned int acc_frames;
-			static double acc_time;
+			static unsigned int acc_frames{};
+			static double acc_time{};
 			acc_time += delta_time;
 			acc_frames++;
 

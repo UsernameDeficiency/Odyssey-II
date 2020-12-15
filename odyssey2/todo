@@ -4,14 +4,19 @@ Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighti
 https://learnopengl.com/Advanced-OpenGL/Geometry-Shader Shader grass
 https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
 terrain.frag snowBlend should use normal.y or 1 - normal.y depending on texture type (snow/rock)
-How to make independent fog shader?
+Make fog shader separate http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/#creating-the-render-target 
 
 Diamond-square:
 Change arrays to double indices?
 Vary filter strength with altitude?
 Save result to file?
-How to make texture repetition less obvious?
+Make texture repetition less obvious
 
 Optimization: 
 Don't draw vertices outside frustum
 Optimize terrain array size (store only y coordinates?)
+
+Move input code out of Camera class
+Make input code independent of world dimensions
+Reduce amount of global variables (globals.txt)
+Potentially move VAO ID into model class
