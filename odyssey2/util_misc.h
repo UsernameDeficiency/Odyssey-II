@@ -33,10 +33,10 @@ struct Model
 // Keyboard state for controls (TODO?)
 extern std::unordered_map<int, int> key_state;
 
-/* Build Model from generated terrain. */
+/* Build Model from generated terrain */
 Model* generate_terrain(const unsigned int world_size, const float world_xz_scale, float tex_scale);
 
-/* Load a cubemap texture. */
+/* Load a cubemap texture */
 void load_cubemap();
 
 /* Exits the program on unrecoverable error, printing an error string to stderr */

@@ -105,7 +105,7 @@ static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terra
 	skybox_shader->use();
 	skybox_shader->set_bool("drawFog", false);
 	skybox_shader->set_vec3("fogColor", fog_color);
-	load_cubemap(); // Load inital skybox
+	load_cubemap(); // Load initial skybox
 	skybox_shader->set_int("skyboxTex", 0);
 
 	// Allocate and activate skybox VAO/VBO
