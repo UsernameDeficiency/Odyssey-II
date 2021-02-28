@@ -31,13 +31,23 @@ static GLFWwindow* init_gl(const bool debug_context)
 
 	// Create GLFW window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 	if (debug_context)
+	{
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+		glfwSetErrorCallback(error_callback);
+	}
+	else
+	{
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0); // no GL_DEBUG_OUTPUT support needed
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+	}
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
+	Camera camera = Camera(world_size);
 	GLFWwindow *window = glfwCreateWindow(camera.window_w, camera.window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
@@ -61,7 +71,6 @@ static GLFWwindow* init_gl(const bool debug_context)
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(debug_message, nullptr);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-		glfwSetErrorCallback(error_callback);
 	}
 
 	// Callback functions
@@ -171,7 +180,7 @@ int main()
 {
 	// Program settings and variables
 	const float world_xz_scale = 16.0f; // TODO: Move scaling parameters into terrain generation code
-	const float tex_scale = 64.0f / world_size;
+	const float tex_scale = 1.0f / 4.0f;
 	const bool debug_context = false; // Enable/disable debugging context and prints
 	const bool print_fps = true;
 	double last_time{};
@@ -280,6 +289,8 @@ int main()
 		glVertexAttribPointer(terr_tex_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(terr_tex_loc);
 
+		// API_ID_RECOMPILE_FRAGMENT_SHADER on (only) first call, 
+		// glUseProgram(0); suppresses this but gives incorrect result
 		glDrawElements(GL_TRIANGLES, m_terrain->numIndices, GL_UNSIGNED_INT, 0L);
 
 		// --------- Draw water surface ---------
@@ -291,7 +302,7 @@ int main()
 		water_shader->set_vec3("cameraPos", camera.position);
 		water_shader->set_float("time", static_cast<float>(glfwGetTime()));
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 6); // API_ID_RECOMPILE_FRAGMENT_SHADER on (only) first call
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

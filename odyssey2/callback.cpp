@@ -72,6 +72,7 @@ void fb_size_callback(GLFWwindow* window, int width, int height)
 {
 	camera.window_w = width;
 	camera.window_h = height;
+	// Skybox clips incorrectly if the aspect ratio is very wide
 	camera.projection = glm::perspective(glm::radians(camera.cam_fov), static_cast<float>(width) / height, camera.vp_near, camera.vp_far);
 	glViewport(0, 0, width, height);
 }
@@ -84,7 +85,7 @@ void error_callback(int code, const char* description)
 }
 
 
-// OpenGL debug callback modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com
+// OpenGL debug callback, based on code by Joey de Vries: https://learnopengl.com
 void APIENTRY debug_message(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param)
 {
 	// Ignore non-significant error codes
