@@ -8,182 +8,184 @@
 #include "camera.h"
 #include "shader.h"
 
-const unsigned int world_size = 256;
-Camera camera{ world_size };
+// Global variables (bad)
+Camera camera{};
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-Shader* terrain_shader;
-Shader* skybox_shader;
-Shader* water_shader;
+Shader *terrain_shader, *skybox_shader, *water_shader;
 GLuint skybox_tex;
 
-struct Terrain_texture_ids
+namespace
 {
-	GLuint snow_tex, grass_tex, rock_tex, bottom_tex;
-};
-
-
-// Initialize openGL, GLAD and GLFW
-static GLFWwindow* init_gl(const bool debug_context)
-{
-	// --------- Initialize GLFW ---------
-	if (!glfwInit())
-		exit_on_error("glfwInit failed");
-
-	// Create GLFW window
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	if (debug_context)
+	struct Terrain_texture_ids
 	{
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
-		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-		glfwSetErrorCallback(error_callback);
-	}
-	else
-	{
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0); // no GL_DEBUG_OUTPUT support needed
-		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
-	}
-
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
-	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
-	GLFWwindow *window = glfwCreateWindow(camera.window_w, camera.window_h, "Odyssey II", NULL, NULL);
-	if (!window)
-		exit_on_error("GLFW window creation failed");
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1); // 1 = Vsync
-
-	// --------- Initialize GLAD ---------
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		exit_on_error("Failed to initialize GLAD");
-
-	// --------- Initialize OpenGL and callbacks ---------
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_MULTISAMPLE); // Enable MSAA
-	glEnable(GL_BLEND); // Enable transparency
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// OpenGL debugging
-	if (debug_context)
-	{
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(debug_message, nullptr);
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-	}
-
-	// Callback functions
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetFramebufferSizeCallback(window, fb_size_callback);
-	glfwSetCursorPosCallback(window, cursor_pos_callback);
-
-	return window;
-}
-
-
-// Set up terrain, skybox and water shaders
-static void init_graphics(const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids)
-{
-	const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
-
-	// Load terrain textures and upload to texture units
-	terrain_shader = new Shader("shader/terrain.vert", "shader/terrain.frag");
-	terrain_shader->use();
-	terrain_shader->load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
-	terrain_shader->load_stb_texture_ref("tex/burned_ground_01.png", &terrain_tex_ids.grass_tex, false);
-	terrain_shader->load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.rock_tex, false);
-	terrain_shader->load_stb_texture_ref("tex/brown_mud_rocks_01.png", &terrain_tex_ids.bottom_tex, false);
-	terrain_shader->set_int("snowTex", 0);
-	terrain_shader->set_int("grassTex", 1);
-	terrain_shader->set_int("rockTex", 2);
-	terrain_shader->set_int("bottomTex", 3);
-	terrain_shader->set_bool("drawFog", false);
-	terrain_shader->set_vec3("fogColor", fog_color);
-
-	// Set multitexturing height limits
-	const float terrain_height{ terrain_struct.max_height - terrain_struct.min_height };
-	terrain_struct.sea_y_pos = terrain_struct.min_height + terrain_height / 3;
-	terrain_shader->set_float("minHeight", terrain_struct.min_height);
-	terrain_shader->set_float("maxHeight", terrain_struct.max_height);
-	terrain_shader->set_float("seaHeight", terrain_struct.sea_y_pos);
-	terrain_shader->set_float("snowHeight", terrain_struct.max_height - terrain_height / 3);
-
-	// Initialize skybox cubemap and vertices
-	skybox_shader = new Shader("shader/skybox.vert", "shader/skybox.frag");
-	skybox_shader->use();
-	skybox_shader->set_bool("drawFog", false);
-	skybox_shader->set_vec3("fogColor", fog_color);
-	load_cubemap(); // Load initial skybox
-	skybox_shader->set_int("skyboxTex", 0);
-
-	// Allocate and activate skybox VAO/VBO
-	const GLfloat skybox_vertices[]{
-		-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
-		 5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
-
-		-5.0f, -5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
-		-5.0f,  5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
-
-		 5.0f, -5.0f, -5.0f, 5.0f, -5.0f,  5.0f, 5.0f,  5.0f,  5.0f,
-		 5.0f,  5.0f,  5.0f, 5.0f,  5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
-
-		-5.0f, -5.0f,  5.0f, -5.0f,  5.0f,  5.0f, 5.0f,  5.0f,  5.0f,
-		 5.0f,  5.0f,  5.0f, 5.0f, -5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
-
-		-5.0f,  5.0f, -5.0f, 5.0f,  5.0f, -5.0f, 5.0f,  5.0f,  5.0f,
-		 5.0f,  5.0f,  5.0f, -5.0f,  5.0f,  5.0f, -5.0f,  5.0f, -5.0f,
-
-		-5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f, -5.0f,
-		 5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f,  5.0f
+		GLuint snow_tex, grass_tex, rock_tex, bottom_tex;
 	};
-	unsigned int skybox_vbo;
-	glGenVertexArrays(1, &skybox_shader->vao);
-	glGenBuffers(1, &skybox_vbo);
-	glBindVertexArray(skybox_shader->vao);
-	glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), &skybox_vertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
-	// Initialize water surface
-	water_shader = new Shader("shader/water.vert", "shader/water.frag");
-	water_shader->use();
-	water_shader->set_bool("drawFog", false);
-	water_shader->set_bool("extraWaves", false);
-	water_shader->set_vec3("fogColor", fog_color);
-	water_shader->set_float("worldSize", world_xz_scale * world_size);
 
-	// Allocate and activate VAO/VBO
-	const GLfloat water_surface_vert[]{
-		// Triangle 1
-		0.0f, terrain_struct.sea_y_pos, 0.0f,
-		0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
-		world_size * world_xz_scale, terrain_struct.sea_y_pos, 0.0f,
-		// Triangle 2
-		world_size * world_xz_scale, terrain_struct.sea_y_pos, 0.0f,
-		0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
-		world_size * world_xz_scale, terrain_struct.sea_y_pos, world_size * world_xz_scale
-	};
-	unsigned int surface_vbo;
-	glGenVertexArrays(1, &water_shader->vao);
-	glBindVertexArray(water_shader->vao);
-	glGenBuffers(1, &surface_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, surface_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 2 * 9 * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(glGetAttribLocation(water_shader->id, "inPos"));
-	glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	// Initialize openGL, GLAD and GLFW
+	GLFWwindow* init_gl(const bool debug_context)
+	{
+		// --------- Initialize GLFW ---------
+		if (!glfwInit())
+			exit_on_error("glfwInit failed");
+
+		// Create GLFW window
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		if (debug_context)
+		{
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+			glfwSetErrorCallback(error_callback);
+		}
+		else
+		{
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0); // no GL_DEBUG_OUTPUT support needed
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+		}
+
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
+		glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
+		GLFWwindow* window = glfwCreateWindow(camera.window_w, camera.window_h, "Odyssey II", NULL, NULL);
+		if (!window)
+			exit_on_error("GLFW window creation failed");
+		glfwMakeContextCurrent(window);
+		glfwSwapInterval(1); // 1 = Vsync
+
+		// --------- Initialize GLAD ---------
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+			exit_on_error("Failed to initialize GLAD");
+
+		// --------- Initialize OpenGL and callbacks ---------
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_MULTISAMPLE); // Enable MSAA
+		glEnable(GL_BLEND); // Enable transparency
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// OpenGL debugging
+		if (debug_context)
+		{
+			glEnable(GL_DEBUG_OUTPUT);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			glDebugMessageCallback(debug_message, nullptr);
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+		}
+
+		// Callback functions
+		glfwSetKeyCallback(window, key_callback);
+		glfwSetFramebufferSizeCallback(window, fb_size_callback);
+		glfwSetCursorPosCallback(window, cursor_pos_callback);
+
+		return window;
+	}
+
+
+	// Set up terrain, skybox and water shaders
+	void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids)
+	{
+		const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
+
+		// Load terrain textures and upload to texture units
+		terrain_shader = new Shader("shader/terrain.vert", "shader/terrain.frag");
+		terrain_shader->use();
+		terrain_shader->load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
+		terrain_shader->load_stb_texture_ref("tex/burned_ground_01.png", &terrain_tex_ids.grass_tex, false);
+		terrain_shader->load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.rock_tex, false);
+		terrain_shader->load_stb_texture_ref("tex/brown_mud_rocks_01.png", &terrain_tex_ids.bottom_tex, false);
+		terrain_shader->set_int("snowTex", 0);
+		terrain_shader->set_int("grassTex", 1);
+		terrain_shader->set_int("rockTex", 2);
+		terrain_shader->set_int("bottomTex", 3);
+		terrain_shader->set_bool("drawFog", false);
+		terrain_shader->set_vec3("fogColor", fog_color);
+
+		// Set multitexturing height limits
+		const float terrain_height{ terrain_struct.max_height - terrain_struct.min_height };
+		terrain_struct.sea_y_pos = terrain_struct.min_height + terrain_height / 3;
+		terrain_shader->set_float("minHeight", terrain_struct.min_height);
+		terrain_shader->set_float("maxHeight", terrain_struct.max_height);
+		terrain_shader->set_float("seaHeight", terrain_struct.sea_y_pos);
+		terrain_shader->set_float("snowHeight", terrain_struct.max_height - terrain_height / 3);
+
+		// Initialize skybox cubemap and vertices
+		skybox_shader = new Shader("shader/skybox.vert", "shader/skybox.frag");
+		skybox_shader->use();
+		skybox_shader->set_bool("drawFog", false);
+		skybox_shader->set_vec3("fogColor", fog_color);
+		load_cubemap(); // Load initial skybox
+		skybox_shader->set_int("skyboxTex", 0);
+
+		// Allocate and activate skybox VAO/VBO
+		const GLfloat skybox_vertices[]{
+			-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
+			 5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
+
+			-5.0f, -5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
+			-5.0f,  5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
+
+			 5.0f, -5.0f, -5.0f, 5.0f, -5.0f,  5.0f, 5.0f,  5.0f,  5.0f,
+			 5.0f,  5.0f,  5.0f, 5.0f,  5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
+
+			-5.0f, -5.0f,  5.0f, -5.0f,  5.0f,  5.0f, 5.0f,  5.0f,  5.0f,
+			 5.0f,  5.0f,  5.0f, 5.0f, -5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
+
+			-5.0f,  5.0f, -5.0f, 5.0f,  5.0f, -5.0f, 5.0f,  5.0f,  5.0f,
+			 5.0f,  5.0f,  5.0f, -5.0f,  5.0f,  5.0f, -5.0f,  5.0f, -5.0f,
+
+			-5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f, -5.0f,
+			 5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f,  5.0f
+		};
+		unsigned int skybox_vbo;
+		glGenVertexArrays(1, &skybox_shader->vao);
+		glGenBuffers(1, &skybox_vbo);
+		glBindVertexArray(skybox_shader->vao);
+		glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), &skybox_vertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+
+		// Initialize water surface
+		water_shader = new Shader("shader/water.vert", "shader/water.frag");
+		water_shader->use();
+		water_shader->set_bool("drawFog", false);
+		water_shader->set_bool("extraWaves", false);
+		water_shader->set_vec3("fogColor", fog_color);
+		water_shader->set_float("worldSize", world_xz_scale * world_size);
+
+		// Allocate and activate VAO/VBO
+		const GLfloat water_surface_vert[]{
+			// Triangle 1
+			0.0f, terrain_struct.sea_y_pos, 0.0f,
+			0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
+			world_size * world_xz_scale, terrain_struct.sea_y_pos, 0.0f,
+			// Triangle 2
+			world_size * world_xz_scale, terrain_struct.sea_y_pos, 0.0f,
+			0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
+			world_size * world_xz_scale, terrain_struct.sea_y_pos, world_size * world_xz_scale
+		};
+		unsigned int surface_vbo;
+		glGenVertexArrays(1, &water_shader->vao);
+		glBindVertexArray(water_shader->vao);
+		glGenBuffers(1, &surface_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, surface_vbo);
+		glBufferData(GL_ARRAY_BUFFER, 2 * 9 * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(glGetAttribLocation(water_shader->id, "inPos"));
+		glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	}
 }
-
 
 int main()
 {
 	// Program settings and variables
+	const unsigned int world_size = 256;
 	const float world_xz_scale{ 16.0f }; // TODO: Move scaling parameters into terrain generation code
 	const float tex_scale{ 1.0f / 4.0f };
 	const bool debug_context{ false }; // Enable/disable debugging context and prints
 	constexpr bool print_fps{ false };
 	double last_time{};
-	Terrain_texture_ids terrain_tex{};
+	Terrain_texture_ids terrain_tex{}; // TODO: Is this struct necessary?
+	camera.world_size = world_size;
 
 	// Print greeting
 	std::cout <<
@@ -203,7 +205,7 @@ int main()
 	// Initiate OpenGL and graphics
 	GLFWwindow* window{ init_gl(debug_context) };
 	Model* m_terrain{ generate_terrain(world_size, world_xz_scale, tex_scale) };
-	init_graphics(world_xz_scale, terrain_tex);
+	init_graphics(world_size, world_xz_scale, terrain_tex);
 	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

@@ -8,13 +8,10 @@ extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set
 
 /* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
-Camera::Camera(const unsigned int world_size)
-: position{ 0.0f, 0.0f, 0.0f }, front{ 0.0f, 0.0f, -1.0f }, world_up{ 0.0f, 1.0f, 0.0f },
-world_size(world_size), yaw(0.0f), pitch(0.0f), movement_speed(cam_speed),
-mouse_sens(cam_sensitivity), height(cam_height), flying(false)
+Camera::Camera()
 {
 	projection = glm::perspective(glm::radians(cam_fov), static_cast<float>(window_w) / window_h, vp_near, vp_far);
-	update_camera_vectors();
+	update_camera_vectors(); // set front, right, up
 }
 
 // Returns the view matrix calculated using Euler Angles and the LookAt Matrix

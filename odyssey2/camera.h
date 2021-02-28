@@ -12,32 +12,32 @@ class Camera
 {
 public:
     // Camera Attributes
-    glm::vec3 position;
+    glm::vec3 position{ 0.0f, 0.0f, 0.0f };
     glm::vec3 front;
     glm::vec3 up;
     glm::vec3 right;
-    glm::vec3 world_up;
+    glm::vec3 world_up{ 0.0f, 1.0f, 0.0f };
 	glm::mat4 projection; // Projection matrix
-    const unsigned int world_size;
+    unsigned int world_size{ 0u };
     // Euler Angles
-    float yaw;
-    float pitch;
+    float yaw{ 0.0f };
+    float pitch{ 0.0f };
     // Default camera values
-    int window_w = 1920;
-    int window_h = 1080;
+    int window_w{ 1920 };
+    int window_h{ 1080 };
     // Camera options
     // Initial camera settings
-    const float cam_speed = 120.0f;
-    const float cam_sensitivity = 0.2f;
-    const float cam_fov = 68.0f; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
-    const float cam_height = 64.0f; // Camera height above ground
-    const float vp_near = 3.0f; // Near distance for frustum
-    const float vp_far = 23000.0f; // Far distance for frustum
+    const float cam_speed{ 120.0f };
+    const float cam_sensitivity{ 0.2f };
+    const float cam_fov{ 68.0f }; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
+    const float cam_height{ 64.0f }; // Camera height above ground
+    const float vp_near{ 3.0f }; // Near distance for frustum
+    const float vp_far{ 23000.0f }; // Far distance for frustum
     // Variable camera settings set by actions like running, flying, zooming 
-    float movement_speed;
-    float mouse_sens;
-	float height;
-	bool flying;
+    float movement_speed{ cam_speed };
+    float mouse_sens{ cam_sensitivity };
+    float height{ cam_height };
+    bool flying{ false };
 
     // Keyboard state for controls
     std::unordered_map<int, int> key_state =
@@ -54,7 +54,7 @@ public:
         {GLFW_KEY_LEFT_CONTROL, GLFW_RELEASE},
     };
 
-	Camera(const unsigned int world_size);
+	Camera();
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 	glm::mat4 get_view_matrix();
