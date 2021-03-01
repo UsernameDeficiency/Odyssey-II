@@ -47,7 +47,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	// Update key state for movement handling if key is bound
 	auto search = camera.key_state.find(key);
 	if (search != camera.key_state.end())
-		camera.key_state.at(key) = action;
+		camera.key_state[key] = action;
 }
 
 
