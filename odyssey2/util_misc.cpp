@@ -32,7 +32,7 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	mean(proc_terrain, 5);
 
 	const size_t vertex_count = static_cast<size_t>(world_size) * world_size;
-	const size_t triangle_count = static_cast<size_t>(world_size - 1) * (world_size - 1) * 2;
+	const size_t triangle_count = static_cast<size_t>(world_size - 1) * static_cast<size_t>(world_size - 1) * 2ull;
 	// TODO: Array sizes too large here?
 	// Since vertices are ordered in a cartesian grid the x and y positions might not be needed?
 	// It might be possible to lower precision for the height values
@@ -131,7 +131,7 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 /* Load a cubemap texture. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
 void load_cubemap()
 {
-	static unsigned int skybox_index;
+	static unsigned int skybox_index{};
 
 	const std::vector<std::string> skybox_paths = {
 		"stormydays", "hw_morning", "sb_frozen", "ame_starfield" };
