@@ -23,15 +23,18 @@ namespace
 
 
 	// Initialize openGL, GLAD and GLFW
-	GLFWwindow* init_gl(const bool debug_context)
+	GLFWwindow* init_gl()
 	{
+		// Enable/disable debugging context and prints
+		constexpr bool debug_context{ false };
+
 		// --------- Initialize GLFW ---------
 		if (!glfwInit())
 			exit_on_error("glfwInit failed");
 
 		// Create GLFW window
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		if (debug_context)
+		if constexpr (debug_context)
 		{
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -64,7 +67,7 @@ namespace
 		glEnable(GL_BLEND); // Enable transparency
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// OpenGL debugging
-		if (debug_context)
+		if constexpr (debug_context)
 		{
 			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -181,11 +184,8 @@ int main()
 	const unsigned int world_size = 256;
 	const float world_xz_scale{ 16.0f }; // TODO: Move scaling parameters into terrain generation code
 	const float tex_scale{ 1.0f / 4.0f };
-	const bool debug_context{ false }; // Enable/disable debugging context and prints
-	constexpr bool print_fps{ false };
 	double last_time{};
 	Terrain_texture_ids terrain_tex{}; // TODO: Is this struct necessary?
-	camera.world_size = world_size;
 
 	// Print greeting
 	std::cout <<
@@ -203,9 +203,10 @@ int main()
 		"------------------------------------\n";
 
 	// Initiate OpenGL and graphics
-	GLFWwindow* window{ init_gl(debug_context) };
+	GLFWwindow* window{ init_gl() };
 	Model* m_terrain{ generate_terrain(world_size, world_xz_scale, tex_scale) };
 	init_graphics(world_size, world_xz_scale, terrain_tex);
+	camera.world_size = world_size;
 	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -228,7 +229,7 @@ int main()
 		camera.process_keyboard(m_terrain->vertexArray.data(), world_xz_scale, delta_time); // Update player state
 
 		// Print FPS once every second
-		if constexpr (print_fps)
+		if constexpr (constexpr bool print_fps{ false }; print_fps)
 		{
 			static unsigned int acc_frames{};
 			static double acc_time{};
