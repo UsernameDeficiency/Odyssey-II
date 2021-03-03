@@ -75,7 +75,7 @@ void fb_size_callback(GLFWwindow* window, int width, int height)
 	Camera &camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
 	camera.window_w = width;
 	camera.window_h = height;
-	// Skybox clips incorrectly if the aspect ratio is very wide
+	// Skybox clips if aspect ratio is too wide for chosen vp_near
 	camera.projection = glm::perspective(glm::radians(camera.cam_fov), static_cast<float>(width) / height, camera.vp_near, camera.vp_far);
 	glViewport(0, 0, width, height);
 }

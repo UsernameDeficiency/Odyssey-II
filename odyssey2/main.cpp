@@ -84,7 +84,6 @@ namespace
 		return window;
 	}
 
-
 	// Set up terrain, skybox and water shaders
 	void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids)
 	{
@@ -206,8 +205,7 @@ int main()
 	GLFWwindow* window{ init_gl() };
 	Model* m_terrain{ generate_terrain(world_size, world_xz_scale) };
 	init_graphics(world_size, world_xz_scale, terrain_tex);
-	camera.world_size = world_size;
-	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
+	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported())
@@ -227,7 +225,7 @@ int main()
 		double current_time{ glfwGetTime() };
 		double delta_time{ current_time - last_time };
 		last_time = current_time;
-		camera.process_keyboard(m_terrain->vertexArray.data(), world_xz_scale, delta_time); // Update player state
+		camera.process_keyboard(m_terrain->vertexArray, world_xz_scale, delta_time); // Update player state
 
 		// Print FPS once every second
 		if constexpr (constexpr bool print_fps{ false }; print_fps)

@@ -17,7 +17,6 @@ public:
     glm::vec3 right;
     glm::vec3 world_up{ 0.0f, 1.0f, 0.0f };
 	glm::mat4 projection; // Projection matrix
-    unsigned int world_size{ 0u };
     // Euler Angles
     float yaw{ 0.0f };
     float pitch{ 0.0f };
@@ -30,7 +29,7 @@ public:
     const float cam_sensitivity{ 0.2f };
     const float cam_fov{ 68.0f }; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
     const float cam_height{ 64.0f }; // Camera height above ground
-    const float vp_near{ 3.0f }; // Near distance for frustum
+    const float vp_near{ 3.0f }; // Near distance for frustum, lower this if skybox is cut off at screen edges
     const float vp_far{ 23000.0f }; // Far distance for frustum
     // Variable camera settings set by actions like running, flying, zooming 
     float movement_speed{ cam_speed };
@@ -56,17 +55,17 @@ public:
 	Camera();
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-	glm::mat4 get_view_matrix();
+	const glm::mat4& get_view_matrix();
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void process_keyboard(const GLfloat* terrain, const float world_xz_scale, const double delta_time);
+    void process_keyboard(const std::vector<GLfloat> &terrain, const float world_xz_scale, const double delta_time);
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void process_mouse_movement(float x_offset, float y_offset);
 
 private:
-	// Interpolate y values over the vertex at position (x, z). No bounds checking for x and z.
-    float get_pos_y(float x, float z, const GLfloat* vertex_array, const float world_xz_scale);
+    // Interpolate height over the vertex at position (x, z)
+    void set_pos(const std::vector<GLfloat>& vertex_array, const float world_xz_scale);
 
     // Calculates the front vector from the Camera's (updated) Euler Angles
     void update_camera_vectors();
