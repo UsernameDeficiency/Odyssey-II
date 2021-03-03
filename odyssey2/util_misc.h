@@ -32,8 +32,8 @@ struct Model
 /* Build Model from generated terrain */
 Model* generate_terrain(const unsigned int world_size, const float world_xz_scale);
 
-/* Load a cubemap texture */
-void load_cubemap();
+/* Load chosen cubemap textures */
+void load_cubemap(std::vector<GLuint> &skybox_tex);
 
 /* Exits the program on unrecoverable error, printing an error string to stderr */
 void exit_on_error(const char* error);

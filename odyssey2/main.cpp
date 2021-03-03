@@ -10,8 +10,8 @@
 
 // Global variables (bad)
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-Shader *terrain_shader, *skybox_shader, *water_shader;
-GLuint skybox_tex;
+Shader *terrain_shader, *skybox_shader, *water_shader; // Callbacks or keyboard code needs Shaders
+unsigned int skybox_index{}; // TODO: Remove global variable
 
 namespace
 {
@@ -20,10 +20,8 @@ namespace
 		GLuint snow_tex, grass_tex, rock_tex, bottom_tex;
 	};
 
-	Camera camera{}; // TODO: Move into main function
-
 	// Initialize openGL, GLAD and GLFW
-	GLFWwindow* init_gl()
+	GLFWwindow* init_gl(Camera &camera)
 	{
 		// Enable/disable debugging context and prints
 		constexpr bool debug_context{ false };
@@ -45,11 +43,11 @@ namespace
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0); // no GL_DEBUG_OUTPUT support needed
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 		}
-
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
 		glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
+
 		GLFWwindow* window = glfwCreateWindow(camera.window_w, camera.window_h, "Odyssey II", NULL, NULL);
 		if (!window)
 			exit_on_error("GLFW window creation failed");
@@ -85,7 +83,7 @@ namespace
 	}
 
 	// Set up terrain, skybox and water shaders
-	void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids)
+	void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids, std::vector<GLuint> &skybox_textures)
 	{
 		const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
 
@@ -116,7 +114,7 @@ namespace
 		skybox_shader->use();
 		skybox_shader->set_bool("drawFog", false);
 		skybox_shader->set_vec3("fogColor", fog_color);
-		load_cubemap(); // Load initial skybox
+		load_cubemap(skybox_textures); // Load initial skybox
 		skybox_shader->set_int("skyboxTex", 0);
 
 		// Allocate and activate skybox VAO/VBO
@@ -185,6 +183,9 @@ int main()
 	const unsigned int world_size = 256;
 	const float world_xz_scale{ 16.0f }; // TODO: Move scaling parameters into terrain generation code
 	Terrain_texture_ids terrain_tex{};
+	Camera camera{}; // TODO: Move into main function
+	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
+	std::vector<GLuint> skybox_textures;
 
 	// Print greeting
 	std::cout <<
@@ -202,10 +203,9 @@ int main()
 		"------------------------------------\n";
 
 	// Initiate OpenGL and graphics
-	GLFWwindow* window{ init_gl() };
+	GLFWwindow* window{ init_gl(camera) };
 	Model* m_terrain{ generate_terrain(world_size, world_xz_scale) };
-	init_graphics(world_size, world_xz_scale, terrain_tex);
-	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
+	init_graphics(world_size, world_xz_scale, terrain_tex, skybox_textures);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported())
@@ -251,7 +251,7 @@ int main()
 		skybox_shader->use();
 		glBindVertexArray(skybox_shader->vao);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_tex);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_textures[skybox_index % skybox_textures.size()]);
 
 		glm::mat4 world_to_view{ glm::mat4(glm::mat3(camera.get_view_matrix())) }; // Remove translation from the view matrix
 		skybox_shader->set_mat4_f("worldToView", world_to_view);

@@ -7,6 +7,7 @@
 #include <iostream>
 
 extern Shader *terrain_shader, *skybox_shader, *water_shader;
+extern unsigned int skybox_index;
 
 // Handle keyboard actions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -37,11 +38,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		water_shader->use();
 		water_shader->set_bool("extraWaves", extra_waves);
 	}
-	// Change skybox texture
+	// Change skybox texture TODO: Remove global variable skybox_index
 	else if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 	{
-		skybox_shader->use();
-		load_cubemap();
+		skybox_index++;
 	}
 
 	// Update key state for movement handling if key is bound

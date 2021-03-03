@@ -10,7 +10,6 @@
 #include "terrain.h"
 
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-extern GLuint skybox_tex;
 
 
 /* Construct Model with full set of vectors, std::move all vectors */
@@ -129,53 +128,49 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 }
 
 
-/* Load a cubemap texture. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
-void load_cubemap()
+/* Load chosen cubemap textures. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
+void load_cubemap(std::vector<GLuint> &skybox_tex)
 {
-	static unsigned int skybox_index{};
-
 	const std::vector<std::string> skybox_paths = {
 		"stormydays", "hw_morning", "sb_frozen", "ame_starfield" };
+	skybox_tex.resize(skybox_paths.size());
 
-	std::string skybox_path = "tex/skybox/" + skybox_paths.at(skybox_index % skybox_paths.size());
-	std::vector<std::string> faces
+	for (unsigned int skybox_index{}; skybox_index < skybox_paths.size(); skybox_index++)
 	{
-		skybox_path + "/front.tga",
-		skybox_path + "/back.tga",
-		skybox_path + "/top.tga",
-		skybox_path + "/bottom.tga",
-		skybox_path + "/right.tga",
-		skybox_path + "/left.tga"
-	};
-
-	// Make sure the wanted texture has not already been loaded. This method makes sure new memory is not allocated
-	// every time the skybox is changed but still loads the texture from disk every time.
-	unsigned int texture_id;
-	glGenTextures(1, &texture_id);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	int width, height, nr_channels;
-	for (unsigned int i = 0; i < faces.size(); i++)
-	{
-		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nr_channels, 0);
-		if (!data)
+		std::string skybox_path = "tex/skybox/" + skybox_paths.at(skybox_index % skybox_paths.size());
+		std::vector<std::string> faces
 		{
-			std::cerr << "loadCubemap failed: texture " << faces[i] << " failed to load\n";
-			stbi_image_free(data);
-			exit(EXIT_FAILURE);
-		}
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-			0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		stbi_image_free(data);
-	}
+			skybox_path + "/front.tga",
+			skybox_path + "/back.tga",
+			skybox_path + "/top.tga",
+			skybox_path + "/bottom.tga",
+			skybox_path + "/right.tga",
+			skybox_path + "/left.tga"
+		};
 
-	skybox_index++;
-	skybox_tex = texture_id;
+		glGenTextures(1, &skybox_tex[skybox_index]);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_tex[skybox_index]);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		int width, height, nr_channels;
+		for (unsigned int i = 0; i < faces.size(); i++)
+		{
+			unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nr_channels, 0);
+			if (!data)
+			{
+				std::cerr << "loadCubemap failed: texture " << faces[i] << " failed to load\n";
+				stbi_image_free(data);
+				exit(EXIT_FAILURE);
+			}
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+	}
 }
 
 

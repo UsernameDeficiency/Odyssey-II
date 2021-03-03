@@ -1,5 +1,4 @@
 Shaders:
-Shaders in view coordinates: https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting-exercise2
 https://learnopengl.com/Advanced-OpenGL/Geometry-Shader Shader grass
 https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
 terrain.frag snowBlend should use normal.y or 1 - normal.y depending on texture type (snow/rock)
@@ -16,6 +15,5 @@ Don't draw vertices outside frustum
 Optimize terrain array size (store only y coordinates?)
 
 Move input code out of Camera class
-Make input code independent of world dimensions
-Reduce amount of global variables (globals.txt)
+Reduce amount of global variables (terrain_struct, Shaders, skybox_tex)
 Potentially move VAO ID into model class
