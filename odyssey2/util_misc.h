@@ -1,7 +1,6 @@
 /* Miscellaneous utility functions for the main program */
 #pragma once
 #include <glad/glad.h>
-#include <unordered_map>
 #include <vector>
 #include <cfloat>
 

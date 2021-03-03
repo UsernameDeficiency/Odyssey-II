@@ -1,11 +1,10 @@
 /* Callback definitions, mainly for GLFW */
 #include "callback.h"
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
 #include "camera.h"
 #include "shader.h"
-#include "util_misc.h"
+#include "util_misc.h" // load_cubemap()
+#include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 
 extern Shader *terrain_shader, *skybox_shader, *water_shader;
 

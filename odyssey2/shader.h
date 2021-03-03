@@ -1,11 +1,8 @@
 ﻿#pragma once
-#define GLFW_INCLUDE_NONE
 #include <string>
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "stb_image.h"
+#include <glm/mat4x4.hpp>
 
 /* Shader utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com */
 class Shader

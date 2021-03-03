@@ -7,7 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "util_misc.h" // Model*
 #include "terrain.h"
 
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
