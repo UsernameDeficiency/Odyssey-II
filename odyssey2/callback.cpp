@@ -8,11 +8,12 @@
 #include "util_misc.h"
 
 extern Shader *terrain_shader, *skybox_shader, *water_shader;
-extern Camera camera;
 
 // Handle keyboard actions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	Camera &camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
+
 	if (key == GLFW_KEY_ESCAPE)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	// Toggle fog
@@ -54,6 +55,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Called on mouse movement
 void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	Camera &camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
+
 	static float mouse_last_x = 0.0f;
 	static float mouse_last_y = camera.window_h / 2.0f;
 
@@ -70,6 +73,7 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 // Called when the window is resized and updates the projection matrix and viewport size
 void fb_size_callback(GLFWwindow* window, int width, int height)
 {
+	Camera &camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
 	camera.window_w = width;
 	camera.window_h = height;
 	// Skybox clips incorrectly if the aspect ratio is very wide

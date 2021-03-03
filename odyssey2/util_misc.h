@@ -30,11 +30,8 @@ struct Model
         GLsizei numVertices, GLsizei numIndices);
 };
 
-// Keyboard state for controls (TODO?)
-extern std::unordered_map<int, int> key_state;
-
 /* Build Model from generated terrain */
-Model* generate_terrain(const unsigned int world_size, const float world_xz_scale, float tex_scale);
+Model* generate_terrain(const unsigned int world_size, const float world_xz_scale);
 
 /* Load a cubemap texture */
 void load_cubemap();

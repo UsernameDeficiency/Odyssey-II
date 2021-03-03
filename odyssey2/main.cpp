@@ -9,7 +9,6 @@
 #include "shader.h"
 
 // Global variables (bad)
-Camera camera{};
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 Shader *terrain_shader, *skybox_shader, *water_shader;
 GLuint skybox_tex;
@@ -21,6 +20,7 @@ namespace
 		GLuint snow_tex, grass_tex, rock_tex, bottom_tex;
 	};
 
+	Camera camera{}; // TODO: Move into main function
 
 	// Initialize openGL, GLAD and GLFW
 	GLFWwindow* init_gl()
@@ -76,6 +76,7 @@ namespace
 		}
 
 		// Callback functions
+		glfwSetWindowUserPointer(window, &camera); // Give callbacks access to camera
 		glfwSetKeyCallback(window, key_callback);
 		glfwSetFramebufferSizeCallback(window, fb_size_callback);
 		glfwSetCursorPosCallback(window, cursor_pos_callback);
@@ -149,23 +150,24 @@ namespace
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
 		// Initialize water surface
+		const float world_total_size = world_xz_scale * world_size;
 		water_shader = new Shader("shader/water.vert", "shader/water.frag");
 		water_shader->use();
 		water_shader->set_bool("drawFog", false);
 		water_shader->set_bool("extraWaves", false);
 		water_shader->set_vec3("fogColor", fog_color);
-		water_shader->set_float("worldSize", world_xz_scale * world_size);
+		water_shader->set_float("worldSize", world_total_size);
 
 		// Allocate and activate VAO/VBO
 		const GLfloat water_surface_vert[]{
 			// Triangle 1
 			0.0f, terrain_struct.sea_y_pos, 0.0f,
-			0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
-			world_size * world_xz_scale, terrain_struct.sea_y_pos, 0.0f,
+			0.0f, terrain_struct.sea_y_pos, world_total_size,
+			world_total_size, terrain_struct.sea_y_pos, 0.0f,
 			// Triangle 2
-			world_size * world_xz_scale, terrain_struct.sea_y_pos, 0.0f,
-			0.0f, terrain_struct.sea_y_pos, world_size * world_xz_scale,
-			world_size * world_xz_scale, terrain_struct.sea_y_pos, world_size * world_xz_scale
+			world_total_size, terrain_struct.sea_y_pos, 0.0f,
+			0.0f, terrain_struct.sea_y_pos, world_total_size,
+			world_total_size, terrain_struct.sea_y_pos, world_total_size
 		};
 		unsigned int surface_vbo;
 		glGenVertexArrays(1, &water_shader->vao);
@@ -183,9 +185,7 @@ int main()
 	// Program settings and variables
 	const unsigned int world_size = 256;
 	const float world_xz_scale{ 16.0f }; // TODO: Move scaling parameters into terrain generation code
-	const float tex_scale{ 1.0f / 4.0f };
-	double last_time{};
-	Terrain_texture_ids terrain_tex{}; // TODO: Is this struct necessary?
+	Terrain_texture_ids terrain_tex{};
 
 	// Print greeting
 	std::cout <<
@@ -204,7 +204,7 @@ int main()
 
 	// Initiate OpenGL and graphics
 	GLFWwindow* window{ init_gl() };
-	Model* m_terrain{ generate_terrain(world_size, world_xz_scale, tex_scale) };
+	Model* m_terrain{ generate_terrain(world_size, world_xz_scale) };
 	init_graphics(world_size, world_xz_scale, terrain_tex);
 	camera.world_size = world_size;
 	camera.position = glm::vec3(camera.world_size * world_xz_scale / 2, 0.0f, camera.world_size * world_xz_scale / 2);
@@ -220,6 +220,7 @@ int main()
 	GLint terr_tex_loc{ glGetAttribLocation(terrain_shader->id, "inTexCoord") };
 
 	// Main render loop
+	double last_time{};
 	while (!glfwWindowShouldClose(window))
 	{
 		// Calculate frame time and update physics state

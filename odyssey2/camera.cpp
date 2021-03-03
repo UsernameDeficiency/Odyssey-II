@@ -76,8 +76,8 @@ void Camera::process_keyboard(const GLfloat* terrain, const float world_xz_scale
 	}
 	else
 	{
-		// Move player to terrain height, world_xz_scale padding ensures arrays stay in bound during interpolation
-		const float world_limit = world_size * world_xz_scale - world_xz_scale;
+		// Move player to terrain position, padding ensures arrays stay in bound during interpolation
+		const float world_limit = world_xz_scale * (world_size - 1);
 		if (position.x < 0.0f)
 			position.x = 0.0f;
 		else if (position.x > world_limit)

@@ -25,8 +25,10 @@ Model::Model(std::vector<GLfloat> vertexArray, std::vector<GLfloat> normalArray,
 
 
 /* Build Model from generated terrain. */
-Model* generate_terrain(const unsigned int world_size, const float world_xz_scale, float tex_scale)
+Model* generate_terrain(const unsigned int world_size, const float world_xz_scale)
 {
+	const float tex_scale{ 1.0f / 4.0f }; // Scaling of texture coordinates
+
 	// Build procedural terrain and smooth result
 	std::vector<float> proc_terrain = diamondsquare(world_size);
 	mean(proc_terrain, 5);
