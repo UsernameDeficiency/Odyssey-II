@@ -23,10 +23,11 @@ void main(void)
 {
 	// ------------------ Lighting --------------------
 	// World directional light
+	// sb_frozen: -1, 0.75, 1, stormydays: 1, 0.75, 1, ame_starfield: 0, 1, 0
 	vec3 lightDir = mat3(worldToView) * vec3(1, 0.75, 1); // Direction to light source (sun)
 
 	// Calculate ambient and diffuse light
-	float ambient = 0.35;
+	float ambient = 0.33;
 	float diffuse = max(dot(normalize(lightDir), normalize(phongNormal)), 0.0);
 	float shade = ambient + (1 - ambient) * diffuse;
 	
