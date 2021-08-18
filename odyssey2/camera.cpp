@@ -15,7 +15,7 @@ Camera::Camera()
 }
 
 // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-const glm::mat4& Camera::get_view_matrix()
+glm::mat4 Camera::get_view_matrix()
 {
 	return glm::lookAt(position, position + front, up);
 }

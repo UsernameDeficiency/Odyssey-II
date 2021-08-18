@@ -55,7 +55,7 @@ public:
 	Camera();
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-	const glm::mat4& get_view_matrix();
+	glm::mat4 get_view_matrix();
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void process_keyboard(const std::vector<GLfloat> &terrain, const float world_xz_scale, const double delta_time);
