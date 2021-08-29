@@ -120,61 +120,62 @@ static float randnum(const float max, const float min)
 }
 
 
-/* diamondsquare creates a heightmap of size width*width using the diamond square algorithm with base offset weight 
+/* diamondsquare creates a heightmap of size width*width using the diamond square algorithm with base offset weight
 	for the random numbers. width must be (2^n)*(2^n) in size for some integer n.*/
 std::vector<float> diamondsquare(const unsigned int width)
 {
 	float weight = 2000.0f; // Base weight for randomized values in diamond-square algorithm
 	const unsigned int seed = 64;
 	srand(seed);
-	std::vector<float> terrain((size_t)width * width);
+	std::vector<std::vector<float>> terrain{ (size_t)width, std::vector<float>((size_t)width) };
 
 	/* Initialize corner values. Since the width for this implementation is 2^n rather than 2^n+1,
 	 * the right and lower edges are "cut off" and terrain[0] wraps around. */
-	terrain[0] = randnum(weight, -weight);
+	terrain[0][0] = randnum(weight, -weight);
 
 	// Iterate over step lengths.
 	for (unsigned int step = width; step > 1; step /= 2) {
-		// Do diamond part for current step length
-		weight /= static_cast<float>(sqrt(2));
-		for (unsigned int row = 0; row < width; row += step) {
-			for (unsigned int col = 0; col < width; col += step) {
-				// Indices for upper/lower right and left corners of the square area being worked on, the mean of the corner
+		// Do diamond step for current step length
+		weight /= 2;
+		for (size_t row = 0; row < width; row += step) {
+			for (size_t col = 0; col < width; col += step) {
+				// Index upper/lower right and left corners of the square area being worked on, the mean of the corner
 				// values give the base displacement for the current point being calculated. Wrap-around if out of bounds.
-				int ul = row * width + col;
-				int ur = row * width + (col + step) % width;
-				int ll = ((row + step) % width) * width + col;
-				int lr = ((row + step) % width) * width + (col + step) % width;
-				int mid = (row + step / 2) * width + col + step / 2; // Current point being calculated
-
-				// Mean of all 4 points
-				terrain[mid] = (terrain[ul] + terrain[ur] + terrain[ll] + terrain[lr]) / 4 + randnum(weight, -weight);
+				terrain[row + step / 2][col + step / 2] = (
+					terrain[row][col] +
+					terrain[row][(col + step) % width] +
+					terrain[(row + step) % width][col] +
+					terrain[(row + step) % width][(col + step) % width]) / 4 + randnum(weight, -weight);
 			}
 		}
 		// Do square step for the upper and left points
-		weight /= static_cast<float>(sqrt(2));
-		for (unsigned int row = 0; row < width; row += step) {
-			for (unsigned int col = 0; col < width; col += step) {
-				size_t r_left = (size_t)row + step / 2;
-				size_t c_up = (size_t)col + step / 2;
+		for (size_t row = 0; row < width; row += step) {
+			for (size_t col = 0; col < width; col += step) {
+				size_t r_left = row + step / 2;
+				size_t c_up = col + step / 2;
 
 				// Being lazy here and making sure all indices are in bounds, even if some will never go out of bounds.
 				float mean_up = (
-					terrain[(((size_t)row - step / 2 + width) % width) * width + c_up] + // Above, make sure it is not negative
-					terrain[(size_t)row * width + (c_up - step / 2 + width) % width] + // Left, make sure it is not negative
-					terrain[(size_t)row * width + (c_up + step / 2) % width] + // Right
-					terrain[(r_left % width) * width + c_up]) / 4; // Below
+					terrain[(row - step / 2 + width) % width][c_up] + // Above, make sure it is not negative
+					terrain[row][(c_up - step / 2 + width) % width] + // Left, make sure it is not negative
+					terrain[row][(c_up + step / 2) % width] + // Right
+					terrain[(r_left % width)][c_up]) / 4; // Below
 				float mean_left = (
-					terrain[((r_left - step / 2 + width) % width) * width + col] +
-					terrain[r_left * width + (col - step / 2 + width) % width] +
-					terrain[r_left * width + c_up % width] +
-					terrain[((r_left + step / 2) % width) * width + col]) / 4;
+					terrain[(r_left - step / 2 + width) % width][col] +
+					terrain[r_left][(col - step / 2 + width) % width] +
+					terrain[r_left][c_up % width] +
+					terrain[(r_left + step / 2) % width][col]) / 4;
 
-				terrain[(size_t)row * (size_t)width + c_up] = mean_up + randnum(weight, -weight);
-				terrain[r_left * width + col] = mean_left + randnum(weight, -weight);
+				terrain[row][c_up] = mean_up + randnum(weight, -weight);
+				terrain[r_left][col] = mean_left + randnum(weight, -weight);
 			}
 		}
 	}
 
-	return terrain;
+	// Flatten vector
+	std::vector<float> temp;
+	for (const auto &vec: terrain)
+		temp.insert(temp.end(), vec.begin(), vec.end());
+
+	return temp;
 }
