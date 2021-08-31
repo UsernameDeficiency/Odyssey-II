@@ -28,7 +28,6 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	const float tex_scale{ 1.0f / 4.0f }; // Scaling of texture coordinates
 
 	// Build procedural terrain and smooth result
-	// TODO: Vector out of bounds when player touches one specific edge of the world
 	std::vector<float> proc_terrain = diamondsquare(world_size);
 	mean(proc_terrain, 5);
 

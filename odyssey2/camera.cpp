@@ -100,6 +100,8 @@ void Camera::process_mouse_movement(float x_offset, float y_offset)
 }
 
 // Interpolate height over the vertex at position (x, z)
+// Interpolations is done over a single triangle, but should probably
+// be done over several to smooth transitions between triangles
 void Camera::set_pos(const std::vector<GLfloat>& vertex_array, const float world_xz_scale)
 {
 	// #vertices in 1 dimension (world_size)
@@ -123,10 +125,10 @@ void Camera::set_pos(const std::vector<GLfloat>& vertex_array, const float world
 	const float z_pos{ z - z_tile };
 
 	// Interpolate over the triangle at the current player position
-	// Interpolation is done into higher x and z, therefore x and z must be below upper array bounds
-	const float y1 = vertex_array[(x_tile + z_tile * num_vert_1D ) * 3 + 1];
-	const float y2 = vertex_array[((x_tile + 1) + z_tile * num_vert_1D ) * 3 + 1];
-	const float y3 = vertex_array[(x_tile + (z_tile + 1) * num_vert_1D ) * 3 + 1];
+	// Interpolation is done into higher x and z
+	const float y1 = vertex_array[(x_tile + z_tile * num_vert_1D) * 3 + 1];
+	const float y2 = vertex_array[(((x_tile + 1) % num_vert_1D) + z_tile * num_vert_1D) * 3 + 1];
+	const float y3 = vertex_array[(x_tile + ((z_tile + 1) % num_vert_1D) * num_vert_1D) * 3 + 1];
 	const float y_pos = y1 + x_pos * (y2 - y1) + z_pos * (y3 - y1) + height;
 
 	// Make sure player does not drown

@@ -11,7 +11,7 @@
 // Global variables (bad)
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 Shader *terrain_shader, *skybox_shader, *water_shader; // Callbacks or keyboard code needs Shaders
-unsigned int skybox_index{}; // TODO: Remove global variable
+unsigned int skybox_index{};
 
 namespace
 {
@@ -147,7 +147,7 @@ namespace
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
 		// Initialize water surface
-		const float world_total_size = world_xz_scale * world_size;
+		const float world_total_size = world_xz_scale * (world_size - 1);
 		water_shader = new Shader("shader/water.vert", "shader/water.frag");
 		water_shader->use();
 		water_shader->set_bool("drawFog", false);
@@ -180,8 +180,8 @@ namespace
 int main()
 {
 	// Program settings and variables
-	const unsigned int world_size = 256;
-	const float world_xz_scale{ 16.0f }; // TODO: Move scaling parameters into terrain generation code
+	const unsigned int world_size = 128;
+	const float world_xz_scale{ 32.0f }; // TODO: Move scaling parameters into terrain generation code
 	Terrain_texture_ids terrain_tex{};
 	Camera camera{}; // TODO: Move into main function
 	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
