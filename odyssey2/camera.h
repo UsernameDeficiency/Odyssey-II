@@ -29,8 +29,8 @@ public:
     const float cam_sensitivity{ 0.2f };
     const float cam_fov{ 68.0f }; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
     const float cam_height{ 64.0f }; // Camera height above ground
-    const float vp_near{ 3.0f }; // Near distance for frustum, lower this if skybox is cut off at screen edges
-    const float vp_far{ 23000.0f }; // Far distance for frustum
+    const float vp_near{ 2.7f }; // Near distance for frustum, lower this if skybox is cut off at screen edges
+    const float vp_far{ 16384.0f }; // Far distance for frustum
     // Variable camera settings set by actions like running, flying, zooming 
     float movement_speed{ cam_speed };
     float mouse_sens{ cam_sensitivity };
@@ -58,7 +58,7 @@ public:
 	Camera();
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-	const glm::mat4& get_view_matrix();
+	glm::mat4 get_view_matrix();
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void process_keyboard(const std::vector<GLfloat> &terrain, const float world_xz_scale, const double delta_time);

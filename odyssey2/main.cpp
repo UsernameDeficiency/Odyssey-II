@@ -146,7 +146,7 @@ namespace
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
 		// Initialize water surface
-		const float world_total_size = world_xz_scale * world_size;
+		const float world_total_size = world_xz_scale * (world_size - 1);
 		water_shader = new Shader("shader/water.vert", "shader/water.frag");
 		water_shader->use();
 		water_shader->set_bool("drawFog", false);
@@ -179,8 +179,8 @@ namespace
 int main()
 {
 	// Program settings and variables
-	const unsigned int world_size = 256;
-	const float world_xz_scale{ 16.0f }; // TODO: Move scaling parameters into terrain generation code
+	const unsigned int world_size = 128;
+	const float world_xz_scale{ 32.0f }; // TODO: Move scaling parameters into terrain generation code
 	unsigned int skybox_index{};
 	Terrain_texture_ids terrain_tex{};
 	Camera camera{};
