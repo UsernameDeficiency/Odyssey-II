@@ -50,6 +50,9 @@ public:
         {GLFW_KEY_F, GLFW_RELEASE},
         {GLFW_KEY_LEFT_SHIFT, GLFW_RELEASE},
         {GLFW_KEY_LEFT_CONTROL, GLFW_RELEASE},
+        {GLFW_KEY_F1, GLFW_RELEASE},
+        {GLFW_KEY_F2, GLFW_RELEASE},
+        {GLFW_KEY_F3, GLFW_RELEASE}
     };
 
 	Camera();

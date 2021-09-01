@@ -6,44 +6,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
-extern Shader *terrain_shader, *skybox_shader, *water_shader;
-extern unsigned int skybox_index;
-
 // Handle keyboard actions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	Camera &camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
-
 	if (key == GLFW_KEY_ESCAPE)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
-	// Toggle fog
-	else if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
-	{
-		static bool draw_fog = false;
 
-		draw_fog = !draw_fog;
-		terrain_shader->use();
-		terrain_shader->set_bool("drawFog", draw_fog);
-		skybox_shader->use();
-		skybox_shader->set_bool("drawFog", draw_fog);
-		water_shader->use();
-		water_shader->set_bool("drawFog", draw_fog);
-	}
-	// Toggle wave amount
-	else if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
-	{
-		static bool extra_waves = false;
-
-		extra_waves = !extra_waves;
-		water_shader->use();
-		water_shader->set_bool("extraWaves", extra_waves);
-	}
-	// Change skybox texture TODO: Remove global variable skybox_index
-	else if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
-	{
-		skybox_index++;
-	}
-
+	Camera& camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
 	// Update key state for movement handling if key is bound
 	auto search = camera.key_state.find(key);
 	if (search != camera.key_state.end())

@@ -15,5 +15,4 @@ Don't draw vertices outside frustum
 Optimize terrain array size (store only y coordinates?)
 
 Move input code out of Camera class
-Reduce amount of global variables (terrain_struct, Shaders, skybox_tex)
 Potentially move VAO ID into model class

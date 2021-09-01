@@ -8,10 +8,8 @@
 #include "camera.h"
 #include "shader.h"
 
-// Global variables (bad)
+// TODO: Remove global variable
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-Shader *terrain_shader, *skybox_shader, *water_shader; // Callbacks or keyboard code needs Shaders
-unsigned int skybox_index{}; // TODO: Remove global variable
 
 namespace
 {
@@ -83,7 +81,8 @@ namespace
 	}
 
 	// Set up terrain, skybox and water shaders
-	void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids, std::vector<GLuint> &skybox_textures)
+	void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids, 
+		std::vector<GLuint> &skybox_textures, Shader *&terrain_shader, Shader *&skybox_shader, Shader *&water_shader)
 	{
 		const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
 
@@ -182,12 +181,13 @@ int main()
 	// Program settings and variables
 	const unsigned int world_size = 256;
 	const float world_xz_scale{ 16.0f }; // TODO: Move scaling parameters into terrain generation code
+	unsigned int skybox_index{};
 	Terrain_texture_ids terrain_tex{};
-	Camera camera{}; // TODO: Move into main function
+	Camera camera{};
 	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
 	std::vector<GLuint> skybox_textures;
+	Shader *terrain_shader, *skybox_shader, *water_shader;
 
-	// Print greeting
 	std::cout <<
 		"------------------------------------\n"
 		"       Welcome to Odyssey II!\n"
@@ -205,7 +205,7 @@ int main()
 	// Initiate OpenGL and graphics
 	GLFWwindow* window{ init_gl(camera) };
 	Model* m_terrain{ generate_terrain(world_size, world_xz_scale) };
-	init_graphics(world_size, world_xz_scale, terrain_tex, skybox_textures);
+	init_graphics(world_size, world_xz_scale, terrain_tex, skybox_textures, terrain_shader, skybox_shader, water_shader);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported())
@@ -226,6 +226,30 @@ int main()
 		double delta_time{ current_time - last_time };
 		last_time = current_time;
 		camera.process_keyboard(m_terrain->vertexArray, world_xz_scale, delta_time); // Update player state
+		// Toggle fog
+		if (camera.key_state[GLFW_KEY_F1] == GLFW_PRESS)
+		{
+			static bool draw_fog = false; // TODO: Probably shouldn't be static
+
+			draw_fog = !draw_fog;
+			terrain_shader->use();
+			terrain_shader->set_bool("drawFog", draw_fog);
+			skybox_shader->use();
+			skybox_shader->set_bool("drawFog", draw_fog);
+			water_shader->use();
+			water_shader->set_bool("drawFog", draw_fog);
+			camera.key_state[GLFW_KEY_F1] = GLFW_REPEAT;
+		}
+		// Toggle wave amount
+		if (camera.key_state[GLFW_KEY_F2] == GLFW_PRESS)
+		{
+			static bool extra_waves = false;
+
+			extra_waves = !extra_waves;
+			water_shader->use();
+			water_shader->set_bool("extraWaves", extra_waves);
+			camera.key_state[GLFW_KEY_F2] = GLFW_REPEAT;
+		}
 
 		// Print FPS once every second
 		if constexpr (constexpr bool print_fps{ false }; print_fps)
@@ -251,7 +275,13 @@ int main()
 		skybox_shader->use();
 		glBindVertexArray(skybox_shader->vao);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_textures[skybox_index % skybox_textures.size()]);
+		// Change skybox texture
+		if (camera.key_state[GLFW_KEY_F3] == GLFW_PRESS)
+		{
+			skybox_index = ++skybox_index % skybox_textures.size();
+			camera.key_state[GLFW_KEY_F3] = GLFW_REPEAT;
+		}
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_textures[skybox_index]);
 
 		glm::mat4 world_to_view{ glm::mat4(glm::mat3(camera.get_view_matrix())) }; // Remove translation from the view matrix
 		skybox_shader->set_mat4_f("worldToView", world_to_view);
