@@ -11,7 +11,8 @@ Make texture repetition less obvious
 
 Optimization: 
 Don't draw vertices outside frustum
-Optimize terrain array size (store only y coordinates?)
+Potentially optimize generate_terrain array sizes (store only y coordinates?)
 
 Move input code out of Camera class
-Potentially move VAO ID into model class
+Potentially move VAO ID from Shader to Model
+Potentially move program settings into init file

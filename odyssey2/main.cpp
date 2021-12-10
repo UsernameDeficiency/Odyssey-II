@@ -229,7 +229,7 @@ int main()
 		// Toggle fog
 		if (camera.key_state[GLFW_KEY_F1] == GLFW_PRESS)
 		{
-			static bool draw_fog = false; // TODO: Probably shouldn't be static
+			static bool draw_fog = false;
 
 			draw_fog = !draw_fog;
 			terrain_shader->use();
@@ -320,8 +320,6 @@ int main()
 		glVertexAttribPointer(terr_tex_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(terr_tex_loc);
 
-		// API_ID_RECOMPILE_FRAGMENT_SHADER on (only) first call, 
-		// glUseProgram(0); suppresses this but gives incorrect result
 		glDrawElements(GL_TRIANGLES, m_terrain->numIndices, GL_UNSIGNED_INT, 0L);
 
 		// --------- Draw water surface ---------

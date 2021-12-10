@@ -9,7 +9,7 @@ class Shader
 {
 public:
 	unsigned int id;
-	unsigned int vao; // Vertex array object ID TODO: Move this (and vbo) into models for water and skybox
+	unsigned int vao; // Vertex array object ID
 	Shader(const char* vertex_path, const char* fragment_path);
 
 	// Activate shader

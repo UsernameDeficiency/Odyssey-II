@@ -30,7 +30,6 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 
 	const size_t vertex_count = static_cast<size_t>(world_size) * world_size;
 	const size_t triangle_count = static_cast<size_t>(world_size - 1) * static_cast<size_t>(world_size - 1) * 2ull;
-	// TODO: Array sizes too large here?
 	// Since vertices are ordered in a cartesian grid the x and y positions might not be needed?
 	// It might be possible to use integer types for some or all of these values
 	std::vector<GLfloat> vertex_array(vertex_count * 3);
