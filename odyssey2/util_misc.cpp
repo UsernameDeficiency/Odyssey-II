@@ -13,12 +13,9 @@ extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set
 
 
 /* Construct Model with full set of vectors, std::move all vectors */
-Model::Model(std::vector<GLfloat> vertexArray, std::vector<GLfloat> normalArray, 
-	std::vector<GLfloat> texCoordArray, std::vector<GLuint> indexArray,
-	GLsizei numVertices, GLsizei numIndices)
-	: vertexArray(std::move(vertexArray)), normalArray(std::move(normalArray)), 
-	texCoordArray(std::move(texCoordArray)), indexArray(std::move(indexArray)),
-	numVertices(numVertices), numIndices(numIndices), vao(0), vb(0), ib(0), nb(0), tb(0)
+Model::Model(std::vector<GLfloat> vertexArray, GLsizei numVertices, GLsizei numIndices)
+	: vertexArray(std::move(vertexArray)), numVertices(numVertices), numIndices(numIndices),
+	vao(0), vb(0), ib(0), nb(0), tb(0)
 { }
 
 
@@ -101,8 +98,7 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	}
 
 	// Create Model and upload to GPU (formerly LoadModelData)
-	Model* m = new Model(std::move(vertex_array), std::move(normal_array), 
-		std::move(tex_coord_array), std::move(index_array), 
+	Model* m = new Model(std::move(vertex_array),
 		static_cast<GLsizei>(vertex_count), static_cast<GLsizei>(triangle_count) * 3);
 
 	glGenVertexArrays(1, &m->vao);
@@ -117,11 +113,11 @@ Model* generate_terrain(const unsigned int world_size, const float world_xz_scal
 	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
 	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->vertexArray.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), m->indexArray.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), index_array.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->normalArray.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, normal_array.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, m->tb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 2, m->texCoordArray.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 2, tex_coord_array.data(), GL_STATIC_DRAW);
 
 	return m;
 }

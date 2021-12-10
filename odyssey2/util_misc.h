@@ -11,12 +11,14 @@ struct Terrain_heights
 	float sea_y_pos{};
 };
 
+/* Holds data for terrain model */
 struct Model
 {
+    // Vertex data is needed on CPU for terrain collision, rest is GPU only
     std::vector<GLfloat> vertexArray;
-    std::vector<GLfloat> normalArray;
-    std::vector<GLfloat> texCoordArray;
-    std::vector<GLuint> indexArray;
+    //std::vector<GLfloat> normalArray;
+    //std::vector<GLfloat> texCoordArray;
+    //std::vector<GLuint> indexArray;
     GLsizei numVertices;
     GLsizei numIndices;
 
@@ -24,9 +26,7 @@ struct Model
     GLuint vao;
     GLuint vb, ib, nb, tb; // VBOs
 
-    Model(std::vector<GLfloat> vertexArray, std::vector<GLfloat> normalArray, 
-        std::vector<GLfloat> texCoordArray, std::vector<GLuint> indexArray, 
-        GLsizei numVertices, GLsizei numIndices);
+    Model(std::vector<GLfloat> vertexArray, GLsizei numVertices, GLsizei numIndices);
 };
 
 /* Build Model from generated terrain */
