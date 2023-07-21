@@ -29,6 +29,7 @@
     <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="io.h" />
     <ClInclude Include="terrain.h" />
     <ClInclude Include="callback.h" />
     <ClInclude Include="camera.h" />

@@ -7,6 +7,7 @@
 #include "callback.h"
 #include "camera.h"
 #include "shader.h"
+#include "io.h"
 
 // TODO: Remove global variable
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
@@ -179,8 +180,9 @@ namespace
 int main()
 {
 	// Program settings and variables
-	const unsigned int world_size = 128;
-	const float world_xz_scale{ 32.0f }; // TODO: Move scaling parameters into terrain generation code
+	// TODO: Move scaling parameters into terrain generation code
+	const unsigned int world_size{ stoul(read_string_from_ini("world_size", "128u")) };
+	const float world_xz_scale{ stof(read_string_from_ini("world_xz_scale", "32.0f")) };
 	unsigned int skybox_index{};
 	Terrain_texture_ids terrain_tex{};
 	Camera camera{};
@@ -188,19 +190,7 @@ int main()
 	std::vector<GLuint> skybox_textures;
 	Shader *terrain_shader, *skybox_shader, *water_shader;
 
-	std::cout <<
-		"------------------------------------\n"
-		"       Welcome to Odyssey II!\n"
-		"------------------------------------\n"
-		"Move: W/A/S/D/Q/E\n"
-		"Run: Shift\n"
-		"Zoom: Ctrl\n"
-		"Crouch: C\n"
-		"Toggle flying/walking: F\n"
-		"Toggle fog: F1\n"
-		"Toggle water wave effect: F2\n"
-		"Toggle skybox: F3\n"
-		"------------------------------------\n";
+	std::cout << read_string_from_ini("greeting");
 
 	// Initiate OpenGL and graphics
 	GLFWwindow* window{ init_gl(camera) };
