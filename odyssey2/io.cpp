@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-// Read value from key
+// Read value from key from INI-inspired settings file
 std::string read_string_from_ini(const std::string& key, const std::string& default_value)
 {
 	const std::string filename = "settings.ini";
@@ -32,7 +32,8 @@ std::string read_string_from_ini(const std::string& key, const std::string& defa
 	return default_value;
 }
 
-std::string literal_to_newline(std::string str)
+// Convert all occurences of "\n" in str to newlines ('\n')
+static std::string literal_to_newline(std::string str)
 {
 	std::string temp{ str };
 	size_t index{ 0 };
