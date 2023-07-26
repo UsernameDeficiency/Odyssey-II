@@ -19,16 +19,21 @@ std::string read_string_from_ini(const std::string& key, const std::string& defa
 			if (read_key == key)
 			{
 				// Remove delimiter, read value, remove leading spaces. There might be a better solution.
-				ini_ifstream >> read_value;
+				ini_ifstream >> read_key;
 				std::getline(ini_ifstream, read_value);
 				const size_t value_start{ read_value.find_first_not_of(' ') };
 				read_value = read_value.substr(value_start, read_value.length() - value_start + 1);
 				read_value = literal_to_newline(read_value);
 				return read_value;
 			}
+			// Don't read values for comments or sections (lines starting with ';' or '[').
+			else if (read_key.at(0) == ';' || read_key.at(0) == '[')
+			{
+				std::getline(ini_ifstream, read_key); // Skip rest of line
+			}
 		}
 	}
-	std::cerr << "read_string_from_ini unable to find value for key " << key << "\n";
+	std::cout << "read_string_from_ini unable to find value for key " << key << "\n";
 	return default_value;
 }
 
