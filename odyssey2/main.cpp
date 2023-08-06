@@ -20,11 +20,10 @@ namespace
 	};
 
 	// Initialize openGL, GLAD and GLFW
-	// TODO: Move debug_context, MSAA samples and maybe more to settings.ini
 	GLFWwindow* init_gl(Camera &camera)
 	{
 		// Enable/disable debugging context and prints
-		constexpr bool debug_context{ false };
+		const bool debug_context{ bool(std::stoi(read_string_from_ini("debug_context", "0")))};
 
 		// --------- Initialize GLFW ---------
 		if (!glfwInit())
@@ -32,7 +31,7 @@ namespace
 
 		// Create GLFW window
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		if constexpr (debug_context)
+		if (debug_context)
 		{
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -44,7 +43,7 @@ namespace
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 		}
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
+		glfwWindowHint(GLFW_SAMPLES, std::stoi(read_string_from_ini("msaa_samples", "2"))); // MSAA samples
 		glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
 
@@ -65,7 +64,7 @@ namespace
 		glEnable(GL_BLEND); // Enable transparency
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// OpenGL debugging
-		if constexpr (debug_context)
+		if (debug_context)
 		{
 			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -83,7 +82,6 @@ namespace
 	}
 
 	// Set up terrain, skybox and water shaders
-	// TODO: Move fog_color and textures to settings.ini
 	void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids, 
 		std::vector<GLuint> &skybox_textures, Shader *&terrain_shader, Shader *&skybox_shader, Shader *&water_shader)
 	{

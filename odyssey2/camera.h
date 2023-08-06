@@ -4,34 +4,35 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <unordered_map>
+#include <string>
+#include "io.h"
 
 /* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
 	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
 class Camera
 {
 public:
-    // Camera Attributes
+    // Camera attributes
     glm::vec3 position{ 0.0f, 0.0f, 0.0f };
     glm::vec3 front;
     glm::vec3 up;
     glm::vec3 right;
     glm::vec3 world_up{ 0.0f, 1.0f, 0.0f };
 	glm::mat4 projection; // Projection matrix
-    // Euler Angles
+    // Euler angles
     float yaw{ 0.0f };
     float pitch{ 0.0f };
-    // Default camera values
-    int window_w{ 1920 };
-    int window_h{ 1080 };
     // Camera options
+    int window_w{ std::stoi(read_string_from_ini("window_w", "1920")) };
+    int window_h{ std::stoi(read_string_from_ini("window_h", "1080")) };
     // Initial camera settings
-    const float cam_speed{ 120.0f };
-    const float cam_sensitivity{ 0.2f };
-    const float cam_fov{ 68.0f }; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
-    const float cam_height{ 64.0f }; // Camera height above ground
-    const float vp_near{ 2.7f }; // Near distance for frustum, lower this if skybox is cut off at screen edges
-    const float vp_far{ 16384.0f }; // Far distance for frustum
-    // Variable camera settings set by actions like running, flying, zooming 
+    const float cam_speed{ std::stof(read_string_from_ini("cam_speed", "120.0f")) };
+    const float cam_sensitivity{ std::stof(read_string_from_ini("cam_sensitivity", "0.2f")) };
+    const float cam_fov{ std::stof(read_string_from_ini("cam_fov", "68.0f")) }; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
+    const float cam_height{ std::stof(read_string_from_ini("cam_height", "64.0f")) }; // Camera height above ground
+    const float vp_near{ std::stof(read_string_from_ini("vp_near", "2.7f")) }; // Near distance for frustum, lower this if skybox is cut off at screen edges
+    const float vp_far{ std::stof(read_string_from_ini("vp_far", "16384.0f")) }; // Far distance for frustum
+    // Variable camera settings set by actions like running, flying, zooming
     float movement_speed{ cam_speed };
     float mouse_sens{ cam_sensitivity };
     float height{ cam_height };
