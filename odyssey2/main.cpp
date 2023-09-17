@@ -3,11 +3,12 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <iostream>
-#include "util_misc.h"
 #include "callback.h"
 #include "camera.h"
-#include "shader.h"
 #include "io.h"
+#include "shader.h"
+#include "terrain.h"
+#include "util_misc.h"
 
 // TODO: Remove global variable
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
@@ -173,7 +174,7 @@ namespace
 		glBindVertexArray(water_shader->vao);
 		glGenBuffers(1, &surface_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, surface_vbo);
-		glBufferData(GL_ARRAY_BUFFER, 2 * 9 * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 2ull * 9ull * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(glGetAttribLocation(water_shader->id, "inPos"));
 		glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
@@ -196,7 +197,7 @@ int main()
 
 	// Initiate OpenGL and graphics
 	GLFWwindow* window{ init_gl(camera) };
-	Model* m_terrain{ generate_terrain(world_size, world_xz_scale) };
+	Terrain terrain{ world_size, world_xz_scale };
 	init_graphics(world_size, world_xz_scale, terrain_tex, skybox_textures, terrain_shader, skybox_shader, water_shader);
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -217,7 +218,7 @@ int main()
 		double current_time{ glfwGetTime() };
 		double delta_time{ current_time - last_time };
 		last_time = current_time;
-		camera.process_keyboard(m_terrain->vertexArray, world_xz_scale, delta_time); // Update player state
+		camera.process_keyboard(terrain.terrain_model->vertexArray, world_xz_scale, delta_time); // Update player state
 		// Toggle fog
 		if (camera.key_state[GLFW_KEY_F1] == GLFW_PRESS)
 		{
@@ -296,23 +297,23 @@ int main()
 		terrain_shader->set_mat4_f("worldToView", camera.get_view_matrix());
 		terrain_shader->set_mat4_f("projection", camera.projection);
 
-		glBindVertexArray(m_terrain->vao); // Select VAO
-		glBindBuffer(GL_ARRAY_BUFFER, m_terrain->vb);
+		glBindVertexArray(terrain.terrain_model->vao); // Select VAO
+		glBindBuffer(GL_ARRAY_BUFFER, terrain.terrain_model->vb);
 
 		glVertexAttribPointer(terr_vert_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(terr_vert_loc);
 
 		// Normals
-		glBindBuffer(GL_ARRAY_BUFFER, m_terrain->nb);
+		glBindBuffer(GL_ARRAY_BUFFER, terrain.terrain_model->nb);
 		glVertexAttribPointer(terr_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(terr_normal_loc);
 
 		// VBO for texture coordinate data
-		glBindBuffer(GL_ARRAY_BUFFER, m_terrain->tb);
+		glBindBuffer(GL_ARRAY_BUFFER, terrain.terrain_model->tb);
 		glVertexAttribPointer(terr_tex_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(terr_tex_loc);
 
-		glDrawElements(GL_TRIANGLES, m_terrain->numIndices, GL_UNSIGNED_INT, 0L);
+		glDrawElements(GL_TRIANGLES, terrain.terrain_model->numIndices, GL_UNSIGNED_INT, 0L);
 
 		// --------- Draw water surface ---------
 		water_shader->use();

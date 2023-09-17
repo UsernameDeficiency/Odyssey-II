@@ -1,9 +1,10 @@
 /* Miscellaneous utility functions for the main program */
 #pragma once
-#include <glad/glad.h>
 #include <vector>
 #include <cfloat>
+#include <glad/glad.h>
 
+// TODO: Potentially move Terrain_heights to terrain.h
 struct Terrain_heights
 {
 	float min_height{ FLT_MAX };
@@ -11,26 +12,6 @@ struct Terrain_heights
 	float sea_y_pos{};
 };
 
-/* Holds data for terrain model */
-struct Model
-{
-    // Vertex data is needed on CPU for terrain collision, rest is GPU only
-    std::vector<GLfloat> vertexArray;
-    //std::vector<GLfloat> normalArray;
-    //std::vector<GLfloat> texCoordArray;
-    //std::vector<GLuint> indexArray;
-    GLsizei numVertices;
-    GLsizei numIndices;
-
-    // VBO and VAO IDs
-    GLuint vao;
-    GLuint vb, ib, nb, tb; // VBOs
-
-    Model(std::vector<GLfloat> vertexArray, GLsizei numVertices, GLsizei numIndices);
-};
-
-/* Build Model from generated terrain */
-Model* generate_terrain(const unsigned int world_size, const float world_xz_scale);
 
 /* Load chosen cubemap textures */
 void load_cubemap(std::vector<GLuint> &skybox_tex);

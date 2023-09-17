@@ -30,6 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="io.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="terrain.h" />
     <ClInclude Include="callback.h" />
     <ClInclude Include="camera.h" />
