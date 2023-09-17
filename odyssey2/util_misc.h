@@ -12,7 +12,6 @@ struct Terrain_heights
 	float sea_y_pos{};
 };
 
-
 /* Load chosen cubemap textures */
 void load_cubemap(std::vector<GLuint> &skybox_tex);
 

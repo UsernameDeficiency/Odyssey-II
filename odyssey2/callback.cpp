@@ -1,8 +1,6 @@
 /* Callback definitions, mainly for GLFW */
 #include "callback.h"
 #include "camera.h"
-#include "shader.h"
-#include "util_misc.h" // load_cubemap()
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 

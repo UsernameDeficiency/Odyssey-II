@@ -16,9 +16,9 @@ std::string read_string_from_ini(const std::string& key, const std::string& defa
 		std::string read_value;
 		while (ini_ifstream >> read_key)
 		{
-                        if (read_key == ";")
-                                std::getline(ini_ifstream, read_key); // Discard commented line
-                        else if (read_key == key)
+			if (read_key == ";")
+				std::getline(ini_ifstream, read_key); // Discard commented line
+			else if (read_key == key)
 			{
 				// Remove delimiter, read value, remove leading spaces. There might be a better solution.
 				ini_ifstream >> read_value;

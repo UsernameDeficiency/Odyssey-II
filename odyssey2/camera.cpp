@@ -83,11 +83,8 @@ void Camera::process_keyboard(const std::vector<GLfloat> &terrain, const float w
 // Processes input received from a mouse input system. Expects the offset value in both the x and y direction
 void Camera::process_mouse_movement(float x_offset, float y_offset)
 {
-	x_offset *= mouse_sens;
-	y_offset *= mouse_sens;
-
-	yaw += x_offset;
-	pitch += y_offset;
+	yaw += x_offset * mouse_sens;
+	pitch += y_offset * mouse_sens;
 
 	// Make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (pitch > 89.0f)
