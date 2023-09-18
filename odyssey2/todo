@@ -18,3 +18,6 @@ Potentially move VAO ID from Shader to Model
 Potentially move program settings into init file
 
 Add jumping
+
+Fix window resize under Ubuntu 23.04. Resizing the window currently forces the window into minimum size, full screen button does nothing.
+
