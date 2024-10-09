@@ -21,7 +21,7 @@ glm::mat4 Camera::get_view_matrix()
 }
 
 // Processes input received from any keyboard-like input system
-void Camera::process_keyboard(const std::vector<GLfloat> &terrain, const float world_xz_scale, const double delta_time)
+void Camera::process_keyboard(const std::vector<GLfloat>& terrain, const float world_xz_scale, const double delta_time)
 {
 	float velocity = movement_speed * static_cast<float>(delta_time);
 	if (flying)

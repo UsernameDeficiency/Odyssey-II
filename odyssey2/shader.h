@@ -29,9 +29,9 @@ public:
 	void set_mat4_f(const std::string& name, const glm::mat4 matrix) const;
 
 	// Load a texture, using int reference to texture only
-	void load_stb_texture_ref(const char* filename, GLuint* texture_ref, bool alpha);
+	static void load_stb_texture_ref(const char* filename, GLuint* texture_ref, bool alpha);
 
 private:
 	// Utility function for checking shader compilation/linking errors
-	void check_compile_errors(unsigned int shader, std::string type);
+	static void check_compile_errors(unsigned int shader, const std::string& type);
 };

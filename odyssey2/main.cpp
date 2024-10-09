@@ -20,7 +20,7 @@ struct Terrain_texture_ids
 
 // Initialize openGL, GLAD and GLFW
 // TODO: Move debug_context, MSAA samples and maybe more to settings.ini
-GLFWwindow* init_gl(Camera &camera)
+static GLFWwindow* init_gl(Camera& camera)
 {
 	// Enable/disable debugging context and prints
 	constexpr bool debug_context{ false };
@@ -83,8 +83,8 @@ GLFWwindow* init_gl(Camera &camera)
 
 // Set up terrain, skybox and water shaders
 // TODO: Move fog_color and textures to settings.ini
-void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids, 
-	std::vector<GLuint> &skybox_textures, Shader *&terrain_shader, Shader *&skybox_shader, Shader *&water_shader)
+static void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids,
+	std::vector<GLuint>& skybox_textures, Shader*& terrain_shader, Shader*& skybox_shader, Shader*& water_shader)
 {
 	const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
 

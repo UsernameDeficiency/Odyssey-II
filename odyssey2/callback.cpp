@@ -21,7 +21,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Called on mouse movement
 void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	Camera &camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
+	Camera& camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
 
 	static float mouse_last_x = 0.0f;
 	static float mouse_last_y = camera.window_h / 2.0f;
@@ -39,7 +39,7 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 // Called when the window is resized and updates the projection matrix and viewport size
 void fb_size_callback(GLFWwindow* window, int width, int height)
 {
-	Camera &camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
+	Camera& camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
 	camera.window_w = width;
 	camera.window_h = height;
 	// Skybox clips if aspect ratio is too wide for chosen vp_near

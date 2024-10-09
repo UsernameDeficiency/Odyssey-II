@@ -62,7 +62,7 @@ public:
 	glm::mat4 get_view_matrix();
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void process_keyboard(const std::vector<GLfloat> &terrain, const float world_xz_scale, const double delta_time);
+	void process_keyboard(const std::vector<GLfloat>& terrain, const float world_xz_scale, const double delta_time);
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void process_mouse_movement(float x_offset, float y_offset);

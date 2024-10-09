@@ -15,11 +15,11 @@ private:
 	/* Build Model from generated terrain */
 	Model* generate_terrain(const unsigned int world_size, const float world_xz_scale);
 
-	/* mean does filter_size-point moving average filtering of arr. */
-	void mean(std::vector<float>& arr, const unsigned int filter_size);
+	/* Do filter_size-point moving average filtering on arr. */
+	static void mean(std::vector<float>& arr, const unsigned int filter_size);
 
 	/* Do median filtering on arr with filter_size number of elements in each direction. */
-	void median(std::vector<float>& arr, const unsigned int filter_size);
+	static void median(std::vector<float>& arr, const unsigned int filter_size);
 
 	/* diamondsquare creates a heightmap of size width*width using the diamond square
 		algorithm with base offset weight for the random numbers. */

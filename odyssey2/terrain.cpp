@@ -293,7 +293,7 @@ std::vector<float> Terrain::diamondsquare(const unsigned int width)
 
 	// Flatten vector
 	std::vector<float> temp;
-	for (const auto &vec: terrain)
+	for (const auto& vec : terrain)
 		temp.insert(temp.end(), vec.begin(), vec.end());
 
 	return temp;

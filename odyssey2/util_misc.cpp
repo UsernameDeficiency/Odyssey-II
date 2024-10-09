@@ -9,7 +9,7 @@
 
 
 /* Load chosen cubemap textures. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
-void load_cubemap(std::vector<GLuint> &skybox_tex)
+void load_cubemap(std::vector<GLuint>& skybox_tex)
 {
 	const std::vector<std::string> skybox_paths = {
 		"stormydays", "hw_morning", "sb_frozen", "ame_starfield" };
