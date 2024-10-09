@@ -15,7 +15,7 @@ Camera::Camera()
 }
 
 // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-glm::mat4 Camera::get_view_matrix()
+glm::mat4 Camera::get_view_matrix() const
 {
 	return glm::lookAt(position, position + front, up);
 }
@@ -39,7 +39,7 @@ void Camera::process_keyboard(const std::vector<GLfloat>& terrain, const float w
 	}
 	else if (key_state[GLFW_KEY_C] == GLFW_RELEASE)
 		height = cam_height;
-	
+
 	// Zoom by lowering fov
 	if (key_state[GLFW_KEY_LEFT_CONTROL] == GLFW_PRESS)
 	{

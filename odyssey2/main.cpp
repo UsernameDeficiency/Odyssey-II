@@ -54,7 +54,7 @@ static GLFWwindow* init_gl(Camera& camera)
 	glfwSwapInterval(1); // 1 = Vsync
 
 	// --------- Initialize GLAD ---------
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 		exit_on_error("Failed to initialize GLAD");
 
 	// --------- Initialize OpenGL and callbacks ---------

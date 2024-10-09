@@ -36,7 +36,7 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 		vertex_code = v_shader_stream.str();
 		fragment_code = f_shader_stream.str();
 	}
-	catch (std::ifstream::failure e)
+	catch (const std::ifstream::failure& e)
 	{
 		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
@@ -66,7 +66,7 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 }
 
 // Activate shader
-void Shader::use()
+void Shader::use() const
 {
 	glUseProgram(id);
 }
@@ -136,7 +136,7 @@ void Shader::load_stb_texture_ref(const char* filename, GLuint* texture_ref, boo
 }
 
 // Utility function for checking shader compilation/linking errors.
-void Shader::check_compile_errors(unsigned int shader, std::string type)
+void Shader::check_compile_errors(unsigned int shader, const std::string& type)
 {
 	int success;
 	char info_log[1024];
