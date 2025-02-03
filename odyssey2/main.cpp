@@ -139,9 +139,7 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 			5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f,  5.0f
 	};
 	unsigned int skybox_vbo;
-	glGenVertexArrays(1, &skybox_shader->vao);
 	glGenBuffers(1, &skybox_vbo);
-	glBindVertexArray(skybox_shader->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), &skybox_vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
@@ -167,11 +165,9 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 		0.0f, terrain_struct.sea_y_pos, world_total_size,
 		world_total_size, terrain_struct.sea_y_pos, world_total_size
 	};
-	unsigned int surface_vbo;
-	glGenVertexArrays(1, &water_shader->vao);
-	glBindVertexArray(water_shader->vao);
-	glGenBuffers(1, &surface_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, surface_vbo);
+	unsigned int water_vbo;
+	glGenBuffers(1, &water_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, water_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 2ull * 9ull * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(glGetAttribLocation(water_shader->id, "inPos"));
 	glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);

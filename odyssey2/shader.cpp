@@ -12,6 +12,9 @@
 // Shader utility class, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders
 Shader::Shader(const char* vertex_path, const char* fragment_path)
 {
+	glGenVertexArrays(1, &this->vao);
+	glBindVertexArray(this->vao);
+
 	// Retrieve the vertex/fragment source code from filePath
 	std::string vertex_code;
 	std::string fragment_code;
