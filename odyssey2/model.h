@@ -2,8 +2,7 @@
 #include <vector>
 #include <glad/glad.h>
 
-// TODO: Potentially move Model to its own file
-/* Holds data for terrain model */
+// Data container for terrain model
 struct Model
 {
     // Construct Model with full set of vectors

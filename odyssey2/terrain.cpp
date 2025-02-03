@@ -14,14 +14,14 @@
 // TODO: Move into Terrain?
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 
-
+// Generate terrain and save it into a Model
 Terrain::Terrain(unsigned int world_size, float world_xz_scale)
 {
 	terrain_model = generate_terrain(world_size, world_xz_scale);
 }
 
 
-/* Build Model from generated terrain. */
+// Build Model from generated terrain
 Model* Terrain::generate_terrain(const unsigned int world_size, const float world_xz_scale)
 {
 	const float tex_scale{ 1.0f / 4.0f }; // Scaling of texture coordinates
@@ -53,7 +53,7 @@ Model* Terrain::generate_terrain(const unsigned int world_size, const float worl
 			vertex_array[index * 3 + 1] = y;
 			vertex_array[index * 3 + 2] = z * world_xz_scale;
 
-			/* Scaled texture coordinates. */
+			// Scaled texture coordinates
 			tex_coord_array[index * 2 + 0] = static_cast<float>(x) * tex_scale;
 			tex_coord_array[index * 2 + 1] = static_cast<float>(z) * tex_scale;
 
@@ -108,7 +108,6 @@ Model* Terrain::generate_terrain(const unsigned int world_size, const float worl
 	glGenBuffers(1, &m->nb);
 	glGenBuffers(1, &m->tb);
 
-	// ReloadModelData() functionality below
 	const GLsizeiptr vert_size = m->numVertices * sizeof(GLfloat);
 	glBindVertexArray(m->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
@@ -124,7 +123,7 @@ Model* Terrain::generate_terrain(const unsigned int world_size, const float worl
 }
 
 
-/* mean does filter_size-point moving average filtering of arr. */
+// Do filter_size-point moving average filtering of arr
 void Terrain::mean(std::vector<float>& arr, const unsigned int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
@@ -186,7 +185,7 @@ void Terrain::mean(std::vector<float>& arr, const unsigned int filter_size)
 }
 
 
-/* Do median filtering on arr with filter_size number of elements in each direction. */
+// Do median filtering on arr with filter_size number of elements in each direction
 void Terrain::median(std::vector<float>& arr, const unsigned int filter_size)
 {
 	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
@@ -232,14 +231,14 @@ void Terrain::median(std::vector<float>& arr, const unsigned int filter_size)
 }
 
 
-/* randnum returns a random float number between min and max, attempting to minimize rounding errors. */
+// Return a random float number between min and max, attempting to minimize rounding errors
 static float randnum(const float max, const float min)
 {
 	return (max - min) * static_cast<float>(rand()) / RAND_MAX + min;
 }
 
 
-/* diamondsquare creates a heightmap of size width*width using the diamond square algorithm with base offset weight
+/* Create a heightmap of size width*width using the diamond square algorithm with base offset weight
 	for the random numbers. width must be (2^n)*(2^n) in size for some integer n.*/
 std::vector<float> Terrain::diamondsquare(const unsigned int width)
 {

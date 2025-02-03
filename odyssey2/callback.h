@@ -6,13 +6,13 @@
 // Handle keyboard actions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-// Called on mouse movement
+// Handle mouse movement
 void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);
 
-// Called when the window is resized and updates the projection matrix and viewport size
+// Handle window resize by updating the projection matrix and viewport size
 void fb_size_callback(GLFWwindow* window, int width, int height);
 
-// Called on each glfw error, upon which it displays an error code and description
+// Display an error code and description on GLFW error
 void error_callback(int code, const char* description);
 
 // OpenGL debug callback

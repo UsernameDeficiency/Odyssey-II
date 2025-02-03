@@ -6,21 +6,21 @@
 
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 
-/* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
-	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
+/* Abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL.
+	Based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera */
 Camera::Camera()
 {
 	projection = glm::perspective(glm::radians(cam_fov), static_cast<float>(window_w) / window_h, vp_near, vp_far);
 	update_camera_vectors(); // set front, right, up
 }
 
-// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
+// Return view matrix calculated using Euler Angles and LookAt Matrix
 glm::mat4 Camera::get_view_matrix() const
 {
 	return glm::lookAt(position, position + front, up);
 }
 
-// Processes input received from any keyboard-like input system
+// Process input received from keyboard-like input system
 void Camera::process_keyboard(const std::vector<GLfloat>& terrain, const float world_xz_scale, const double delta_time)
 {
 	float velocity = movement_speed * static_cast<float>(delta_time);
@@ -80,7 +80,7 @@ void Camera::process_keyboard(const std::vector<GLfloat>& terrain, const float w
 		set_pos(terrain, world_xz_scale);
 }
 
-// Processes input received from a mouse input system. Expects the offset value in both the x and y direction
+// Process input received from a mouse input system. Expects the offset value in both the x and y direction.
 void Camera::process_mouse_movement(float x_offset, float y_offset)
 {
 	yaw += x_offset * mouse_sens;
@@ -136,7 +136,7 @@ void Camera::set_pos(const std::vector<GLfloat>& vertex_array, const float world
 		position.y = swim_height;
 }
 
-// Calculates the front vector from the Camera's (updated) Euler Angles
+// Calculate the front vector from Camera's (updated) Euler Angles
 void Camera::update_camera_vectors()
 {
 	// Calculate the new front vector
@@ -146,6 +146,8 @@ void Camera::update_camera_vectors()
 		sin(glm::radians(yaw)) * cos(glm::radians(pitch)) };
 	front = glm::normalize(front_tmp);
 	// Also re-calculate the right and up vector
-	right = glm::normalize(glm::cross(front, world_up)); // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement
+	// Normalize the vectors, because their length gets closer to 0 the more you look up
+	// or down which results in slower movement
+	right = glm::normalize(glm::cross(front, world_up));
 	up = glm::normalize(glm::cross(right, front));
 }

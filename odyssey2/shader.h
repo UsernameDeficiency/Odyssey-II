@@ -4,11 +4,13 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-/* Shader utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com */
+// Shader utility class, based on code by Joey de Vries: https://learnopengl.com
 class Shader
 {
 public:
 	unsigned int id;
+	// TODO: vao is not used by terrain_shader
+	// TODO: Why do Shaders have vaos?
 	unsigned int vao; // Vertex array object ID
 	Shader(const char* vertex_path, const char* fragment_path);
 

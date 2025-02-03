@@ -118,7 +118,7 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 	load_cubemap(skybox_textures); // Load initial skybox
 	skybox_shader->set_int("skyboxTex", 0);
 
-	// Allocate and activate skybox VAO/VBO
+	// Allocate and activate skybox VBO
 	const GLfloat skybox_vertices[]{
 		-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
 			5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
@@ -190,6 +190,7 @@ int main()
 	GLFWwindow* window{ init_gl(camera) };
 
 	std::vector<GLuint> skybox_textures;
+	// TODO: terrain only accesses terrain.terrain_model
 	Terrain terrain{ world_size, world_xz_scale };
 	Shader* terrain_shader, * skybox_shader, * water_shader;
 	Terrain_texture_ids terrain_tex{};
@@ -294,7 +295,7 @@ int main()
 		terrain_shader->set_mat4_f("worldToView", camera.get_view_matrix());
 		terrain_shader->set_mat4_f("projection", camera.projection);
 
-		glBindVertexArray(terrain.terrain_model->vao); // Select VAO
+		glBindVertexArray(terrain.terrain_model->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, terrain.terrain_model->vb);
 
 		glVertexAttribPointer(terr_vert_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);

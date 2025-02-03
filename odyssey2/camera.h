@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
-/* Camera utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera
-	An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL */
+/* Abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL.
+	Based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera */
 class Camera
 {
 public:
@@ -32,7 +32,7 @@ public:
 	const float cam_height{ 64.0f }; // Camera height above ground
 	const float vp_near{ 2.7f }; // Near distance for frustum, lower this if skybox is cut off at screen edges
 	const float vp_far{ 16384.0f }; // Far distance for frustum
-	// Variable camera settings set by actions like running, flying, zooming 
+	// Variable camera settings set by actions like running, flying, zooming
 	float movement_speed{ cam_speed };
 	float mouse_sens{ cam_sensitivity };
 	float height{ cam_height };

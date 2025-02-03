@@ -1,4 +1,3 @@
-/* Shader utility class modified for Odyssey, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders */
 #include <glad/glad.h>
 #include "shader.h"
 #include <glm/vec3.hpp>
@@ -10,9 +9,10 @@
 #include <sstream>
 #include <iostream>
 
+// Shader utility class, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders
 Shader::Shader(const char* vertex_path, const char* fragment_path)
 {
-	// 1. Retrieve the vertex/fragment source code from filePath
+	// Retrieve the vertex/fragment source code from filePath
 	std::string vertex_code;
 	std::string fragment_code;
 	std::ifstream v_shader_file;
@@ -42,7 +42,8 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 	}
 	const char* v_shader_code = vertex_code.c_str();
 	const char* f_shader_code = fragment_code.c_str();
-	// 2. Compile shaders
+
+	// Compile shaders
 	unsigned int vertex, fragment;
 	// Vertex shader
 	vertex = glCreateShader(GL_VERTEX_SHADER);

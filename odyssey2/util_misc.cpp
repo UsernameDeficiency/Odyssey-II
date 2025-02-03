@@ -8,7 +8,7 @@
 #include "stb_image.h"
 
 
-/* Load chosen cubemap textures. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps */
+// Load chosen cubemap textures. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps
 void load_cubemap(std::vector<GLuint>& skybox_tex)
 {
 	const std::vector<std::string> skybox_paths = {
@@ -54,7 +54,7 @@ void load_cubemap(std::vector<GLuint>& skybox_tex)
 }
 
 
-/* Exits the program on unrecoverable error, printing an error string to stderr */
+// Exit the program on unrecoverable error, printing an error string to stderr
 void exit_on_error(const char* error)
 {
 	std::cerr << "Unrecoverable error: " << error << std::endl;

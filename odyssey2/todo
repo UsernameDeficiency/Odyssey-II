@@ -4,7 +4,7 @@ https://learnopengl.com/Advanced-Lighting/Advanced-Lighting Blinn-Phong
 terrain.frag snowBlend should use normal.y or 1 - normal.y depending on texture type (snow/rock)
 Make fog shader separate http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/#creating-the-render-target 
 
-Diamond-square:
+Terrain generation:
 Vary filter strength with altitude?
 Save result to file?
 Make texture repetition less obvious
