@@ -1,14 +1,14 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
-#include <iostream>
 #include "callback.h"
 #include "camera.h"
 #include "io.h"
 #include "shader.h"
 #include "terrain.h"
 #include "util_misc.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <iostream>
 
 // TODO: Remove global variable
 Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
@@ -120,23 +120,23 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 
 	// Allocate and activate skybox VBO
 	const GLfloat skybox_vertices[]{
-		-5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
-			5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
+		-5.0f, 5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
+		5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, -5.0f, 5.0f, -5.0f,
 
-		-5.0f, -5.0f,  5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, -5.0f,
-		-5.0f,  5.0f, -5.0f, -5.0f,  5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
+		-5.0f, -5.0f, 5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f,
+		-5.0f, 5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, -5.0f, 5.0f,
 
-			5.0f, -5.0f, -5.0f, 5.0f, -5.0f,  5.0f, 5.0f,  5.0f,  5.0f,
-			5.0f,  5.0f,  5.0f, 5.0f,  5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
+		5.0f, -5.0f, -5.0f, 5.0f, -5.0f, 5.0f, 5.0f, 5.0f, 5.0f,
+		5.0f, 5.0f, 5.0f, 5.0f, 5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
 
-		-5.0f, -5.0f,  5.0f, -5.0f,  5.0f,  5.0f, 5.0f,  5.0f,  5.0f,
-			5.0f,  5.0f,  5.0f, 5.0f, -5.0f,  5.0f, -5.0f, -5.0f,  5.0f,
+		-5.0f, -5.0f, 5.0f, -5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f,
+		5.0f, 5.0f, 5.0f, 5.0f, -5.0f, 5.0f, -5.0f, -5.0f, 5.0f,
 
-		-5.0f,  5.0f, -5.0f, 5.0f,  5.0f, -5.0f, 5.0f,  5.0f,  5.0f,
-			5.0f,  5.0f,  5.0f, -5.0f,  5.0f,  5.0f, -5.0f,  5.0f, -5.0f,
+		-5.0f, 5.0f, -5.0f, 5.0f, 5.0f, -5.0f, 5.0f, 5.0f, 5.0f,
+		5.0f, 5.0f, 5.0f, -5.0f, 5.0f, 5.0f, -5.0f, 5.0f, -5.0f,
 
-		-5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f, -5.0f,
-			5.0f, -5.0f, -5.0f, -5.0f, -5.0f,  5.0f, 5.0f, -5.0f,  5.0f
+		-5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, -5.0f,
+		5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, 5.0f
 	};
 	unsigned int skybox_vbo;
 	glGenBuffers(1, &skybox_vbo);
@@ -176,7 +176,7 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 int main()
 {
 	std::cout << read_string_from_ini("greeting");
-	
+
 	// Initiate OpenGL and graphics
 	// TODO: Move scaling parameters into terrain generation code
 	const unsigned int world_size{ stoul(read_string_from_ini("world_size", "128u")) };
@@ -188,7 +188,7 @@ int main()
 	std::vector<GLuint> skybox_textures;
 	// TODO: terrain only accesses terrain.terrain_model
 	Terrain terrain{ world_size, world_xz_scale };
-	Shader* terrain_shader, * skybox_shader, * water_shader;
+	Shader *terrain_shader, *skybox_shader, *water_shader;
 	Terrain_texture_ids terrain_tex{};
 	init_graphics(world_size, world_xz_scale, terrain_tex, skybox_textures, terrain_shader, skybox_shader, water_shader);
 
@@ -253,7 +253,7 @@ int main()
 				acc_frames = 0;
 			}
 		}
-		
+
 		// Clear screen and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

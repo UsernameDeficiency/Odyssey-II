@@ -1,6 +1,6 @@
 #include "io.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 // Read value from key from INI-inspired settings file

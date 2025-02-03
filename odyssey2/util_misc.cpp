@@ -1,25 +1,24 @@
 /* Miscellaneous utility functions for the main program */
 #include "util_misc.h"
+#include <glad/glad.h>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <glad/glad.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
 
 // Load chosen cubemap textures. Based on code by Joey de Vries: https://learnopengl.com/Advanced-OpenGL/Cubemaps
 void load_cubemap(std::vector<GLuint>& skybox_tex)
 {
 	const std::vector<std::string> skybox_paths = {
-		"stormydays", "hw_morning", "sb_frozen", "ame_starfield" };
+		"stormydays", "hw_morning", "sb_frozen", "ame_starfield"
+	};
 	skybox_tex.resize(skybox_paths.size());
 
 	for (unsigned int skybox_index{}; skybox_index < skybox_paths.size(); skybox_index++)
 	{
 		const std::string skybox_path = "tex/skybox/" + skybox_paths.at(skybox_index % skybox_paths.size());
-		const std::vector<std::string> faces
-		{
+		const std::vector<std::string> faces{
 			skybox_path + "/front.tga",
 			skybox_path + "/back.tga",
 			skybox_path + "/top.tga",
@@ -52,7 +51,6 @@ void load_cubemap(std::vector<GLuint>& skybox_tex)
 		}
 	}
 }
-
 
 // Exit the program on unrecoverable error, printing an error string to stderr
 void exit_on_error(const char* error)

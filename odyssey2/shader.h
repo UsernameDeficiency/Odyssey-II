@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include <string>
 #include <glad/glad.h>
-#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <string>
 
 // Shader utility class, based on code by Joey de Vries: https://learnopengl.com
 class Shader

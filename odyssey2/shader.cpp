@@ -1,13 +1,13 @@
-#include <glad/glad.h>
 #include "shader.h"
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include "stb_image.h"
-#include <string>
 #include <fstream>
-#include <sstream>
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 // Shader utility class, based on code by Joey de Vries: https://learnopengl.com/Getting-started/Shaders
 Shader::Shader(const char* vertex_path, const char* fragment_path)
@@ -21,8 +21,8 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 	std::ifstream v_shader_file;
 	std::ifstream f_shader_file;
 	// ensure ifstream objects can throw exceptions (failbit checks fail for some reason):
-	v_shader_file.exceptions(std::ifstream::badbit);//| std::ifstream::failbit);
-	f_shader_file.exceptions(std::ifstream::badbit);//| std::ifstream::failbit);
+	v_shader_file.exceptions(std::ifstream::badbit); //| std::ifstream::failbit);
+	f_shader_file.exceptions(std::ifstream::badbit); //| std::ifstream::failbit);
 	try
 	{
 		// Open files
@@ -95,6 +95,7 @@ void Shader::set_vec3(const std::string& name, const glm::vec3& value) const
 {
 	glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
+
 void Shader::set_vec3(const std::string& name, float x, float y, float z) const
 {
 	glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
@@ -121,7 +122,7 @@ void Shader::load_stb_texture_ref(const char* filename, GLuint* texture_ref, boo
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	// Load image, create texture and generate mipmaps
 	int nr_channels;
-	//stbi_set_flip_vertically_on_load(true); // Tell stb_image.h to flip loaded texture y-axis
+	// stbi_set_flip_vertically_on_load(true); // Tell stb_image.h to flip loaded texture y-axis
 	unsigned char* data = stbi_load(filename, &width_temp, &height_temp, &nr_channels, 0);
 	if (data)
 	{
@@ -150,7 +151,8 @@ void Shader::check_compile_errors(unsigned int shader, const std::string& type)
 		if (!success)
 		{
 			glGetShaderInfoLog(shader, 1024, NULL, info_log);
-			std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
+			std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
+					  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
 		}
 	}
 	else
@@ -159,7 +161,8 @@ void Shader::check_compile_errors(unsigned int shader, const std::string& type)
 		if (!success)
 		{
 			glGetProgramInfoLog(shader, 1024, NULL, info_log);
-			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
+			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
+					  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
 		}
 	}
 }

@@ -1,8 +1,8 @@
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -39,21 +39,20 @@ public:
 	bool flying{ false };
 
 	// Keyboard state for controls
-	std::unordered_map<int, int> key_state =
-	{
-		{GLFW_KEY_W, GLFW_RELEASE},
-		{GLFW_KEY_A, GLFW_RELEASE},
-		{GLFW_KEY_S, GLFW_RELEASE},
-		{GLFW_KEY_D, GLFW_RELEASE},
-		{GLFW_KEY_Q, GLFW_RELEASE},
-		{GLFW_KEY_E, GLFW_RELEASE},
-		{GLFW_KEY_C, GLFW_RELEASE},
-		{GLFW_KEY_F, GLFW_RELEASE},
-		{GLFW_KEY_LEFT_SHIFT, GLFW_RELEASE},
-		{GLFW_KEY_LEFT_CONTROL, GLFW_RELEASE},
-		{GLFW_KEY_F1, GLFW_RELEASE},
-		{GLFW_KEY_F2, GLFW_RELEASE},
-		{GLFW_KEY_F3, GLFW_RELEASE}
+	std::unordered_map<int, int> key_state = {
+		{ GLFW_KEY_W, GLFW_RELEASE },
+		{ GLFW_KEY_A, GLFW_RELEASE },
+		{ GLFW_KEY_S, GLFW_RELEASE },
+		{ GLFW_KEY_D, GLFW_RELEASE },
+		{ GLFW_KEY_Q, GLFW_RELEASE },
+		{ GLFW_KEY_E, GLFW_RELEASE },
+		{ GLFW_KEY_C, GLFW_RELEASE },
+		{ GLFW_KEY_F, GLFW_RELEASE },
+		{ GLFW_KEY_LEFT_SHIFT, GLFW_RELEASE },
+		{ GLFW_KEY_LEFT_CONTROL, GLFW_RELEASE },
+		{ GLFW_KEY_F1, GLFW_RELEASE },
+		{ GLFW_KEY_F2, GLFW_RELEASE },
+		{ GLFW_KEY_F3, GLFW_RELEASE }
 	};
 
 	Camera();

@@ -1,8 +1,8 @@
-#include <glad/glad.h>
 #include "camera.h"
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "util_misc.h" // Terrain_heights
+#include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/mat4x4.hpp>
 
 extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
 
@@ -143,7 +143,8 @@ void Camera::update_camera_vectors()
 	glm::vec3 front_tmp{
 		cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
 		sin(glm::radians(pitch)),
-		sin(glm::radians(yaw)) * cos(glm::radians(pitch)) };
+		sin(glm::radians(yaw)) * cos(glm::radians(pitch))
+	};
 	front = glm::normalize(front_tmp);
 	// Also re-calculate the right and up vector
 	// Normalize the vectors, because their length gets closer to 0 the more you look up

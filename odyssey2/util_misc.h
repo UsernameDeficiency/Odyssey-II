@@ -1,8 +1,8 @@
 /* Miscellaneous utility functions for the main program */
 #pragma once
-#include <vector>
 #include <cfloat>
 #include <glad/glad.h>
+#include <vector>
 
 // TODO: Potentially move Terrain_heights to terrain.h
 struct Terrain_heights
