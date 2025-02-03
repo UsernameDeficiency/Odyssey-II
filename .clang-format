@@ -1,0 +1,20 @@
+# ClangFormat settings based on the clang Visual Studio style. https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+{ 
+    BasedOnStyle: LLVM,
+    AccessModifierOffset: -4,
+    AlignAfterOpenBracket: DontAlign,
+    AlignTrailingComments: Never,
+    AllowShortIfStatementsOnASingleLine: false,
+    BreakBeforeBraces: Allman,
+    ColumnLimit: 0,
+    Cpp11BracedListStyle: False,
+    IndentCaseLabels: false,
+    AllowShortCaseLabelsOnASingleLine: true,
+    IndentWidth: 4,
+    NamespaceIndentation: All,
+    PointerAlignment: Left,
+    SeparateDefinitionBlocks: Always,
+    SortIncludes: CaseInsensitive, # Ensure GLFW is sorted after glad
+    TabWidth: 4,
+    UseTab: ForContinuationAndIndentation,
+}
