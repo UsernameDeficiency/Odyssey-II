@@ -20,17 +20,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Handle mouse movement
 void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	static double mouse_last_x = xpos;
+	static double mouse_last_y = ypos;
+
+	const double x_offset = xpos - mouse_last_x;
+	const double y_offset = mouse_last_y - ypos; // reversed since y-coordinates go from bottom to top
+
+	mouse_last_x = xpos;
+	mouse_last_y = ypos;
+
 	Camera& camera = *static_cast<Camera*>(glfwGetWindowUserPointer(window));
-
-	static float mouse_last_x = 0.0f;
-	static float mouse_last_y = camera.window_h / 2.0f;
-
-	float x_offset = static_cast<float>(xpos) - mouse_last_x;
-	float y_offset = mouse_last_y - static_cast<float>(ypos); // reversed since y-coordinates go from bottom to top
-
-	mouse_last_x = static_cast<float>(xpos);
-	mouse_last_y = static_cast<float>(ypos);
-
 	camera.process_mouse_movement(x_offset, y_offset);
 }
 
