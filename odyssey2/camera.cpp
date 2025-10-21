@@ -1,16 +1,13 @@
 #include "camera.h"
-#include "util_misc.h" // Terrain_heights
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 
-extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-
 /* Abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL.
 	Based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera */
-Camera::Camera()
+Camera::Camera(const float sea_height) : swim_height(sea_height + cam_height / 3)
 {
-	projection = glm::perspective(glm::radians(cam_fov), static_cast<float>(window_w) / window_h, vp_near, vp_far);
+	projection = glm::perspective(glm::radians(cam_fov), aspect_ratio, vp_near, vp_far);
 	update_camera_vectors(); // set front, right, up
 }
 
@@ -43,13 +40,13 @@ void Camera::process_keyboard(const std::vector<GLfloat>& terrain, const float w
 	// Zoom by lowering fov
 	if (key_state[GLFW_KEY_LEFT_CONTROL] == GLFW_PRESS)
 	{
-		projection = glm::perspective(glm::radians(cam_fov / 4), static_cast<float>(window_w) / window_h, vp_near, 1.5f * vp_far);
+		projection = glm::perspective(glm::radians(cam_fov / 4), aspect_ratio, vp_near, 1.5f * vp_far);
 		mouse_sens = cam_sensitivity / 3.0f;
 		key_state[GLFW_KEY_C] = GLFW_REPEAT;
 	}
 	else if (key_state[GLFW_KEY_LEFT_CONTROL] == GLFW_RELEASE)
 	{
-		projection = glm::perspective(glm::radians(cam_fov), static_cast<float>(window_w) / window_h, vp_near, vp_far);
+		projection = glm::perspective(glm::radians(cam_fov), aspect_ratio, vp_near, vp_far);
 		mouse_sens = cam_sensitivity;
 	}
 
@@ -81,7 +78,7 @@ void Camera::process_keyboard(const std::vector<GLfloat>& terrain, const float w
 }
 
 // Process input received from a mouse input system. Expects the offset value in both the x and y direction.
-void Camera::process_mouse_movement(float x_offset, float y_offset)
+void Camera::process_mouse_movement(const float x_offset, const float y_offset)
 {
 	yaw += x_offset * mouse_sens;
 	pitch += y_offset * mouse_sens;
@@ -129,7 +126,6 @@ void Camera::set_pos(const std::vector<GLfloat>& vertex_array, const float world
 	const float y_pos = y1 + x_pos * (y2 - y1) + z_pos * (y3 - y1) + height;
 
 	// Make sure player does not drown
-	const float swim_height = terrain_struct.sea_y_pos + height / 3;
 	if (y_pos > swim_height)
 		position.y = y_pos;
 	else

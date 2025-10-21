@@ -10,9 +10,6 @@
 #include <glm/vec3.hpp>
 #include <iostream>
 
-// TODO: Remove global variable
-Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-
 struct Terrain_texture_ids
 {
 	GLuint snow_tex, grass_tex, rock_tex, bottom_tex;
@@ -20,7 +17,7 @@ struct Terrain_texture_ids
 
 // Initialize openGL, GLAD and GLFW
 // TODO: Move debug_context, MSAA samples and maybe more to settings.ini
-static GLFWwindow* init_gl(Camera& camera)
+static GLFWwindow* init_gl()
 {
 	// Enable/disable debugging context and prints
 	constexpr bool debug_context{ false };
@@ -47,7 +44,9 @@ static GLFWwindow* init_gl(Camera& camera)
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
 
-	GLFWwindow* window = glfwCreateWindow(camera.window_w, camera.window_h, "Odyssey II", NULL, NULL);
+	unsigned requested_window_w{ stoul(read_string_from_ini("window_w", "1280")) };
+	unsigned requested_window_h{ stoul(read_string_from_ini("window_h", "720")) };
+	GLFWwindow* window = glfwCreateWindow(requested_window_w, requested_window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
 	glfwMakeContextCurrent(window);
@@ -73,7 +72,6 @@ static GLFWwindow* init_gl(Camera& camera)
 	}
 
 	// Callback functions
-	glfwSetWindowUserPointer(window, &camera); // Give callbacks access to camera
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetFramebufferSizeCallback(window, fb_size_callback);
 	glfwSetCursorPosCallback(window, cursor_pos_callback);
@@ -83,8 +81,8 @@ static GLFWwindow* init_gl(Camera& camera)
 
 // Set up terrain, skybox and water shaders
 // TODO: Move fog_color and textures to settings.ini
-static void init_graphics(const unsigned int world_size, const float world_xz_scale, Terrain_texture_ids& terrain_tex_ids,
-	std::vector<GLuint>& skybox_textures, Shader*& terrain_shader, Shader*& skybox_shader, Shader*& water_shader)
+static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
+	std::vector<GLuint>& skybox_textures, Shader*& skybox_shader, Shader*& terrain_shader, Shader*& water_shader, const Terrain& terrain)
 {
 	const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
 
@@ -103,12 +101,11 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 	terrain_shader->set_vec3("fogColor", fog_color);
 
 	// Set multitexturing height limits
-	const float terrain_height{ terrain_struct.max_height - terrain_struct.min_height };
-	terrain_struct.sea_y_pos = terrain_struct.min_height + terrain_height / 3;
-	terrain_shader->set_float("minHeight", terrain_struct.min_height);
-	terrain_shader->set_float("maxHeight", terrain_struct.max_height);
-	terrain_shader->set_float("seaHeight", terrain_struct.sea_y_pos);
-	terrain_shader->set_float("snowHeight", terrain_struct.max_height - terrain_height / 3);
+	const float terrain_height{ terrain.max_height - terrain.min_height };
+	terrain_shader->set_float("minHeight", terrain.min_height);
+	terrain_shader->set_float("maxHeight", terrain.max_height);
+	terrain_shader->set_float("seaHeight", terrain.sea_height);
+	terrain_shader->set_float("snowHeight", terrain.max_height - terrain_height / 3);
 
 	// Initialize skybox cubemap and vertices
 	skybox_shader = new Shader("shader/skybox.vert", "shader/skybox.frag");
@@ -146,7 +143,7 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
 	// Initialize water surface
-	const float world_total_size = world_xz_scale * (world_size - 1);
+	const float world_total_size = terrain.world_xz_scale * (terrain.world_size - 1);
 	water_shader = new Shader("shader/water.vert", "shader/water.frag");
 	water_shader->use();
 	water_shader->set_bool("drawFog", false);
@@ -157,13 +154,13 @@ static void init_graphics(const unsigned int world_size, const float world_xz_sc
 	// Allocate and activate VAO/VBO
 	const GLfloat water_surface_vert[]{
 		// Triangle 1
-		0.0f, terrain_struct.sea_y_pos, 0.0f,
-		0.0f, terrain_struct.sea_y_pos, world_total_size,
-		world_total_size, terrain_struct.sea_y_pos, 0.0f,
+		0.0f, terrain.sea_height, 0.0f,
+		0.0f, terrain.sea_height, world_total_size,
+		world_total_size, terrain.sea_height, 0.0f,
 		// Triangle 2
-		world_total_size, terrain_struct.sea_y_pos, 0.0f,
-		0.0f, terrain_struct.sea_y_pos, world_total_size,
-		world_total_size, terrain_struct.sea_y_pos, world_total_size
+		world_total_size, terrain.sea_height, 0.0f,
+		0.0f, terrain.sea_height, world_total_size,
+		world_total_size, terrain.sea_height, world_total_size
 	};
 	unsigned int water_vbo;
 	glGenBuffers(1, &water_vbo);
@@ -178,19 +175,26 @@ int main()
 	std::cout << read_string_from_ini("greeting");
 
 	// Initiate OpenGL and graphics
-	// TODO: Move scaling parameters into terrain generation code
+	GLFWwindow* window{ init_gl() };
+
+	// Generate terrain
 	const unsigned int world_size{ stoul(read_string_from_ini("world_size", "128u")) };
 	const float world_xz_scale{ stof(read_string_from_ini("world_xz_scale", "32.0f")) };
-	Camera camera{};
-	camera.position = glm::vec3(world_size * world_xz_scale / 2, 0.0f, world_size * world_xz_scale / 2);
-	GLFWwindow* window{ init_gl(camera) };
+	const Terrain terrain{ world_size, world_xz_scale };
 
-	std::vector<GLuint> skybox_textures;
-	// TODO: terrain only accesses terrain.terrain_model
-	Terrain terrain{ world_size, world_xz_scale };
-	Shader *terrain_shader, *skybox_shader, *water_shader;
+	Shader *skybox_shader, *terrain_shader, *water_shader;
 	Terrain_texture_ids terrain_tex{};
-	init_graphics(world_size, world_xz_scale, terrain_tex, skybox_textures, terrain_shader, skybox_shader, water_shader);
+	std::vector<GLuint> skybox_textures;
+	init_graphics(terrain_tex, skybox_textures, skybox_shader, terrain_shader, water_shader, terrain);
+
+	// Initialize player camera
+	Camera camera(terrain.sea_height);
+	glfwSetWindowUserPointer(window, &camera); // Give callbacks access to camera
+	int window_w{}, window_h{};
+	glfwGetWindowSize(window, &window_w, &window_h);
+	camera.aspect_ratio = static_cast<float>(window_w) / window_h; // Can be set after window initialization
+	const float initial_xz_pos = terrain.world_size * terrain.world_xz_scale / 2.0f;
+	camera.position = glm::vec3(initial_xz_pos, terrain.max_height, initial_xz_pos);
 
 	// Give GLFW mouse pointer control and show window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -212,7 +216,7 @@ int main()
 		double current_time{ glfwGetTime() };
 		double delta_time{ current_time - last_time };
 		last_time = current_time;
-		camera.process_keyboard(terrain.terrain_model->vertexArray, world_xz_scale, delta_time); // Update player state
+		camera.process_keyboard(terrain.terrain_model->vertexArray, terrain.world_xz_scale, delta_time); // Update player state
 		// Toggle fog
 		if (camera.key_state[GLFW_KEY_F1] == GLFW_PRESS)
 		{

@@ -4,14 +4,6 @@
 #include <glad/glad.h>
 #include <vector>
 
-// TODO: Potentially move Terrain_heights to terrain.h
-struct Terrain_heights
-{
-	float min_height{ FLT_MAX };
-	float max_height{ -FLT_MAX };
-	float sea_y_pos{};
-};
-
 // Load chosen cubemap textures
 void load_cubemap(std::vector<GLuint>& skybox_tex);
 

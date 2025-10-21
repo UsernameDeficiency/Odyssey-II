@@ -21,9 +21,9 @@ public:
 	// Euler Angles
 	float yaw{ 0.0f };
 	float pitch{ 0.0f };
-	// Default camera values
-	int window_w{ 1920 };
-	int window_h{ 1080 };
+	// Aspect ratio for projection matrix
+	// Should be updated using actual window size after window is created or resized
+	float aspect_ratio{ 16.0f / 9.0f };
 	// Camera options
 	// Initial camera settings
 	const float cam_speed{ 120.0f };
@@ -36,6 +36,8 @@ public:
 	float movement_speed{ cam_speed };
 	float mouse_sens{ cam_sensitivity };
 	float height{ cam_height };
+	// Minimum height, keeps camera above water level
+	const float swim_height;
 	bool flying{ false };
 
 	// Keyboard state for controls
@@ -55,7 +57,7 @@ public:
 		{ GLFW_KEY_F3, GLFW_RELEASE }
 	};
 
-	Camera();
+	Camera(const float sea_height);
 
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 	glm::mat4 get_view_matrix() const;
@@ -64,7 +66,7 @@ public:
 	void process_keyboard(const std::vector<GLfloat>& terrain, const float world_xz_scale, const double delta_time);
 
 	// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-	void process_mouse_movement(float x_offset, float y_offset);
+	void process_mouse_movement(const float x_offset, const float y_offset);
 
 private:
 	// Interpolate height over the vertex at position (x, z)

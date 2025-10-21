@@ -3,24 +3,23 @@
 #include "glm/vec3.hpp"
 #include "io.h"
 #include "model.h"
-#include "util_misc.h"
 #include <algorithm>
 #include <cmath>
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <vector>
 
-// TODO: Move into Terrain?
-extern struct Terrain_heights terrain_struct; // Used by generate_terrain to set heights for water and snow
-
 // Generate terrain and save it into a Model
-Terrain::Terrain(unsigned int world_size, float world_xz_scale)
+Terrain::Terrain(const unsigned int world_size, const float world_xz_scale) : world_size(world_size), world_xz_scale(world_xz_scale)
 {
-	terrain_model = generate_terrain(world_size, world_xz_scale);
+	terrain_model = generate_terrain();
+	const float terrain_height = max_height - min_height;
+	sea_height = min_height + terrain_height / 3;
 }
 
 // Build Model from generated terrain
-Model* Terrain::generate_terrain(const unsigned int world_size, const float world_xz_scale)
+// TODO: Move into constructor
+Model* Terrain::generate_terrain()
 {
 	const float tex_scale{ 1.0f / 4.0f }; // Scaling of texture coordinates
 
@@ -44,10 +43,8 @@ Model* Terrain::generate_terrain(const unsigned int world_size, const float worl
 		{
 			size_t index = x + z * static_cast<size_t>(world_size);
 			float y = proc_terrain[index];
-			if (y < terrain_struct.min_height)
-				terrain_struct.min_height = y;
-			if (y > terrain_struct.max_height)
-				terrain_struct.max_height = y;
+			min_height = std::min(min_height, y);
+			max_height = std::max(max_height, y);
 
 			vertex_array[index * 3] = x * world_xz_scale;
 			vertex_array[index * 3 + 1] = y;
