@@ -20,45 +20,54 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 	std::string fragment_code;
 	std::ifstream v_shader_file;
 	std::ifstream f_shader_file;
-	// ensure ifstream objects can throw exceptions (failbit checks fail for some reason):
-	v_shader_file.exceptions(std::ifstream::badbit); //| std::ifstream::failbit);
-	f_shader_file.exceptions(std::ifstream::badbit); //| std::ifstream::failbit);
+	// ensure ifstream objects can throw exceptions for below catch clauses
+	// failbit checks supposedly failed previously, might want to test this more
+	v_shader_file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+	f_shader_file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+
 	try
 	{
-		// Open files
 		v_shader_file.open(vertex_path);
-		f_shader_file.open(fragment_path);
-		std::stringstream v_shader_stream, f_shader_stream;
-		// Read file's buffer contents into streams
+		std::stringstream v_shader_stream;
 		v_shader_stream << v_shader_file.rdbuf();
-		f_shader_stream << f_shader_file.rdbuf();
-		// Close file handlers
 		v_shader_file.close();
-		f_shader_file.close();
-		// Convert stream into string
 		vertex_code = v_shader_stream.str();
+	}
+	catch (const std::ifstream::failure& e)
+	{
+		std::cerr << "Failed to open shader " << vertex_path << ": " << e.what() << std::endl;
+		// TODO: Throw an exception or set a fail flag here to indicate shader loading failure
+		return;
+	}
+
+	try
+	{
+		f_shader_file.open(fragment_path);
+		std::stringstream f_shader_stream;
+		f_shader_stream << f_shader_file.rdbuf();
+		f_shader_file.close();
 		fragment_code = f_shader_stream.str();
 	}
 	catch (const std::ifstream::failure& e)
 	{
-		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		std::cerr << "Failed to open shader " << fragment_path << ": " << e.what() << std::endl;
+		return;
 	}
-	const char* v_shader_code = vertex_code.c_str();
-	const char* f_shader_code = fragment_code.c_str();
 
 	// Compile shaders
-	unsigned int vertex, fragment;
 	// Vertex shader
-	vertex = glCreateShader(GL_VERTEX_SHADER);
+	unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
+	const char* v_shader_code = vertex_code.c_str();
 	glShaderSource(vertex, 1, &v_shader_code, NULL);
 	glCompileShader(vertex);
 	check_compile_errors(vertex, "VERTEX");
-	// Fragment Shader
-	fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	// Fragment shader
+	unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	const char* f_shader_code = fragment_code.c_str();
 	glShaderSource(fragment, 1, &f_shader_code, NULL);
 	glCompileShader(fragment);
 	check_compile_errors(fragment, "FRAGMENT");
-	// Shader Program
+	// Shader program
 	id = glCreateProgram();
 	glAttachShader(id, vertex);
 	glAttachShader(id, fragment);
@@ -151,7 +160,7 @@ void Shader::check_compile_errors(unsigned int shader, const std::string& type)
 		if (!success)
 		{
 			glGetShaderInfoLog(shader, 1024, NULL, info_log);
-			std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
+			std::cerr << "SHADER_COMPILATION_ERROR of type: " << type << "\n"
 					  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
 		}
 	}
@@ -161,7 +170,7 @@ void Shader::check_compile_errors(unsigned int shader, const std::string& type)
 		if (!success)
 		{
 			glGetProgramInfoLog(shader, 1024, NULL, info_log);
-			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
+			std::cerr << "PROGRAM_LINKING_ERROR of type: " << type << "\n"
 					  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
 		}
 	}
