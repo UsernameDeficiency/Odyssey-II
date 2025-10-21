@@ -238,6 +238,8 @@ int main()
 
 			extra_waves = !extra_waves;
 			water_shader->use();
+			// TODO: Would it be more performant to switch shaders here based on
+			// extra_waves instead of checking a boolean inside the shader?
 			water_shader->set_bool("extraWaves", extra_waves);
 			camera.key_state[GLFW_KEY_F2] = GLFW_REPEAT;
 		}

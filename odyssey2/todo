@@ -7,7 +7,7 @@ Make fog shader separate http://www.opengl-tutorial.org/intermediate-tutorials/t
 Terrain generation:
 Vary filter strength with altitude?
 Save result to file?
-Make texture repetition less obvious
+Make texture repetition less obvious. Detail map with randomness spanning several repetitions?
 
 Optimization: 
 Don't draw vertices outside frustum
@@ -15,9 +15,17 @@ Potentially optimize generate_terrain array sizes (store only y coordinates?)
 
 Move input code out of Camera class
 Potentially move VAO ID from Shader to Model
-Potentially move program settings into init file
 
 Add jumping
 
 Fix window resize under Ubuntu 23.04. Resizing the window currently forces the window into minimum size, full screen button does nothing.
 
+Set light direction and intensity based on skybox (scene)
+
+Reflect terrain in water (second pass that draws over skybox reflection?)
+
+Check if performance has changed after latest changes
+
+Should terrain_shader be split into one shader for each terrain type? That would remove need for if statements in the shader
+
+Why is there a skybox model floating outside the terrain? Visible if "real" skybox rendering is disabled.
