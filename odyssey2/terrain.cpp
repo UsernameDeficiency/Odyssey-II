@@ -249,8 +249,8 @@ static float randnum(const float max, const float min)
 	for the random numbers. width must be (2^n)*(2^n) in size for some integer n.*/
 std::vector<float> Terrain::diamondsquare(const unsigned int width)
 {
-	float weight{ stof(read_string_from_ini("weight", "2000.0f")) }; // Base weight for randomized values in diamond-square algorithm
-	const unsigned int seed{ stoul(read_string_from_ini("seed", "64")) };
+	float weight{ read_value_from_ini("weight", 2000.0f) }; // Base weight for randomized values in diamond-square algorithm
+	const unsigned int seed{ read_value_from_ini("seed", 64u) };
 	srand(seed);
 	std::vector<std::vector<float>> terrain{ (size_t)width, std::vector<float>((size_t)width) };
 

@@ -44,8 +44,8 @@ static GLFWwindow* init_gl()
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
 
-	unsigned requested_window_w{ stoul(read_string_from_ini("window_w", "1280")) };
-	unsigned requested_window_h{ stoul(read_string_from_ini("window_h", "720")) };
+	unsigned requested_window_w{ read_value_from_ini("window_w", 1280u) };
+	unsigned requested_window_h{ read_value_from_ini("window_h", 720u) };
 	GLFWwindow* window = glfwCreateWindow(requested_window_w, requested_window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
@@ -172,14 +172,14 @@ static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 
 int main()
 {
-	std::cout << read_string_from_ini("greeting");
+	std::cout << read_value_from_ini<std::string>("greeting", "");
 
 	// Initiate OpenGL and graphics
 	GLFWwindow* window{ init_gl() };
 
 	// Generate terrain
-	const unsigned int world_size{ stoul(read_string_from_ini("world_size", "128u")) };
-	const float world_xz_scale{ stof(read_string_from_ini("world_xz_scale", "32.0f")) };
+	const unsigned int world_size{ read_value_from_ini("world_size", 128u) };
+	const float world_xz_scale{ read_value_from_ini("world_xz_scale", 32.0f) };
 	const Terrain terrain{ world_size, world_xz_scale };
 
 	Shader *skybox_shader, *terrain_shader, *water_shader;
