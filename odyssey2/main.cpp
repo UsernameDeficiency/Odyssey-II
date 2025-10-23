@@ -2,13 +2,22 @@
 #include "camera.h"
 #include "io.h"
 #include "shader.h"
+#include "skybox.h"
 #include "terrain.h"
-#include "util_misc.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+// Exit the program on unrecoverable error, printing an error string to stderr
+static void exit_on_error(const char* error)
+{
+	std::cerr << "Unrecoverable error: " << error << std::endl;
+	exit(EXIT_FAILURE);
+}
 
 struct Terrain_texture_ids
 {
@@ -82,10 +91,8 @@ static GLFWwindow* init_gl()
 // Set up terrain, skybox and water shaders
 // TODO: Move fog_color and textures to settings.ini
 static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
-	std::vector<GLuint>& skybox_textures, Shader*& skybox_shader, Shader*& terrain_shader, Shader*& water_shader, const Terrain& terrain)
+	Shader*& terrain_shader, Shader*& water_shader, const Terrain& terrain, const glm::vec3& fog_color)
 {
-	const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
-
 	// Load terrain textures and upload to texture units
 	terrain_shader = new Shader("shader/terrain.vert", "shader/terrain.frag");
 	terrain_shader->use();
@@ -106,41 +113,6 @@ static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 	terrain_shader->set_float("maxHeight", terrain.max_height);
 	terrain_shader->set_float("seaHeight", terrain.sea_height);
 	terrain_shader->set_float("snowHeight", terrain.max_height - terrain_height / 3);
-
-	// Initialize skybox cubemap and vertices
-	skybox_shader = new Shader("shader/skybox.vert", "shader/skybox.frag");
-	skybox_shader->use();
-	skybox_shader->set_bool("drawFog", false);
-	skybox_shader->set_vec3("fogColor", fog_color);
-	load_cubemap(skybox_textures); // Load initial skybox
-	skybox_shader->set_int("skyboxTex", 0);
-
-	// Allocate and activate skybox VBO
-	const GLfloat skybox_vertices[]{
-		-5.0f, 5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
-		5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, -5.0f, 5.0f, -5.0f,
-
-		-5.0f, -5.0f, 5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f,
-		-5.0f, 5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, -5.0f, 5.0f,
-
-		5.0f, -5.0f, -5.0f, 5.0f, -5.0f, 5.0f, 5.0f, 5.0f, 5.0f,
-		5.0f, 5.0f, 5.0f, 5.0f, 5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
-
-		-5.0f, -5.0f, 5.0f, -5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f,
-		5.0f, 5.0f, 5.0f, 5.0f, -5.0f, 5.0f, -5.0f, -5.0f, 5.0f,
-
-		-5.0f, 5.0f, -5.0f, 5.0f, 5.0f, -5.0f, 5.0f, 5.0f, 5.0f,
-		5.0f, 5.0f, 5.0f, -5.0f, 5.0f, 5.0f, -5.0f, 5.0f, -5.0f,
-
-		-5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, -5.0f,
-		5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, 5.0f
-	};
-	unsigned int skybox_vbo;
-	glGenBuffers(1, &skybox_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), &skybox_vertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
 	// Initialize water surface
 	const float world_total_size = terrain.world_xz_scale * (terrain.world_size - 1);
@@ -182,10 +154,11 @@ int main()
 	const float world_xz_scale{ read_value_from_ini("world_xz_scale", 32.0f) };
 	const Terrain terrain{ world_size, world_xz_scale };
 
-	Shader *skybox_shader, *terrain_shader, *water_shader;
+	Shader *terrain_shader, *water_shader;
 	Terrain_texture_ids terrain_tex{};
-	std::vector<GLuint> skybox_textures;
-	init_graphics(terrain_tex, skybox_textures, skybox_shader, terrain_shader, water_shader, terrain);
+	const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
+	Skybox skybox{ fog_color };
+	init_graphics(terrain_tex, terrain_shader, water_shader, terrain, fog_color);
 
 	// Initialize player camera
 	Camera camera(terrain.sea_height);
@@ -225,8 +198,7 @@ int main()
 			draw_fog = !draw_fog;
 			terrain_shader->use();
 			terrain_shader->set_bool("drawFog", draw_fog);
-			skybox_shader->use();
-			skybox_shader->set_bool("drawFog", draw_fog);
+			skybox.set_fog(draw_fog);
 			water_shader->use();
 			water_shader->set_bool("drawFog", draw_fog);
 			camera.key_state[GLFW_KEY_F1] = GLFW_REPEAT;
@@ -264,24 +236,14 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// --------- Draw skybox ---------
-		glDepthMask(GL_FALSE); // Disable depth writes
-		skybox_shader->use();
-		glBindVertexArray(skybox_shader->vao);
-		glActiveTexture(GL_TEXTURE0);
 		// Change skybox texture
 		if (camera.key_state[GLFW_KEY_F3] == GLFW_PRESS)
 		{
-			skybox_index = ++skybox_index % skybox_textures.size();
+			skybox.change_active_texture_set();
+			// Don't change texture until button is released and pressed again
 			camera.key_state[GLFW_KEY_F3] = GLFW_REPEAT;
 		}
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_textures[skybox_index]);
-
-		glm::mat4 world_to_view{ glm::mat4(glm::mat3(camera.get_view_matrix())) }; // Remove translation from the view matrix
-		skybox_shader->set_mat4_f("worldToView", world_to_view);
-		skybox_shader->set_mat4_f("projection", camera.projection);
-
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glDepthMask(GL_TRUE);
+		skybox.draw(camera.get_view_matrix(), camera.projection);
 
 		// --------- Draw terrain ---------
 		terrain_shader->use();

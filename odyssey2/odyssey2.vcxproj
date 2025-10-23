@@ -21,19 +21,19 @@
   <ItemGroup>
     <ClCompile Include="dependencies\glad\src\glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="skybox.cpp" />
     <ClCompile Include="terrain.cpp" />
     <ClCompile Include="callback.cpp" />
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="util_misc.cpp" />
     <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="io.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="skybox.h" />
     <ClInclude Include="terrain.h" />
     <ClInclude Include="callback.h" />
     <ClInclude Include="camera.h" />
-    <ClInclude Include="util_misc.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
   <ItemGroup>
