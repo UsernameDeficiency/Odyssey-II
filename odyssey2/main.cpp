@@ -25,11 +25,10 @@ struct Terrain_texture_ids
 };
 
 // Initialize openGL, GLAD and GLFW
-// TODO: Move debug_context, MSAA samples and maybe more to settings.ini
 static GLFWwindow* init_gl()
 {
 	// Enable/disable debugging context and prints
-	constexpr bool debug_context{ false };
+	const bool debug_context{ read_value_from_ini("debug_context", false) };
 
 	// --------- Initialize GLFW ---------
 	if (!glfwInit())
@@ -37,7 +36,7 @@ static GLFWwindow* init_gl()
 
 	// Create GLFW window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	if constexpr (debug_context)
+	if (debug_context)
 	{
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // GL_DEBUG_OUTPUT support
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -49,7 +48,9 @@ static GLFWwindow* init_gl()
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 	}
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 2); // MSAA samples
+	// Anti aliasing
+	const unsigned int msaa_samples{ read_value_from_ini("msaa_samples", 2u) };
+	glfwWindowHint(GLFW_SAMPLES, msaa_samples);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
 
@@ -59,7 +60,7 @@ static GLFWwindow* init_gl()
 	if (!window)
 		exit_on_error("GLFW window creation failed");
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1); // 1 = Vsync
+	glfwSwapInterval(read_value_from_ini("vsync_frames", 1));
 
 	// --------- Initialize GLAD ---------
 	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
@@ -68,11 +69,12 @@ static GLFWwindow* init_gl()
 	// --------- Initialize OpenGL and callbacks ---------
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_MULTISAMPLE); // Enable MSAA
+	if (msaa_samples > 0u)
+		glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND); // Enable transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// OpenGL debugging
-	if constexpr (debug_context)
+	if (debug_context)
 	{
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
