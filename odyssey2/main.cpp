@@ -90,6 +90,7 @@ static GLFWwindow* init_gl()
 
 // Set up terrain, skybox and water shaders
 // TODO: Move fog_color and textures to settings.ini
+// TODO: Make use of all the included textures. Blending between textures? Maybe different texture sets for different regions?
 static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 	Shader*& terrain_shader, Shader*& water_shader, const Terrain& terrain, const glm::vec3& fog_color)
 {
@@ -150,6 +151,7 @@ int main()
 	GLFWwindow* window{ init_gl() };
 
 	// Generate terrain
+	// TODO: Don't fail if world_size is not a power of two. Fallback to nearest power of two?
 	const unsigned int world_size{ read_value_from_ini("world_size", 128u) };
 	const float world_xz_scale{ read_value_from_ini("world_xz_scale", 32.0f) };
 	const Terrain terrain{ world_size, world_xz_scale };

@@ -43,6 +43,7 @@
     <None Include="shader\terrain.vert" />
     <None Include="shader\water.frag" />
     <None Include="shader\water.vert" />
+    <None Include="todo" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

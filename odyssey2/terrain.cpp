@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cmath>
 #include <glm/gtc/type_ptr.hpp>
-#include <string>
 #include <vector>
 
 // Generate terrain and save it into a Model
@@ -46,7 +45,7 @@ Model* Terrain::generate_terrain()
 			min_height = std::min(min_height, y);
 			max_height = std::max(max_height, y);
 
-			vertex_array[index * 3] = x * world_xz_scale;
+			vertex_array[index * 3 + 0] = x * world_xz_scale;
 			vertex_array[index * 3 + 1] = y;
 			vertex_array[index * 3 + 2] = z * world_xz_scale;
 
@@ -58,7 +57,7 @@ Model* Terrain::generate_terrain()
 			{
 				index = (x + z * static_cast<size_t>(world_size - 1)) * 6;
 				// Triangle 1
-				index_array[index] = x + z * world_size;
+				index_array[index + 0] = x + z * world_size;
 				index_array[index + 1] = x + (z + 1) * world_size;
 				index_array[index + 2] = x + 1 + z * world_size;
 				// Triangle 2

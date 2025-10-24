@@ -1,7 +1,6 @@
 /* Code for terrain generation and filtering */
 #pragma once
 #include "model.h"
-#include <string>
 #include <vector>
 
 // Generate terrain and save it into a Model
@@ -35,7 +34,6 @@ private:
 	static void mean(std::vector<float>& arr, const unsigned int filter_size);
 
 	// Do median filtering on arr with filter_size number of elements in each direction
-	// TODO: Terrain::median is unused
 	static void median(std::vector<float>& arr, const unsigned int filter_size);
 
 	/* Create a heightmap of size width*width using the diamond square algorithm with

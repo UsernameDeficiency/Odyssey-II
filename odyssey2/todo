@@ -29,3 +29,7 @@ Check if performance has changed after latest changes
 Should terrain_shader be split into one shader for each terrain type? That would remove need for if statements in the shader
 
 Why is there a skybox model floating outside the terrain? Visible if "real" skybox rendering is disabled.
+
+Why is the clipping distance longer at the edges of the screen?
+
+Test if latest changes are compatible with the included makefile
