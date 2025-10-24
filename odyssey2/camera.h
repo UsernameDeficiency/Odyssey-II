@@ -26,18 +26,18 @@ public:
 	float aspect_ratio{ 16.0f / 9.0f };
 	// Camera options
 	// Initial camera settings
-	const float cam_speed{ 120.0f };
-	const float cam_sensitivity{ 0.2f };
-	const float cam_fov{ 68.0f }; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
-	const float cam_height{ 64.0f }; // Camera height above ground
-	const float vp_near{ 2.7f }; // Near distance for frustum, lower this if skybox is cut off at screen edges
-	const float vp_far{ 16384.0f }; // Far distance for frustum
+	const float cam_fov; // Vertical field of view (y) in degrees (68 deg vertical = 100 deg horizontal fov)
+	const float cam_height; // Camera height above ground
+	const float cam_sensitivity;
+	const float cam_speed;
+	const float vp_near; // Near distance for frustum, lower this if skybox is cut off at screen edges
+	const float vp_far; // Far distance for frustum
+	// Minimum height, keeps camera above water level
+	const float swim_height;
 	// Variable camera settings set by actions like running, flying, zooming
 	float movement_speed{ cam_speed };
 	float mouse_sens{ cam_sensitivity };
-	float height{ cam_height };
-	// Minimum height, keeps camera above water level
-	const float swim_height;
+	float height;
 	bool flying{ false };
 
 	// Keyboard state for controls

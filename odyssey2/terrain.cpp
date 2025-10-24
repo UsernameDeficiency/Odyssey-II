@@ -20,7 +20,8 @@ Terrain::Terrain(const unsigned int world_size, const float world_xz_scale) : wo
 // TODO: Move into constructor
 Model* Terrain::generate_terrain()
 {
-	const float tex_scale{ 1.0f / 4.0f }; // Scaling of texture coordinates
+	// Calculate a scale for texture coordinates that is "reasonable" around texture_scale == 1.0f regardless of world_size
+	const float tex_scale{ 64.0f / read_value_from_ini("texture_scale", 2.0f) / world_size }; // Scaling of texture coordinates
 
 	// Build procedural terrain and smooth result
 	std::vector<float> proc_terrain = diamondsquare(world_size);

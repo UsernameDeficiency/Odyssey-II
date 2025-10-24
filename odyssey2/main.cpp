@@ -153,7 +153,8 @@ int main()
 	// Generate terrain
 	// TODO: Don't fail if world_size is not a power of two. Fallback to nearest power of two?
 	const unsigned int world_size{ read_value_from_ini("world_size", 128u) };
-	const float world_xz_scale{ read_value_from_ini("world_xz_scale", 32.0f) };
+	// Horizontal scaling of terrain, adjusted so that values close to 1.0 are "reasonable" regardless of world_size
+	const float world_xz_scale{ read_value_from_ini("world_xz_scale", 2.0f) / world_size * 2048u };
 	const Terrain terrain{ world_size, world_xz_scale };
 
 	Shader *terrain_shader, *water_shader;

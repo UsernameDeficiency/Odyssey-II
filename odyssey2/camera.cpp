@@ -1,11 +1,19 @@
 #include "camera.h"
+#include "io.h"
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 
 /* Abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL.
 	Based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera */
-Camera::Camera(const float sea_height) : swim_height(sea_height + cam_height / 3)
+Camera::Camera(const float sea_height) : cam_fov(read_value_from_ini("cam_fov", 68.0f)),
+										 cam_height(read_value_from_ini("cam_height", 64.0f)),
+										 cam_sensitivity(read_value_from_ini("cam_sensitivity", 0.2f)),
+										 cam_speed(read_value_from_ini("cam_speed", 120.0f)),
+										 vp_near(read_value_from_ini("vp_near", 2.7f)),
+										 vp_far(read_value_from_ini("vp_far", 16384.0f)),
+										 swim_height(sea_height + cam_height / 3),
+										 height(cam_height)
 {
 	projection = glm::perspective(glm::radians(cam_fov), aspect_ratio, vp_near, vp_far);
 	update_camera_vectors(); // set front, right, up
