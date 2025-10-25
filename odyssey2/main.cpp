@@ -1,6 +1,6 @@
 #include "callback.h"
 #include "camera.h"
-#include "io.h"
+#include "settings_cache.h"
 #include "shader.h"
 #include "skybox.h"
 #include "terrain.h"
@@ -28,7 +28,7 @@ struct Terrain_texture_ids
 static GLFWwindow* init_gl()
 {
 	// Enable/disable debugging context and prints
-	const bool debug_context{ read_value_from_ini("debug_context", false) };
+	const bool debug_context{ get_setting("debug_context", false) };
 
 	// --------- Initialize GLFW ---------
 	if (!glfwInit())
@@ -49,18 +49,18 @@ static GLFWwindow* init_gl()
 	}
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	// Anti aliasing
-	const unsigned int msaa_samples{ read_value_from_ini("msaa_samples", 2u) };
+	const unsigned int msaa_samples{ get_setting("msaa_samples", 2u) };
 	glfwWindowHint(GLFW_SAMPLES, msaa_samples);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
 
-	unsigned requested_window_w{ read_value_from_ini("window_w", 1280u) };
-	unsigned requested_window_h{ read_value_from_ini("window_h", 720u) };
+	unsigned requested_window_w{ get_setting("window_w", 1280u) };
+	unsigned requested_window_h{ get_setting("window_h", 720u) };
 	GLFWwindow* window = glfwCreateWindow(requested_window_w, requested_window_h, "Odyssey II", NULL, NULL);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(read_value_from_ini("vsync_frames", 1));
+	glfwSwapInterval(get_setting("vsync_frames", 1));
 
 	// --------- Initialize GLAD ---------
 	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
@@ -147,16 +147,16 @@ static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 
 int main()
 {
-	std::cout << read_value_from_ini<std::string>("greeting", "");
+	std::cout << get_setting<std::string>("greeting", "");
 
 	// Initiate OpenGL and graphics
 	GLFWwindow* window{ init_gl() };
 
 	// Generate terrain
 	// TODO: Don't fail if world_size is not a power of two. Fallback to nearest power of two?
-	const unsigned int world_size{ read_value_from_ini("world_size", 128u) };
+	const unsigned int world_size{ get_setting("world_size", 128u) };
 	// Horizontal scaling of terrain, adjusted so that values close to 1.0 are "reasonable" regardless of world_size
-	const float world_xz_scale{ read_value_from_ini("world_xz_scale", 2.0f) / world_size * 2048u };
+	const float world_xz_scale{ get_setting("world_xz_scale", 2.0f) / world_size * 2048u };
 	const Terrain terrain{ world_size, world_xz_scale };
 
 	Shader *terrain_shader, *water_shader;

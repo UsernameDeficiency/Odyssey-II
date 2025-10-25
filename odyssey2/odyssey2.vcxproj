@@ -28,7 +28,7 @@
     <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="io.h" />
+    <ClInclude Include="settings_cache.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="skybox.h" />
     <ClInclude Include="terrain.h" />

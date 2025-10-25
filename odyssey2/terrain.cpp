@@ -1,7 +1,7 @@
 /* Code for terrain generation and filtering */
 #include "terrain.h"
 #include "glm/vec3.hpp"
-#include "io.h"
+#include "settings_cache.h"
 #include "model.h"
 #include <algorithm>
 #include <cmath>
@@ -21,7 +21,7 @@ Terrain::Terrain(const unsigned int world_size, const float world_xz_scale) : wo
 Model* Terrain::generate_terrain()
 {
 	// Calculate a scale for texture coordinates that is "reasonable" around texture_scale == 1.0f regardless of world_size
-	const float tex_scale{ 64.0f / read_value_from_ini("texture_scale", 2.0f) / world_size }; // Scaling of texture coordinates
+	const float tex_scale{ 64.0f / get_setting("texture_scale", 2.0f) / world_size }; // Scaling of texture coordinates
 
 	// Build procedural terrain and smooth result
 	std::vector<float> proc_terrain = diamondsquare(world_size);
@@ -249,8 +249,8 @@ static float randnum(const float max, const float min)
 	for the random numbers. width must be (2^n)*(2^n) in size for some integer n.*/
 std::vector<float> Terrain::diamondsquare(const unsigned int width)
 {
-	float weight{ read_value_from_ini("weight", 2000.0f) }; // Base weight for randomized values in diamond-square algorithm
-	const unsigned int seed{ read_value_from_ini("seed", 64u) };
+	float weight{ get_setting("weight", 2000.0f) }; // Base weight for randomized values in diamond-square algorithm
+	const unsigned int seed{ get_setting("seed", 64u) };
 	srand(seed);
 	std::vector<std::vector<float>> terrain{ (size_t)width, std::vector<float>((size_t)width) };
 

@@ -23,9 +23,6 @@
     <ClCompile Include="terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util_misc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,11 +32,11 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="util_misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -52,10 +49,13 @@
     <ClInclude Include="callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io.h">
+    <ClInclude Include="settings_cache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -78,5 +78,7 @@
     <None Include="shader\water.vert">
       <Filter>shader</Filter>
     </None>
+    <None Include="settings.ini" />
+    <None Include="todo" />
   </ItemGroup>
 </Project>
