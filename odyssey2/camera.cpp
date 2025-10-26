@@ -1,19 +1,20 @@
 #include "camera.h"
 #include "settings_cache.h"
 #include <glad/glad.h>
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 
 /* Abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL.
 	Based on code by Joey de Vries: https://learnopengl.com/Getting-started/Camera */
 Camera::Camera(const float sea_height) : cam_fov(get_setting("cam_fov", 68.0f)),
-										 cam_height(get_setting("cam_height", 64.0f)),
-										 cam_sensitivity(get_setting("cam_sensitivity", 0.2f)),
-										 cam_speed(get_setting("cam_speed", 120.0f)),
-										 vp_near(get_setting("vp_near", 2.7f)),
-										 vp_far(get_setting("vp_far", 16384.0f)),
-										 swim_height(sea_height + cam_height / 3),
-										 height(cam_height)
+                                         cam_height(get_setting("cam_height", 64.0f)),
+                                         cam_sensitivity(get_setting("cam_sensitivity", 0.2f)),
+                                         cam_speed(get_setting("cam_speed", 120.0f)),
+                                         vp_near(get_setting("vp_near", 2.7f)),
+                                         vp_far(get_setting("vp_far", 16384.0f)),
+                                         swim_height(sea_height + cam_height / 3),
+                                         height(cam_height)
 {
 	projection = glm::perspective(glm::radians(cam_fov), aspect_ratio, vp_near, vp_far);
 	update_camera_vectors(); // set front, right, up
@@ -92,10 +93,8 @@ void Camera::process_mouse_movement(const float x_offset, const float y_offset)
 	pitch += y_offset * mouse_sens;
 
 	// Make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
+	pitch = std::min(pitch, 89.0f);
+	pitch = std::max(pitch, -89.0f);
 
 	// Update front, right and up Vectors using the updated Euler angles
 	update_camera_vectors();
@@ -107,7 +106,7 @@ void Camera::process_mouse_movement(const float x_offset, const float y_offset)
 void Camera::set_pos(const std::vector<GLfloat>& vertex_array, const float world_xz_scale)
 {
 	// #vertices in 1 dimension (world_size)
-	unsigned int num_vert_1D = static_cast<unsigned int>(sqrt(vertex_array.size() / 3));
+	const unsigned int num_vert_1D = static_cast<unsigned int>(sqrt(vertex_array.size() / 3));
 	// Keep player in bounds, padding ensures arrays stay in bound during interpolation
 	const float world_limit = world_xz_scale * (num_vert_1D - 1);
 	if (position.x < 0.0f)
@@ -144,7 +143,7 @@ void Camera::set_pos(const std::vector<GLfloat>& vertex_array, const float world
 void Camera::update_camera_vectors()
 {
 	// Calculate the new front vector
-	glm::vec3 front_tmp{
+	const glm::vec3 front_tmp{
 		cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
 		sin(glm::radians(pitch)),
 		sin(glm::radians(yaw)) * cos(glm::radians(pitch))

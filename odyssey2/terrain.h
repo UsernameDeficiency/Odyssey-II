@@ -38,5 +38,5 @@ private:
 
 	/* Create a heightmap of size width*width using the diamond square algorithm with
 		base offset weight for the random numbers. */
-	std::vector<float> diamondsquare(const unsigned int width);
+	static std::vector<float> diamond_square(const unsigned int width);
 };

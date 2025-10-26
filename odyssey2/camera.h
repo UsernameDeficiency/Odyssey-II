@@ -57,7 +57,7 @@ public:
 		{ GLFW_KEY_F3, GLFW_RELEASE }
 	};
 
-	Camera(const float sea_height);
+	explicit Camera(const float sea_height);
 
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 	glm::mat4 get_view_matrix() const;

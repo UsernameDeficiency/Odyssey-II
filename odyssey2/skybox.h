@@ -8,7 +8,7 @@
 class Skybox
 {
 public:
-	Skybox(const glm::vec3& fog_color);
+	explicit Skybox(const glm::vec3& fog_color);
 	~Skybox();
 
 	void bind() const;
@@ -18,7 +18,7 @@ public:
 	void change_active_texture_set();
 
 	// Set if fog effect should be rendered in skybox shader
-	void set_fog(bool enabled);
+	void set_fog(bool enabled) const;
 
 private:
 	size_t active_texture_index;

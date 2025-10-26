@@ -7,7 +7,7 @@
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 // Handle mouse movement
-void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);
+void cursor_pos_callback(GLFWwindow* window, double x_pos, double y_pos);
 
 // Handle window resize by updating the projection matrix and viewport size
 void fb_size_callback(GLFWwindow* window, int width, int height);

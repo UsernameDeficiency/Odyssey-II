@@ -17,4 +17,6 @@
     SortIncludes: CaseInsensitive, # Ensure GLFW is sorted after glad
     TabWidth: 4,
     UseTab: ForContinuationAndIndentation,
+	InsertNewlineAtEOF: true,
+	KeepEmptyLinesAtEOF: true,
 }

@@ -15,7 +15,7 @@
 // Exit the program on unrecoverable error, printing an error string to stderr
 static void exit_on_error(const char* error)
 {
-	std::cerr << "Unrecoverable error: " << error << std::endl;
+	std::cerr << "Unrecoverable error: " << error << '\n';
 	exit(EXIT_FAILURE);
 }
 
@@ -54,9 +54,9 @@ static GLFWwindow* init_gl()
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Don't show window until loading finished
 
-	unsigned requested_window_w{ get_setting("window_w", 1280u) };
-	unsigned requested_window_h{ get_setting("window_h", 720u) };
-	GLFWwindow* window = glfwCreateWindow(requested_window_w, requested_window_h, "Odyssey II", NULL, NULL);
+	unsigned target_window_w{ get_setting("window_w", 1280u) };
+	unsigned target_window_h{ get_setting("window_h", 720u) };
+	GLFWwindow* window = glfwCreateWindow(target_window_w, target_window_h, "Odyssey II", nullptr, nullptr);
 	if (!window)
 		exit_on_error("GLFW window creation failed");
 	glfwMakeContextCurrent(window);
@@ -91,7 +91,7 @@ static GLFWwindow* init_gl()
 }
 
 // Set up terrain, skybox and water shaders
-// TODO: Move fog_color and textures to settings.ini
+// TODO: Move texture paths to settings.ini
 // TODO: Make use of all the included textures. Blending between textures? Maybe different texture sets for different regions?
 static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 	Shader*& terrain_shader, Shader*& water_shader, const Terrain& terrain, const glm::vec3& fog_color)
@@ -99,10 +99,10 @@ static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 	// Load terrain textures and upload to texture units
 	terrain_shader = new Shader("shader/terrain.vert", "shader/terrain.frag");
 	terrain_shader->use();
-	terrain_shader->load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
-	terrain_shader->load_stb_texture_ref("tex/burned_ground_01.png", &terrain_tex_ids.grass_tex, false);
-	terrain_shader->load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.rock_tex, false);
-	terrain_shader->load_stb_texture_ref("tex/brown_mud_rocks_01.png", &terrain_tex_ids.bottom_tex, false);
+	Shader::load_stb_texture_ref("tex/snow_02_translucent.png", &terrain_tex_ids.snow_tex, false);
+	Shader::load_stb_texture_ref("tex/burned_ground_01.png", &terrain_tex_ids.grass_tex, false);
+	Shader::load_stb_texture_ref("tex/rock_06.png", &terrain_tex_ids.rock_tex, false);
+	Shader::load_stb_texture_ref("tex/brown_mud_rocks_01.png", &terrain_tex_ids.bottom_tex, false);
 	terrain_shader->set_int("snowTex", 0);
 	terrain_shader->set_int("grassTex", 1);
 	terrain_shader->set_int("rockTex", 2);
@@ -118,7 +118,7 @@ static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 	terrain_shader->set_float("snowHeight", terrain.max_height - terrain_height / 3);
 
 	// Initialize water surface
-	const float world_total_size = terrain.world_xz_scale * (terrain.world_size - 1);
+	const float world_total_size = terrain.world_xz_scale * static_cast<float>(terrain.world_size - 1);
 	water_shader = new Shader("shader/water.vert", "shader/water.frag");
 	water_shader->use();
 	water_shader->set_bool("drawFog", false);
@@ -142,7 +142,7 @@ static void init_graphics(Terrain_texture_ids& terrain_tex_ids,
 	glBindBuffer(GL_ARRAY_BUFFER, water_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 2ull * 9ull * sizeof(GLfloat), water_surface_vert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(glGetAttribLocation(water_shader->id, "inPos"));
-	glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(glGetAttribLocation(water_shader->id, "inPos"), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 }
 
 int main()
@@ -161,7 +161,10 @@ int main()
 
 	Shader *terrain_shader, *water_shader;
 	Terrain_texture_ids terrain_tex{};
-	const glm::vec3 fog_color{ glm::vec3(0.7, 0.7, 0.7) };
+	const auto fog_color{ glm::vec3(
+		get_setting("fog_r", 0.8f),
+		get_setting("fog_g", 0.8f),
+		get_setting("fog_b", 0.8f)) };
 	Skybox skybox{ fog_color };
 	init_graphics(terrain_tex, terrain_shader, water_shader, terrain, fog_color);
 
@@ -194,7 +197,7 @@ int main()
 		double current_time{ glfwGetTime() };
 		double delta_time{ current_time - last_time };
 		last_time = current_time;
-		camera.process_keyboard(terrain.terrain_model->vertexArray, terrain.world_xz_scale, delta_time); // Update player state
+		camera.process_keyboard(terrain.terrain_model->vertex_array, terrain.world_xz_scale, delta_time); // Update player state
 		// Toggle fog
 		if (camera.key_state[GLFW_KEY_F1] == GLFW_PRESS)
 		{
@@ -267,20 +270,20 @@ int main()
 		glBindVertexArray(terrain.terrain_model->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, terrain.terrain_model->vb);
 
-		glVertexAttribPointer(terr_vert_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(terr_vert_loc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(terr_vert_loc);
 
 		// Normals
 		glBindBuffer(GL_ARRAY_BUFFER, terrain.terrain_model->nb);
-		glVertexAttribPointer(terr_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(terr_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(terr_normal_loc);
 
 		// VBO for texture coordinate data
 		glBindBuffer(GL_ARRAY_BUFFER, terrain.terrain_model->tb);
-		glVertexAttribPointer(terr_tex_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(terr_tex_loc, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(terr_tex_loc);
 
-		glDrawElements(GL_TRIANGLES, terrain.terrain_model->numIndices, GL_UNSIGNED_INT, 0L);
+		glDrawElements(GL_TRIANGLES, terrain.terrain_model->num_indices, GL_UNSIGNED_INT, nullptr);
 
 		// --------- Draw water surface ---------
 		water_shader->use();

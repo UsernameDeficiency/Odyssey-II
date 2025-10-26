@@ -2,13 +2,12 @@
 #include "glm/ext/matrix_float3x3.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "shader.h"
-#include <iostream>
 #include <stb_image.h>
 #include <stdexcept>
 #include <vector>
 
 Skybox::Skybox(const glm::vec3& fog_color)
-	: active_texture_index{}, shader(Shader{"shader/skybox.vert", "shader/skybox.frag"}), vbo{}
+	: active_texture_index{}, shader(Shader{ "shader/skybox.vert", "shader/skybox.frag" }), vbo{}
 {
 	shader.use();
 	shader.set_bool("drawFog", false);
@@ -28,7 +27,7 @@ Skybox::~Skybox()
 // Load all sets of skybox textures
 void Skybox::load_cubemap()
 {
-	// TODO: Move skybox textures into settings file
+	// TODO: Move skybox textures into settings file. How to create a vector from the settings file?
 	const std::vector<std::string> skybox_paths = {
 		"stormydays", "hw_morning", "sb_frozen", "ame_starfield"
 	};
@@ -73,7 +72,7 @@ void Skybox::load_cubemap()
 
 void Skybox::setup_vertices()
 {
-	const GLfloat skybox_vertices[]{
+	constexpr GLfloat skybox_vertices[]{
 		-5.0f, 5.0f, -5.0f, -5.0f, -5.0f, -5.0f, 5.0f, -5.0f, -5.0f,
 		5.0f, -5.0f, -5.0f, 5.0f, 5.0f, -5.0f, -5.0f, 5.0f, -5.0f,
 
@@ -112,7 +111,7 @@ void Skybox::draw(const glm::mat4& view_matrix, const glm::mat4& projection) con
 	glDepthMask(GL_FALSE); // Disable depth writes
 	shader.use();
 	bind();
-	glm::mat4 world_to_view{ glm::mat4(glm::mat3(view_matrix)) }; // Remove translation from the view matrix
+	const auto world_to_view{ glm::mat4(glm::mat3(view_matrix)) }; // Remove translation from the view matrix
 	shader.set_mat4_f("worldToView", world_to_view);
 	shader.set_mat4_f("projection", projection);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -124,7 +123,7 @@ void Skybox::change_active_texture_set()
 	active_texture_index = (active_texture_index + 1) % textures.size();
 }
 
-void Skybox::set_fog(bool enabled)
+void Skybox::set_fog(const bool enabled) const
 {
 	shader.use();
 	shader.set_bool("drawFog", enabled);

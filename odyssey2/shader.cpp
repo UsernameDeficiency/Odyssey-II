@@ -58,13 +58,13 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 	// Vertex shader
 	unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
 	const char* v_shader_code = vertex_code.c_str();
-	glShaderSource(vertex, 1, &v_shader_code, NULL);
+	glShaderSource(vertex, 1, &v_shader_code, nullptr);
 	glCompileShader(vertex);
 	check_compile_errors(vertex, "VERTEX");
 	// Fragment shader
 	unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
 	const char* f_shader_code = fragment_code.c_str();
-	glShaderSource(fragment, 1, &f_shader_code, NULL);
+	glShaderSource(fragment, 1, &f_shader_code, nullptr);
 	glCompileShader(fragment);
 	check_compile_errors(fragment, "FRAGMENT");
 	// Shader program
@@ -159,7 +159,7 @@ void Shader::check_compile_errors(unsigned int shader, const std::string& type)
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 		if (!success)
 		{
-			glGetShaderInfoLog(shader, 1024, NULL, info_log);
+			glGetShaderInfoLog(shader, 1024, nullptr, info_log);
 			std::cerr << "SHADER_COMPILATION_ERROR of type: " << type << "\n"
 					  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
 		}
@@ -169,7 +169,7 @@ void Shader::check_compile_errors(unsigned int shader, const std::string& type)
 		glGetProgramiv(shader, GL_LINK_STATUS, &success);
 		if (!success)
 		{
-			glGetProgramInfoLog(shader, 1024, NULL, info_log);
+			glGetProgramInfoLog(shader, 1024, nullptr, info_log);
 			std::cerr << "PROGRAM_LINKING_ERROR of type: " << type << "\n"
 					  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
 		}

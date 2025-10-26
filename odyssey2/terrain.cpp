@@ -1,8 +1,8 @@
 /* Code for terrain generation and filtering */
 #include "terrain.h"
 #include "glm/vec3.hpp"
-#include "settings_cache.h"
 #include "model.h"
+#include "settings_cache.h"
 #include <algorithm>
 #include <cmath>
 #include <glm/gtc/type_ptr.hpp>
@@ -17,14 +17,13 @@ Terrain::Terrain(const unsigned int world_size, const float world_xz_scale) : wo
 }
 
 // Build Model from generated terrain
-// TODO: Move into constructor
 Model* Terrain::generate_terrain()
 {
 	// Calculate a scale for texture coordinates that is "reasonable" around texture_scale == 1.0f regardless of world_size
 	const float tex_scale{ 64.0f / get_setting("texture_scale", 2.0f) / world_size }; // Scaling of texture coordinates
 
 	// Build procedural terrain and smooth result
-	std::vector<float> proc_terrain = diamondsquare(world_size);
+	std::vector<float> proc_terrain = diamond_square(world_size);
 	mean(proc_terrain, 5);
 
 	const size_t vertex_count = static_cast<size_t>(world_size) * world_size;
@@ -101,7 +100,7 @@ Model* Terrain::generate_terrain()
 	}
 
 	// Create Model and upload to GPU (formerly LoadModelData)
-	Model* m = new Model(std::move(vertex_array),
+	auto m = new Model(std::move(vertex_array),
 		static_cast<GLsizei>(vertex_count), static_cast<GLsizei>(triangle_count) * 3);
 
 	glGenVertexArrays(1, &m->vao);
@@ -110,12 +109,12 @@ Model* Terrain::generate_terrain()
 	glGenBuffers(1, &m->nb);
 	glGenBuffers(1, &m->tb);
 
-	const GLsizeiptr vert_size = m->numVertices * sizeof(GLfloat);
+	const GLsizeiptr vert_size = m->num_vertices * sizeof(GLfloat);
 	glBindVertexArray(m->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
-	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->vertexArray.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, m->vertex_array.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices * sizeof(GLuint), index_array.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->num_indices * sizeof(GLuint), index_array.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, m->nb);
 	glBufferData(GL_ARRAY_BUFFER, vert_size * 3, normal_array.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, m->tb);
@@ -127,7 +126,7 @@ Model* Terrain::generate_terrain()
 // Do filter_size-point moving average filtering of arr
 void Terrain::mean(std::vector<float>& arr, const unsigned int filter_size)
 {
-	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
+	const size_t arr_width = static_cast<size_t>(sqrt(arr.size())); // width = height of terrain array
 	std::vector<float> arr_tmp(arr.size());
 
 	// Horizontal filter
@@ -135,13 +134,13 @@ void Terrain::mean(std::vector<float>& arr, const unsigned int filter_size)
 	{
 		for (size_t col = 0; col < arr_width; col++)
 		{
-			size_t i = row * arr_width + col; // Index of element being smoothed
+			const size_t i = row * arr_width + col; // Index of element being smoothed
 			float avg = arr[i]; // Initialize average with current element
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_size / 2; offset++)
 			{
-				float scale = 1 / static_cast<float>(pow(2, offset)); // Lower scaling for high offsets
+				const float scale = 1 / static_cast<float>(pow(2, offset)); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
 				// Left value
@@ -165,13 +164,13 @@ void Terrain::mean(std::vector<float>& arr, const unsigned int filter_size)
 	{
 		for (size_t row = 0; row < arr_width; row++)
 		{
-			size_t i = row * arr_width + col; // Index of element being smoothed
+			const size_t i = row * arr_width + col; // Index of element being smoothed
 			float avg = arr_tmp[i]; // Initialize average with current element
 			float normalization = 1; // Normalize calculated average
 
 			for (size_t offset = 1; offset <= filter_size / 2; offset++)
 			{
-				float scale = 1 / static_cast<float>(pow(2, offset)); // Lower scaling for high offsets
+				const float scale = 1 / static_cast<float>(pow(2, offset)); // Lower scaling for high offsets
 				normalization += 2 * scale;
 
 				// Upper value
@@ -194,20 +193,20 @@ void Terrain::mean(std::vector<float>& arr, const unsigned int filter_size)
 // Do median filtering on arr with filter_size number of elements in each direction
 void Terrain::median(std::vector<float>& arr, const unsigned int filter_size)
 {
-	size_t arr_width = (size_t)sqrt(arr.size()); // width = height of terrain array
-	std::vector<float> arr_tmp = std::vector<float>(arr.size());
-	std::vector<float> median(4 * ((size_t)filter_size / 2) + 1);
+	const size_t arr_width = static_cast<size_t>(sqrt(arr.size())); // width = height of terrain array
+	auto arr_tmp = std::vector<float>(arr.size());
+	std::vector<float> median(4 * (static_cast<size_t>(filter_size) / 2) + 1);
 
 	// Horizontal filter
 	for (size_t row = 0; row < arr_width; row++)
 	{
 		for (size_t col = 0; col < arr_width; col++)
 		{
-			size_t i = row * arr_width + col; // Index of element being smoothed
+			const size_t i = row * arr_width + col; // Index of element being smoothed
 			median[0] = arr[i];
 			for (size_t offset = 1; offset <= filter_size / 2; offset++)
 			{
-				size_t j = 4 * (offset - 1); // Index for median vector
+				const size_t j = 4 * (offset - 1); // Index for median vector
 				// Left value
 				if (col < offset)
 					median[j + 1] = arr[i - offset + arr_width]; // Out of bounds, wrap to end of row
@@ -247,12 +246,12 @@ static float randnum(const float max, const float min)
 
 /* Create a heightmap of size width*width using the diamond square algorithm with base offset weight
 	for the random numbers. width must be (2^n)*(2^n) in size for some integer n.*/
-std::vector<float> Terrain::diamondsquare(const unsigned int width)
+std::vector<float> Terrain::diamond_square(const unsigned int width)
 {
 	float weight{ get_setting("weight", 2000.0f) }; // Base weight for randomized values in diamond-square algorithm
 	const unsigned int seed{ get_setting("seed", 64u) };
 	srand(seed);
-	std::vector<std::vector<float>> terrain{ (size_t)width, std::vector<float>((size_t)width) };
+	std::vector<std::vector<float>> terrain{ width, std::vector<float>(width) };
 
 	/* Initialize corner values. Since the width for this implementation is 2^n rather than 2^n+1,
 		the right and lower edges are "cut off" and terrain[0] wraps around. */
@@ -282,20 +281,20 @@ std::vector<float> Terrain::diamondsquare(const unsigned int width)
 		{
 			for (size_t col = 0; col < width; col += step)
 			{
-				size_t r_left = row + step / 2;
-				size_t c_up = col + step / 2;
+				const size_t r_left = row + step / 2;
+				const size_t c_up = col + step / 2;
 
 				// Being lazy here and making sure all indices are in bounds, even if some will never go out of bounds.
-				float mean_up = (terrain[(row - step / 2 + width) % width][c_up] + // Above, make sure it is not negative
-									terrain[row][(c_up - step / 2 + width) % width] + // Left, make sure it is not negative
-									terrain[row][(c_up + step / 2) % width] + // Right
-									terrain[(r_left % width)][c_up]) /
-								4; // Below
-				float mean_left = (terrain[(r_left - step / 2 + width) % width][col] +
-									  terrain[r_left][(col - step / 2 + width) % width] +
-									  terrain[r_left][c_up % width] +
-									  terrain[(r_left + step / 2) % width][col]) /
-								  4;
+				const float mean_up = (terrain[(row - step / 2 + width) % width][c_up] + // Above, make sure it is not negative
+										  terrain[row][(c_up - step / 2 + width) % width] + // Left, make sure it is not negative
+										  terrain[row][(c_up + step / 2) % width] + // Right
+										  terrain[(r_left % width)][c_up]) /
+									  4; // Below
+				const float mean_left = (terrain[(r_left - step / 2 + width) % width][col] +
+											terrain[r_left][(col - step / 2 + width) % width] +
+											terrain[r_left][c_up % width] +
+											terrain[(r_left + step / 2) % width][col]) /
+										4;
 
 				terrain[row][c_up] = mean_up + randnum(weight, -weight);
 				terrain[r_left][col] = mean_left + randnum(weight, -weight);
