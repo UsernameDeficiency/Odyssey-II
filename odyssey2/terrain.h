@@ -1,6 +1,7 @@
 /* Code for terrain generation and filtering */
 #pragma once
 #include "model.h"
+#include <cfloat>
 #include <vector>
 
 // Generate terrain and save it into a Model
